@@ -1,0 +1,21 @@
+{
+    "name" : "net-tools/js-core",
+	
+    "description" : "Composer library for Javascript core functions",
+	
+	"type": "library",
+	
+	"require" : {
+	},
+	
+    "license" : "MIT",
+
+    "authors": [
+        {
+            "name": "Pierre",
+            "email": "dev@net-tools.ovh",
+            "role": "Developer"
+        }
+    ]
+
+}
