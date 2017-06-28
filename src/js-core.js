@@ -587,7 +587,7 @@ nettools.jscore = nettools.jscore || {
     {
         // si navigateur moderne, utiliser fonction intégrée
         if ( window['atob'] )
-            return window.atob;//function(data){return atob(data);}
+            return window.atob.bind(window);//function(data){return atob(data);}
         else
             // sinon fonction perso, moins optimisée
             return function(data)
