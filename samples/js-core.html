@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>com_android</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="js-core.css">
+   
+    <script src="../src/js-core.js"></script>
+    <script src="js-core.js"></script>
+
+    
+    <style>
+                
+        div.flex {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        div.flex > div {
+            width:45%;
+        }
+        
+        div.flex > div > h1 {
+            margin-top:0;
+        }
+        
+        @media screen and (max-width:1024px) {
+            div.flex > div {
+                width:100%;
+            }
+
+        }
+        
+        
+    </style>
+    
+    
+    <script>
+    
+    var test = {
+        
+        dumpObject : function(o)
+        {
+            var ret = [];
+            for ( var p in o )
+                ret.push(p + ':' + o[p]);
+            
+            return ret.join('\n');
+        },
+        
+        
+        dumpQuerystring : function(u)
+        {
+            sample.output('Querystring=' + test.dumpObject(u.getQuerystringObject()) +
+                            '\ntoString()=' + u.toString());
+        },
+        
+        
+        dumpUrl : function(u)
+        {
+            sample.output('Resource=' + u.getResource() + 
+                          '\nQuerystring=' + test.dumpObject(u.getQuerystring().getQuerystringObject()) +
+                                '\nQuerystring.toString()=' + u.getQuerystring().toString() +
+                          '\nUrl.toString()=' + u.toString());
+        }
+        
+    }
+    
+    </script>
+    
+
+</head>
+
+<body>
+    <div id="output"></div>
+    
+
+    <div class="flex">
+        <div class="sampleBox">
+            <h1>String functions</h1>
+            <div id="sampleString">   
+                <p>removeDiacritics : <input type="text"><input type="Submit" value="envoyer" onclick="sample.output(nettools.jscore.removeDiacritics(this.previousSibling.value));"></p>
+                <p>escape : <input type="text"><input type="Submit" value="envoyer" onclick="sample.output(nettools.jscore.escape(this.previousSibling.value));"></p>
+                <p>unescape : <input type="text"><input type="Submit" value="envoyer" onclick="sample.output(nettools.jscore.unescape(this.previousSibling.value));"></p>
+                <p>htmlentities : <input type="text"><input type="Submit" value="envoyer" onclick="sample.output(this.previousSibling.value = nettools.jscore.htmlentities(this.previousSibling.value));"></p>
+                <p>querystringAppend : <input type="text" value="key1=value1"><input type="Submit" value="envoyer" onclick="sample.output(nettools.jscore.querystringAppend(this.previousSibling.value, 'key2', '=val&2'));"></p>
+            </div>
+             
+        </div>
+    
+       
+        <div class="sampleBox">
+            <h1>Array functions</h1>
+            <div id="sampleArray">   
+                <p>arrayFilter : <input type="text" value="1,2,,,3"><input type="Submit" value="envoyer" onclick="sample.output('[' + nettools.jscore.arrayFilter(this.previousSibling.value.split(','), true, true).join(',') + ']');"></p>
+            </div>
+             
+        </div>
+    
+       
+        <div class="sampleBox">
+            <h1>nettools.jscore.Querystring &amp; Url</h1>
+            <div id="sampleUrl">   
+                <p>Querystring constructor : <input type="text" value="key1=value1&key2=%26&key3="><input type="Submit" value="envoyer" onclick="test.dumpQuerystring(new nettools.jscore.Querystring(this.previousSibling.value));"></p>
+                <p>Url constructor : <input type="text" value="myfile.php?key1=value1&key2=%26&key3="><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
+                <p>Url constructor : <input type="text" value="myfile.php?"><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
+                <p>Url constructor : <input type="text" value="myfile.php"><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
+                <p>Add parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="text" value="key3"><input type="text" value="v=&? /"><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.previousSibling.previousSibling.value).addParameter(this.previousSibling.previousSibling.value, this.previousSibling.value));"></p>
+                <p>Remove key1 parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value).removeParameter('key1'));"></p>
+            </div>
+             
+        </div>
+
+
+    </div>
+
+</body>
+</html>
