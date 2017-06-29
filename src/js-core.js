@@ -2051,7 +2051,7 @@ nettools.jscore.validator.RealTimeValidator = function(rtcb){
 		var inputsl = inputs.length;
 		for ( var i = 0; i < inputsl ; i++ )
 			inputs[i].onchange = __handler;
-	},
+	};
 	
 	
         
@@ -2065,7 +2065,7 @@ nettools.jscore.validator.RealTimeValidator = function(rtcb){
 		var elementsl = f.elements.length;
 		for ( var i = 0 ; i < elementsl ; i++ )
 			_inputonchange.call(f.elements[i]);
-	}
+	};
 
 	// ---- /PROTECTED MEMBERS ----
 };
@@ -2673,6 +2673,8 @@ nettools.jscore.aes_decrypt = function(str, key)
 
 
 
+
+
 // ==== URL ====
 
 /**
@@ -2978,8 +2980,148 @@ nettools.jscore.Url.prototype.removeParameter = function(key)
 
 
 
+// ==== SIZE ====
+	
+/** 
+ * Size object constructor : handle sizes (arithmetics) and preserve unit
+ *
+ * @param int|string s Size ; if no unit given, we assume it's 'px'
+ */
+nettools.jscore.Size = function(s)
+{
+    if ( s == null )
+    {
+        this.size = null;
+        this.unit = null;
+        return;
+    }
 
 
+    var regs = null;
+    if ( regs = (s).toString().match(/^([0-9]+)([a-z]+)$/) )
+    {
+        this.size = parseInt(regs[1]);
+        this.unit = String(regs[2]);
+    }
+    else
+    {
+        this.size = parseInt(s);
+        this.unit = 'px';
+    }
+}
+
+
+
+/** 
+ * Does the size exists (not null) ?
+ *
+ * @return bool
+ */
+nettools.jscore.Size.prototype.isNull = function()
+{
+    return (this.size == null);
+}
+
+
+
+/** 
+ * Is size positive ?
+ *
+ * @return bool 
+ */
+nettools.jscore.Size.prototype.isPositive = function()
+{
+    return (this.size >= 0 );
+}
+
+
+
+/** 
+ * Is size negative ?
+ *
+ * @return bool 
+ */
+nettools.jscore.Size.prototype.isNegative = function()
+{
+    return (this.size < 0 );
+}
+
+
+
+/**
+ * Negate the size sign (eg. 5px becomes -5px)
+ *
+ * @return Size Returns a new Size object
+ */
+nettools.jscore.Size.prototype.negate = function()
+{
+    if ( this.isNull() )
+        return new nettools.jscore.Size(null);
+    
+    return new nettools.jscore.Size((-this.size) + this.unit);
+}
+
+
+
+/**
+ * Get the absolute value of size (eg. -5px becomes 5px ; 5px stays 5px)
+ *
+ * @return Size Returns a new Size object
+ */
+nettools.jscore.Size.prototype.abs = function()
+{
+    if ( this.isNull() )
+        return new nettools.jscore.Size(null);
+    
+    return new nettools.jscore.Size(Math.abs(this.size) + this.unit);
+}
+
+
+
+/**
+ * Convert the Size object to a string (size with unit appended)
+ *
+ * @return string
+ */
+nettools.jscore.Size.prototype.toString = function()
+{
+    if ( this.isNull() )
+        return '';
+    
+    return this.size + this.unit;
+}
+
+
+
+/**
+ * Add a value to a Size object
+ * 
+ * @param int value 
+ * @return Size Returns a new Size object where its size property has been incremented with value parameter
+ */
+nettools.jscore.Size.prototype.add = function(value)
+{
+    if ( this.isNull() )
+        return new nettools.jscore.Size(null);
+    
+    return new nettools.jscore.Size(this.size + Number(value) + this.unit);
+}
+
+
+
+/**
+ * Subtract a value from a Size object
+ * 
+ * @param int value 
+ * @return Size Returns a new Size object where its size property has been decremented with value parameter
+ */
+nettools.jscore.Size.prototype.subtract = function(value)
+{
+    if ( this.isNull() )
+        return new nettools.jscore.Size(null);
+    
+    return new nettools.jscore.Size(this.size - Number(value) + this.unit);
+}
 
 
 
