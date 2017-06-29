@@ -1211,7 +1211,7 @@ nettools.jscore.RequestHelper = (function(){
                 var sdata = _signCallback(postData);
 
                 // créer un paramètre supplémentaire avec cette signature
-                postData[_sign_field] = nettools.core.RequestHelper.sign(sdata.elements, sdata.token);
+                postData[_sign_field] = nettools.jscore.RequestHelper.sign(sdata.elements, sdata.token);
             }
         },
         
@@ -1254,7 +1254,7 @@ nettools.jscore.RequestHelper = (function(){
 					
 				// if sign mode on
 				if ( _signOn )
-					nettools.core.RequestHelper.signObject(data);
+					nettools.jscore.RequestHelper.signObject(data);
 
 				
 				// creating hidden fields
