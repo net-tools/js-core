@@ -117,7 +117,7 @@
     
        
         <div class="sampleBox">
-            <h1>Form functions</h1>
+            <h1>Form &amp; styles functions</h1>
             <div id="sampleForm">   
                 <form>
                     <p>
@@ -126,8 +126,8 @@
                         Text : <input name="txt" type="text" value="My special value &quot;">
                     </p>
                     <p>
-                        <label><input name="chk1" value="check1" checked type="checkbox">Chk1 ;
-                        <label><input name="chk2" value="check2" type="checkbox">Chk2
+                        <label><input name="chk1" value="check1" checked type="checkbox">Chk1</label> ;
+                        <label><input name="chk2" value="check2" type="checkbox">Chk2</label>
                         <select name="sel">
                             <option></option>
                             <option value="val1">Value1</option>
@@ -136,16 +136,25 @@
                     <p>
                         <input type="button" value="getCheckedRadioButton" onclick="sample.output(nettools.jscore.getCheckedRadioButton(this.form, 'radiobtns').value); return false;">
                         <input type="button" value="inputs2querystring" onclick="sample.output(nettools.jscore.inputs2querystring(this.form.elements)); return false;">
+                        <input type="button" value="formFieldsToObject" onclick="sample.output(test.dumpObject(nettools.jscore.formFieldsToObject(this.form.elements))); return false;">
                     </p>
                 </form>
+                
+                <p>cssToJs : <input type="text" value="font-size:12px;color:white"><input type="Submit" onclick="sample.output(test.dumpObject(nettools.jscore.cssToJs(this.previousSibling.value)));"></p>
+                <p>JsToCss : <input type="Submit" onclick="sample.output(nettools.jscore.jsToCss({fontSize:'12px',color:'black'}));"></p>
+                <p>camelCaseToCss : <input type="text" value="fontSize"><input type="Submit" onclick="test.simpleCall(this);"></p>
+                <p>cssToCamelCase : <input type="text" value="font-size"><input type="Submit" onclick="test.simpleCall(this);"></p>
             </div>
-             
         </div>
     
        
         <div class="sampleBox">
-            <h1>Array functions</h1>
+            <h1>Size & array functions</h1>
             <div id="sampleArray">   
+                <p>Size.add(int, Size) : <input type="text" value="12px"><input type="text" value="15em"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).add(new nettools.jscore.Size(this.previousSibling.value)));"></p>
+                <p>Size.subtract(int, Size) : <input type="text" value="12px"><input type="text" value="15em"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).subtract(new nettools.jscore.Size(this.previousSibling.value)));"></p>
+                <p>Size.add(int, int) : <input type="text" value="12px"><input type="text" value="15"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).add(this.previousSibling.value));"></p>
+                <p>Size.subtract(int, int) : <input type="text" value="12px"><input type="text" value="15"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).subtract(this.previousSibling.value));"></p>
                 <p>arrayFilter : <input type="text" value="1,2,,,3"><input type="Submit" onclick="sample.output('[' + nettools.jscore.arrayFilter(this.previousSibling.value.split(','), true, true).join(',') + ']');"></p>
             </div>
              
@@ -162,8 +171,16 @@
                 <p>Add parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="text" value="key3"><input type="text" value="v=&? /"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.previousSibling.previousSibling.value).addParameter(this.previousSibling.previousSibling.value, this.previousSibling.value));"></p>
                 <p>Remove key1 parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value).removeParameter('key1'));"></p>
             </div>
-             
         </div>
+    
+       
+        <div class="sampleBox">
+            <h1>nettools.jscore.StorageManager</h1>
+            <div id="sampleStorageManager">   
+                <p><input type="submit" value="fetch()" onclick="nettools.jscore.StorageManager.fetch('nettools.jscore.test_storagemanager', 'storage-manager.json', 'tmp', function(val){sample.output(val);})"></p>
+            </div>
+        </div>
+
 
 
     </div>

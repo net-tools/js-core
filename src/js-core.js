@@ -987,7 +987,9 @@ nettools.jscore = nettools.jscore || {
 
 
     /**
-     * Convert a CSS string of format "name1:value1;name2:value2" to a object litteral (css values with '-' are converted to camelCase)
+     * Convert a CSS string of format "name1:value1;name2:value2;" to a object litteral (css values with '-' are converted to camelCase)
+     *
+     * String must be properly formatted : no space around ';', and a trailing ';' is required !
      *
      * @param string css
      * @return Object
@@ -1024,7 +1026,7 @@ nettools.jscore = nettools.jscore || {
             ret.push(nettools.jscore.camelCaseToCss(s) + ':' + styles[s]);
 
         if ( ret.length )	
-            return ret.join('; ') + ';';
+            return ret.join(';') + ';';
         else
             return '';
     },
@@ -2992,7 +2994,7 @@ nettools.jscore.Url.prototype.removeParameter = function(key)
 /** 
  * Size object constructor : handle sizes (arithmetics) and preserve unit
  *
- * @param int|string s Size ; if no unit given, we assume it's 'px'
+ * @param int|string|nettools.jscore.Size s Size (as a string, an int, or a Size object to clone) ; if no unit given, we assume it's 'px'
  */
 nettools.jscore.Size = function(s)
 {
@@ -3002,8 +3004,18 @@ nettools.jscore.Size = function(s)
         this.unit = null;
         return;
     }
+    
+    
+    // si clone
+    if ( s instanceof nettools.jscore.Size )
+    {
+        this.size = s.size;
+        this.unit = s.unit;
+        return;
+    }
 
 
+    // cas général
     var regs = null;
     if ( regs = (s).toString().match(/^([0-9]+)([a-z]+)$/) )
     {
@@ -3103,7 +3115,7 @@ nettools.jscore.Size.prototype.toString = function()
 /**
  * Add a value to a Size object
  * 
- * @param int value 
+ * @param int|nettools.jscore.Size value Value to add to object, as an int or a Size object
  * @return Size Returns a new Size object where its size property has been incremented with value parameter
  */
 nettools.jscore.Size.prototype.add = function(value)
@@ -3111,7 +3123,16 @@ nettools.jscore.Size.prototype.add = function(value)
     if ( this.isNull() )
         return new nettools.jscore.Size(null);
     
-    return new nettools.jscore.Size(this.size + Number(value) + this.unit);
+    
+    // si ajout de deux objets entre eux
+    if ( value instanceof nettools.jscore.Size )
+        // ce n'est possible que si l'unité est la même
+        if ( this.unit === value.unit )
+            return new nettools.jscore.Size(this.size + value.size, this.unit);
+        else
+            throw new Error('Cannot add a Size object to another with different units');
+    else
+        return new nettools.jscore.Size(this.size + Number(value) + this.unit);
 }
 
 
@@ -3119,7 +3140,7 @@ nettools.jscore.Size.prototype.add = function(value)
 /**
  * Subtract a value from a Size object
  * 
- * @param int value 
+ * @param int|nettools.jscore.Size value Value to subtract from an object, as an int or a Size object 
  * @return Size Returns a new Size object where its size property has been decremented with value parameter
  */
 nettools.jscore.Size.prototype.subtract = function(value)
@@ -3127,7 +3148,16 @@ nettools.jscore.Size.prototype.subtract = function(value)
     if ( this.isNull() )
         return new nettools.jscore.Size(null);
     
-    return new nettools.jscore.Size(this.size - Number(value) + this.unit);
+    
+    // si ajout de deux objets entre eux
+    if ( value instanceof nettools.jscore.Size )
+        // ce n'est possible que si l'unité est la même
+        if ( this.unit === value.unit )
+            return new nettools.jscore.Size(this.size - value.size, this.unit);
+        else
+            throw new Error('Cannot subtract a Size object from another with different units');
+    else
+        return new nettools.jscore.Size(this.size - Number(value) + this.unit);
 }
 
 

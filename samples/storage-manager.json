@@ -1,0 +1,1 @@
+var tmp = "my value stored in browser LocalStorage";
