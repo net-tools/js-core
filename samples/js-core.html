@@ -64,6 +64,26 @@
                           '\nQuerystring=' + test.dumpObject(u.getQuerystring().getQuerystringObject()) +
                                 '\nQuerystring.toString()=' + u.getQuerystring().toString() +
                           '\nUrl.toString()=' + u.toString());
+        },
+        
+        
+        call : function(fun, params)
+        {
+            try
+            {
+                sample.output(fun.apply(null, params));
+            }
+            catch (e)
+            {
+                alert(e);
+            }
+        },
+        
+        
+        simpleCall : function(btn)
+        {
+            var fun = btn.parentNode.firstChild;
+            test.call(nettools.jscore[fun.textContent.split(' ')[0]], [btn.previousSibling.value]);
         }
         
     }
@@ -81,11 +101,43 @@
         <div class="sampleBox">
             <h1>String functions</h1>
             <div id="sampleString">   
-                <p>removeDiacritics : <input type="text"><input type="Submit" value="envoyer" onclick="sample.output(nettools.jscore.removeDiacritics(this.previousSibling.value));"></p>
-                <p>escape : <input type="text"><input type="Submit" value="envoyer" onclick="sample.output(nettools.jscore.escape(this.previousSibling.value));"></p>
-                <p>unescape : <input type="text"><input type="Submit" value="envoyer" onclick="sample.output(nettools.jscore.unescape(this.previousSibling.value));"></p>
-                <p>htmlentities : <input type="text"><input type="Submit" value="envoyer" onclick="sample.output(this.previousSibling.value = nettools.jscore.htmlentities(this.previousSibling.value));"></p>
-                <p>querystringAppend : <input type="text" value="key1=value1"><input type="Submit" value="envoyer" onclick="sample.output(nettools.jscore.querystringAppend(this.previousSibling.value, 'key2', '=val&2'));"></p>
+                <p>removeDiacritics : <input type="text"><input type="Submit" onclick="test.simpleCall(this);"></p>
+                <p>escape : <input type="text"><input type="Submit" onclick="test.simpleCall(this);"></p>
+                <p>unescape : <input type="text"><input type="Submit" onclick="test.simpleCall(this);"></p>
+                <p>htmlentities : <input type="text"><input type="Submit" onclick="this.previousSibling.value=nettools.jscore.htmlentities(this.previousSibling.value);"></p>
+                <p>querystringAppend : <input type="text" value="key1=value1"><input type="Submit" onclick="test.call(nettools.jscore.querystringAppend, [this.previousSibling.value, 'key2', '=val&2']);"></p>
+                <p>appendToUrl : <input type="text" value="key2=value2"><input type="Submit" onclick="test.call(nettools.jscore.appendToUrl, ['file.php?key1=value1', this.previousSibling.value]);"></p>
+                <p>appendToUrl : <input type="text" value="key2=value2"><input type="Submit" onclick="test.call(nettools.jscore.appendToUrl, ['file.php', this.previousSibling.value]);"></p>
+                <p>count(sub, str) : <input type="text"><input type="text"><input type="Submit" onclick="test.call(nettools.jscore.count, [this.previousSibling.previousSibling.value, this.previousSibling.value]);"></p>
+                <p>extractFileName : <input type="text"><input type="Submit" onclick="test.simpleCall(this);"></p>
+                <p>selfUrl : <input type="Submit" onclick="sample.output(test.dumpObject(nettools.jscore.selfUrl()));"></p>
+            </div>
+             
+        </div>
+    
+       
+        <div class="sampleBox">
+            <h1>Form functions</h1>
+            <div id="sampleForm">   
+                <form>
+                    <p>
+                        <label><input type="radio" value="r1" name="radiobtns" checked>Radio1</label> ; 
+                        <label><input type="radio" value="r2" name="radiobtns">Radio2</label>
+                        Text : <input name="txt" type="text" value="My special value &quot;">
+                    </p>
+                    <p>
+                        <label><input name="chk1" value="check1" checked type="checkbox">Chk1 ;
+                        <label><input name="chk2" value="check2" type="checkbox">Chk2
+                        <select name="sel">
+                            <option></option>
+                            <option value="val1">Value1</option>
+                        </select>
+                    </p>
+                    <p>
+                        <input type="button" value="getCheckedRadioButton" onclick="sample.output(nettools.jscore.getCheckedRadioButton(this.form, 'radiobtns').value); return false;">
+                        <input type="button" value="inputs2querystring" onclick="sample.output(nettools.jscore.inputs2querystring(this.form.elements)); return false;">
+                    </p>
+                </form>
             </div>
              
         </div>
@@ -94,7 +146,7 @@
         <div class="sampleBox">
             <h1>Array functions</h1>
             <div id="sampleArray">   
-                <p>arrayFilter : <input type="text" value="1,2,,,3"><input type="Submit" value="envoyer" onclick="sample.output('[' + nettools.jscore.arrayFilter(this.previousSibling.value.split(','), true, true).join(',') + ']');"></p>
+                <p>arrayFilter : <input type="text" value="1,2,,,3"><input type="Submit" onclick="sample.output('[' + nettools.jscore.arrayFilter(this.previousSibling.value.split(','), true, true).join(',') + ']');"></p>
             </div>
              
         </div>
@@ -103,12 +155,12 @@
         <div class="sampleBox">
             <h1>nettools.jscore.Querystring &amp; Url</h1>
             <div id="sampleUrl">   
-                <p>Querystring constructor : <input type="text" value="key1=value1&key2=%26&key3="><input type="Submit" value="envoyer" onclick="test.dumpQuerystring(new nettools.jscore.Querystring(this.previousSibling.value));"></p>
-                <p>Url constructor : <input type="text" value="myfile.php?key1=value1&key2=%26&key3="><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
-                <p>Url constructor : <input type="text" value="myfile.php?"><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
-                <p>Url constructor : <input type="text" value="myfile.php"><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
-                <p>Add parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="text" value="key3"><input type="text" value="v=&? /"><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.previousSibling.previousSibling.value).addParameter(this.previousSibling.previousSibling.value, this.previousSibling.value));"></p>
-                <p>Remove key1 parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="Submit" value="envoyer" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value).removeParameter('key1'));"></p>
+                <p>Querystring constructor : <input type="text" value="key1=value1&key2=%26&key3="><input type="Submit" onclick="test.dumpQuerystring(new nettools.jscore.Querystring(this.previousSibling.value));"></p>
+                <p>Url constructor : <input type="text" value="myfile.php?key1=value1&key2=%26&key3="><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
+                <p>Url constructor : <input type="text" value="myfile.php?"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
+                <p>Url constructor : <input type="text" value="myfile.php"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
+                <p>Add parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="text" value="key3"><input type="text" value="v=&? /"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.previousSibling.previousSibling.value).addParameter(this.previousSibling.previousSibling.value, this.previousSibling.value));"></p>
+                <p>Remove key1 parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value).removeParameter('key1'));"></p>
             </div>
              
         </div>

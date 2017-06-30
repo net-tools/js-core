@@ -445,6 +445,10 @@ nettools.jscore = nettools.jscore || {
      */
     count : function(sub, s)
     {
+        if ( !sub || !s )
+            return 0;
+        
+            
         var p = s.indexOf(sub);
         var n = 0;
 
@@ -767,8 +771,11 @@ nettools.jscore = nettools.jscore || {
         for ( var i = 0 ; i < elementsl ; i++ )
         {
             var e = elements[i];
+            
+            if ( !e.name )
+                continue;
 
-            if ( (e.type === 'checkbox') && !e.checked )
+            if ( ((e.type === 'radio')||(e.type === 'checkbox')) && !e.checked )
                 continue;
 
             if ( (e.type === 'submit') || (e.type === 'button') || (e.type === 'image') || (e.type === 'cancel') )
