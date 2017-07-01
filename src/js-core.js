@@ -1174,7 +1174,7 @@ nettools.jscore.RequestHelper = (function(){
 	var _signOn = false;
 	var _signCallback = null;
 	var _sign_field = 'sign';
-    var _signMethod = function(msg, token){return (window.btoa?btoa(msg+token):msg+token);};
+    var _signMethod = function(msg, token){return nettools.jscore.sha256(msg+token);};
 	
 	// --- /PRIVATE DECLARATIONS ---
 	
@@ -1232,7 +1232,7 @@ nettools.jscore.RequestHelper = (function(){
         
         
         /** 
-         * Set sign method handler
+         * Set sign method handler ; by default, a simple sign handler is used (sha256 of message and token concatenated)
          *
          * @param function(msg, token) handler
          */
@@ -1279,7 +1279,7 @@ nettools.jscore.RequestHelper = (function(){
 					e.name = d;
 					
 					if ( typeof(data[d]) === 'boolean' )
-						e.value = data[d] ? 1:0;
+						e.value = data[d] ? '1':'0';
 					else
 						e.value = ((data[d]!==undefined) && (data[d]!==null)) ? data[d] : "";
 					
@@ -1299,7 +1299,7 @@ nettools.jscore.RequestHelper = (function(){
          * 
          * @param string url
          * @param callback function(response)
-         * @param string|object postData
+         * @param string|Object postData
          */
 		sendXmlHTTPRequest : function(url,callback,postData)
 		{
@@ -1464,6 +1464,8 @@ nettools.jscore.RequestHelper = (function(){
          *
          * We handle the special case of null : a null javascript value is sent by FormData as a string 'null' value, 
          * this is not desired, so null values will be converted to empty '' values
+         * We handle the special case of bool values : a true or false value is sent by FormData as a string 'true' or 'false' value, 
+         * this is not desired, so bool values will be converted to 1 or 0 values
          *
          * @param Object obj
          * @param null|FormData fd Already created FormData object or null to create a new one from scratch
@@ -1474,9 +1476,19 @@ nettools.jscore.RequestHelper = (function(){
 			if ( (fd === null) || (fd === undefined) ) 
 				fd = new FormData();
 				
-			// envoi données perso
 			for ( var k in obj )
-				fd.append(k, ((obj[k] === null)||(obj[k] === undefined)) ? '' : obj[k]);				
+                // special case : null values
+                if ( (obj[k] === null)||(obj[k] === undefined) )
+                    fd.append(k, '');
+                
+                    
+                // special case : bool values
+                else if ( typeof obj[k] === 'boolean' )
+                    fd.append(k, obj[k] ? '1':'0');
+            
+                // default case
+                else    
+				    fd.append(k, obj[k]);				
 				
 			return fd;
 		}	
@@ -1808,19 +1820,14 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          */
 		parseResponse : function(resp)
 		{
-			if ( resp.responseText.substr(0, 1) === "{" )
-			{
-				try
-                {
-                    return JSON.parse(resp.responseText);
-                }
-                catch(e)
-                {
-                    return null;
-                }
-			}
-			else
-				return null;
+            try
+            {
+                return JSON.parse(resp.responseText);
+            }
+            catch(e)
+            {
+                return null;
+            }
 		},
 
         
@@ -1835,36 +1842,28 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          */
 		parseJsonResponse : function(resp)
 		{
-			if ( resp.responseText.substr(0, 1) === "{" )
-			{
-                var r = null;
-                
-                try
-                {
-				    r = JSON.parse(resp.responseText);
-                }
-                catch(e)
-                {
-                    // error JSON.parse
-                    alert("Unreadble async response : " + e);
-                    return {statut:false};
-                }
-				
-				// statut ko and message
-				if ( !r.statut && r.message )
-					alert(r.message);
-                
-                // statut ko and exception
-				if ( !r.statut && r.exception )
-                    _handleException(r.exception, r.message ? r.message : 'Error during async request (message unavailable)');
-					
-				return r;
-			}
-			else
-			{
-				alert("Unreadble async response");
-				return {statut:false};
-			}
+            var r = null;
+
+            try
+            {
+                r = JSON.parse(resp.responseText);
+            }
+            catch(e)
+            {
+                // error JSON.parse
+                alert("Unreadble async response : " + e);
+                return {statut:false};
+            }
+
+            // statut ko and message
+            if ( !r.statut && r.message )
+                alert(r.message);
+
+            // statut ko and exception
+            if ( !r.statut && r.exception )
+                _handleException(r.exception, r.message ? r.message : 'Error during async request (message unavailable)');
+
+            return r;
 		}
 	};
 })();
@@ -2783,11 +2782,22 @@ nettools.jscore.Querystring.prototype.setQuerystring = function(qs)
  */
 nettools.jscore.Querystring.prototype.toString = function()
 {
+    function _getValue(v)
+    {
+        if ( typeof v === 'boolean' )
+            return v?'1':'0';
+        else if ( (v === null) || (v === undefined) )
+            return '';
+        else
+            return v;
+    }
+    
+    
     var ret = [];
     var qs = this.getQuerystringObject();
     
     for ( var p in qs )
-        ret.push(p + '=' + nettools.jscore.escape(qs[p]));
+        ret.push(p + '=' + nettools.jscore.escape(_getValue(qs[p])));
     
     return ret.join('&');
 }

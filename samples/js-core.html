@@ -120,6 +120,32 @@
         {
             
             nettools.jscore.RequestHelper.formSign(form, form.tokenfield, form.signfield);
+        },
+        
+        
+        sendXmlHTTPRequest : function(sendString)
+        {
+            nettools.jscore.RequestHelper.sendXmlHTTPRequest('js-core-http.php', 
+                    function(resp)
+                    {
+                        var r = nettools.jscore.xmlhttp.parseResponse(resp);
+                        sample.output('XmlHttpRequest answered : \n' + r);
+                    },
+                                                             
+                    sendString?'v1=myvalue1&v2=&v3=1':{v1:'myvalue1', v2:'', v3:true}
+                );
+        },
+        
+        
+        sendXmlHTTPRequestPromise : function(sendString)
+        {
+            nettools.jscore.RequestHelper.sendXmlHTTPRequestPromise('js-core-http-promise.php', sendString?'v1=myvalue1&v2=&v3=1':{v1:'myvalue1', v2:'', v3:true}). 
+                    then(function(r)
+                        {
+                            sample.output('XmlHttpRequestPromise answered with status OK and message : \n' + r.message);
+                        }).
+                    catch(nettools.jscore.RequestHelper.promiseErrorHandler);
+        
         }
         
     }
@@ -171,12 +197,19 @@
                         </select>
                     </p>
                     <p>
-                        <input type="button" value="getCheckedRadioButton" onclick="sample.output(nettools.jscore.getCheckedRadioButton(this.form, 'radiobtns').value); return false;">
-                        <input type="button" value="inputs2querystring" onclick="sample.output(nettools.jscore.inputs2querystring(this.form.elements)); return false;">
-                        <input type="button" value="formFieldsToObject" onclick="sample.output(test.dumpObject(nettools.jscore.formFieldsToObject(this.form.elements))); return false;">
-                        <input type="button" value="signObject" onclick="test.signObject(); return false;">
-                        <input type="button" value="formSign" onclick="test.signForm(this.form); return false;">
-                        <input type="text" name="signfield">
+                        <input type="button" value="getCheckedRadioButton" onclick="sample.output(nettools.jscore.getCheckedRadioButton(this.form, 'radiobtns').value); ">
+                        <input type="button" value="inputs2querystring" onclick="sample.output(nettools.jscore.inputs2querystring(this.form.elements)); ">
+                        <input type="button" value="formFieldsToObject" onclick="sample.output(test.dumpObject(nettools.jscore.formFieldsToObject(this.form.elements)));">
+                        <input type="button" value="signObject" onclick="test.signObject();">
+                        <input type="button" value="formSign" onclick="test.signForm(this.form);">
+                        <label>Signfield : <input type="text" name="signfield"></label>
+                    </p>
+                    <p>Url to sign : <input type="text" value="f.php?v1=val1&v2=val2"><input type="button" value="signUrl" onclick="sample.output(nettools.jscore.RequestHelper.signUrl(this.previousSibling.value, 'token', ['v1']));"></p>
+                    <p>
+                        <input type="button" value="sendXmlHTTPRequest(string)" onclick="test.sendXmlHTTPRequest(true);">
+                        <input type="button" value="sendXmlHTTPRequest(Object)" onclick="test.sendXmlHTTPRequest(false);">
+                        <input type="button" value="sendXmlHTTPRequestPromise(string)" onclick="test.sendXmlHTTPRequestPromise(true);">
+                        <input type="button" value="sendXmlHTTPRequestPromise(Object)" onclick="test.sendXmlHTTPRequestPromise(false);">
                     </p>
                 </form>
                 <hr>
@@ -205,6 +238,7 @@
             <h1>nettools.jscore.Querystring &amp; Url</h1>
             <div id="sampleUrl">   
                 <p>Querystring constructor : <input type="text" value="key1=value1&key2=%26&key3="><input type="Submit" onclick="test.dumpQuerystring(new nettools.jscore.Querystring(this.previousSibling.value));"></p>
+                <p>Querystring constructor (object) : <input type="Submit" onclick="test.dumpQuerystring(new nettools.jscore.Querystring({v1:'my val', v2:null, v3:true}));"></p>
                 <p>Url constructor : <input type="text" value="myfile.php?key1=value1&key2=%26&key3="><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
                 <p>Url constructor : <input type="text" value="myfile.php?"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
                 <p>Url constructor : <input type="text" value="myfile.php"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
