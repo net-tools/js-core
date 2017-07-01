@@ -26,6 +26,10 @@
             margin-top:0;
         }
         
+        div#sampleSizeArray input[type=text]{
+            width:4em;
+        }
+        
         @media screen and (max-width:1024px) {
             div.flex > div {
                 width:100%;
@@ -84,6 +88,38 @@
         {
             var fun = btn.parentNode.firstChild;
             test.call(nettools.jscore[fun.textContent.split(' ')[0]], [btn.previousSibling.value]);
+        },
+        
+        
+        signObject : function()
+        {
+            nettools.jscore.RequestHelper.setSignOn(true,
+                    function(o)
+                    {
+                        return {
+                            elements : [o.v1, o.v2],
+                            token : 'my encryption key'
+                        };
+                    }
+                );
+            
+            
+            var request = {
+                v1 : 'my value1',
+                v2 : 'my value2',
+                vx : 'other value not used on signature'
+            };
+            
+            nettools.jscore.RequestHelper.signObject(request);
+            
+            sample.output(test.dumpObject(request));
+        },
+        
+        
+        signForm : function(form)
+        {
+            
+            nettools.jscore.RequestHelper.formSign(form, form.tokenfield, form.signfield);
         }
         
     }
@@ -120,15 +156,16 @@
             <h1>Form &amp; styles functions</h1>
             <div id="sampleForm">   
                 <form>
+                    <input type="hidden" name="tokenfield" value="abcd">
                     <p>
                         <label><input type="radio" value="r1" name="radiobtns" checked>Radio1</label> ; 
                         <label><input type="radio" value="r2" name="radiobtns">Radio2</label>
-                        Text : <input name="txt" type="text" value="My special value &quot;">
+                        Text : <input name="txt" type="text" value="My special value &quot;" data-sign="1">
                     </p>
                     <p>
                         <label><input name="chk1" value="check1" checked type="checkbox">Chk1</label> ;
                         <label><input name="chk2" value="check2" type="checkbox">Chk2</label>
-                        <select name="sel">
+                        <select name="sel" data-sign="2">
                             <option></option>
                             <option value="val1">Value1</option>
                         </select>
@@ -137,9 +174,12 @@
                         <input type="button" value="getCheckedRadioButton" onclick="sample.output(nettools.jscore.getCheckedRadioButton(this.form, 'radiobtns').value); return false;">
                         <input type="button" value="inputs2querystring" onclick="sample.output(nettools.jscore.inputs2querystring(this.form.elements)); return false;">
                         <input type="button" value="formFieldsToObject" onclick="sample.output(test.dumpObject(nettools.jscore.formFieldsToObject(this.form.elements))); return false;">
+                        <input type="button" value="signObject" onclick="test.signObject(); return false;">
+                        <input type="button" value="formSign" onclick="test.signForm(this.form); return false;">
+                        <input type="text" name="signfield">
                     </p>
                 </form>
-                
+                <hr>
                 <p>cssToJs : <input type="text" value="font-size:12px;color:white"><input type="Submit" onclick="sample.output(test.dumpObject(nettools.jscore.cssToJs(this.previousSibling.value)));"></p>
                 <p>JsToCss : <input type="Submit" onclick="sample.output(nettools.jscore.jsToCss({fontSize:'12px',color:'black'}));"></p>
                 <p>camelCaseToCss : <input type="text" value="fontSize"><input type="Submit" onclick="test.simpleCall(this);"></p>
@@ -150,7 +190,7 @@
        
         <div class="sampleBox">
             <h1>Size & array functions</h1>
-            <div id="sampleArray">   
+            <div id="sampleSizeArray">   
                 <p>Size.add(int, Size) : <input type="text" value="12px"><input type="text" value="15em"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).add(new nettools.jscore.Size(this.previousSibling.value)));"></p>
                 <p>Size.subtract(int, Size) : <input type="text" value="12px"><input type="text" value="15em"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).subtract(new nettools.jscore.Size(this.previousSibling.value)));"></p>
                 <p>Size.add(int, int) : <input type="text" value="12px"><input type="text" value="15"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).add(this.previousSibling.value));"></p>

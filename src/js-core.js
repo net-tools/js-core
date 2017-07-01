@@ -1173,8 +1173,8 @@ nettools.jscore.RequestHelper = (function(){
 	
 	var _signOn = false;
 	var _signCallback = null;
-	var _validity = 30;
 	var _sign_field = 'sign';
+    var _signMethod = function(msg, token){return (window.btoa?btoa(msg+token):msg+token);};
 	
 	// --- /PRIVATE DECLARATIONS ---
 	
@@ -1183,9 +1183,14 @@ nettools.jscore.RequestHelper = (function(){
 
 		/**
          * Set sign mode on or off
+         *
+         * Callback is used in signObject, post, sendXmlHTTPRequest, sendXmlHTTPRequestPromise ; 
+         * - formSign find elements to use in signature by looking at inputs having data-sign attribute
+         * - signUrl has an elements array parameters which holds an array of parameter names in url to use in signature
+         * - sign has an elements array
          * 
          * @param bool b
-         * @param function(Object) Callback called to identify elements of postData to use in the signature process ; must return {elements:[string1, string2], token:string}
+         * @param function(Object) Callback called to identify to use in the signature process ; must return {elements:[string1, string2], token:string}
          */
 		setSignOn : function(b, cb)
 		{
@@ -1225,17 +1230,17 @@ nettools.jscore.RequestHelper = (function(){
         },
         
         
-
-		/** 
-         * Sets token validity delay in seconds
+        
+        /** 
+         * Set sign method handler
          *
-         * @param int t
+         * @param function(msg, token) handler
          */
-		setValidityDelay : function(t)
-		{
-			_validity = t;
-		},
-		
+        setSignHandler : function(h)
+        {
+            _signMethod = h;    
+        },
+        
         
 
 		/**
@@ -1397,7 +1402,7 @@ nettools.jscore.RequestHelper = (function(){
          *
          * @param string[] elements
          * @param string token
-         * @return string Returns the ELEMENTS array values signed with token and a validity delay
+         * @return string Returns the ELEMENTS array values signed with token through signMethod handler (default or custom)
          */
 		sign : function(elements, token)
 		{
@@ -1408,9 +1413,7 @@ nettools.jscore.RequestHelper = (function(){
 			
 			
 			// Sign elements with token and timestamp of validity delay (encoded in hex)
-			var dt = new Date();
-			dt = Math.floor(dt.valueOf() / 1000) + _validity;
-			return nettools.jscore.hmacSha256(nettools.jscore.base64_decode('Zm9ybVNpZ246') + token + '|' + msg + dt, nettools.jscore.base64_decode('UmVxdWVzdEhlbHBlcjo6Y2hlY2tGb3JtU2lnbg==')) + dt.toString(16);
+            return _signMethod(msg, token);
 		},
 		
 
@@ -1442,7 +1445,7 @@ nettools.jscore.RequestHelper = (function(){
 						);
 						
             
-			// converting to an array of inputs
+			// converting to an array of input values
 			var elementsl = elements.length;
 			var arr = [];
 			for ( var i = 0 ; i < elementsl ; i++ )
