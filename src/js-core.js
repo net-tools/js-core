@@ -1602,7 +1602,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 				console.table(table);
 		}
 		else
-			console.log('Can\'t display details about the exception');
+			console.log(nettools.jscore.xmlhttp.i18n.CANNOT_LOG_EXCEPTION_DETAILS);
 	}
 
 	
@@ -1637,7 +1637,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 					exw.document.close();
 				}
 				else
-					alert("Can't open a popup window to display the exception details");
+					alert(nettools.jscore.xmlhttp.i18n.CANNOT_OPEN_POPUP_WINDOW_EXCEPTION_DETAILS);
 			};
 
 		if ( document.body.firstChild )
@@ -1682,7 +1682,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 		var exw = window.open('', "ExceptionWindow" + (Math.floor(Math.random() * 10000000)));
 		if ( exw )
 		{
-			exw.document.write('<!DOCTYPE html><html><body>' + exception + '</body></html>');
+			exw.document.write('<!DOCTYPE html><head><title>' + title + '</title></head><html><body>' + exception + '</body></html>');
 			exw.document.close();
 		}
 
@@ -1697,6 +1697,19 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
     
 	return {
+        
+        /**
+         * Translations
+         */
+        i18n : {
+            CANNOT_LOG_EXCEPTION_DETAILS : 'Can\'t display details about the exception',
+            CANNOT_OPEN_POPUP_WINDOW_EXCEPTION_DETAILS : "Can't open a popup window to display the exception details",
+            UNREADABLE_ASYNC_RESPONSE : 'Unreadable async response',
+            ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE : 'Error during async request (message unavailable)',
+            NO_ERROR_MESSAGE : 'Async request has not return any error message'
+        },
+        
+        
 		
 		/**
          * Send the request 
@@ -1775,7 +1788,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 								var resp = nettools.jscore.xmlhttp.parseResponse(req);
 								if ( resp === null )
                                 {
-									reject(new Error('Unreadble async request response'));
+									reject(new Error(nettools.jscore.xmlhttp.i18n.UNREADABLE_ASYNC_RESPONSE));
                                     return;
                                 }
 									
@@ -1788,14 +1801,14 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 									if ( resp.exception )
 										try
 										{
-											_handlePromiseException(resp.exception, resp.message ? resp.message : 'Error during async request (message unavailable)');
+											_handlePromiseException(resp.exception, resp.message ? resp.message : nettools.jscore.xmlhttp.i18n.ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE);
 										}
 										catch(e)
 										{
 										}
 										
 									// reject promise
-									reject(new Error(resp.message ? resp.message : 'Async request has not return any error message'));
+									reject(new Error(resp.message ? resp.message : nettools.jscore.xmlhttp.i18n.NO_ERROR_MESSAGE));
 									return;
                                 }
 									
@@ -1836,6 +1849,9 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * Parse a response and decode it to Json
          *
          * If the json returned response has statut, message, or exception properties, we use them to display error data
+         * If exception property has a special formatting of H1, H2 and CODE tags, it will be used to extract critical meaningful
+         * data from exception property and output them to Javascript console (H1 may contain title for exception page such as 
+         * 'an exception occured', H2 may contain the exception class name, and CODE will contain the exception message).
          * 
          * @param string resp
          * @return Object Returning an object litteral with the Json response, always containing a statut property
@@ -1851,7 +1867,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
             catch(e)
             {
                 // error JSON.parse
-                alert("Unreadble async response : " + e);
+                alert(nettools.jscore.xmlhttp.i18n.UNREADABLE_ASYNC_RESPONSE + " : " + e);
                 return {statut:false};
             }
 
@@ -1861,7 +1877,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
             // statut ko and exception
             if ( !r.statut && r.exception )
-                _handleException(r.exception, r.message ? r.message : 'Error during async request (message unavailable)');
+                _handleException(r.exception, r.message ? r.message : nettools.jscore.xmlhttp.i18n.ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE);
 
             return r;
 		}
@@ -2009,6 +2025,7 @@ nettools.jscore.validator.RealTimeValidator = function(rtcb){
 			switch ( valid )
 			{
 				case ( null ) :
+				case ( undefined ) :
 					break;	
 				case ( false ) :
 					this.setAttribute('data-valid', 0);
@@ -2042,6 +2059,8 @@ nettools.jscore.validator.RealTimeValidator = function(rtcb){
     
 	/**
      * Register several inputs to validate with a custom callback
+     *
+     * The custom callback must set the data-valid to 1 or 0 depending on the input validity
      *
      * @param HTMLInput[] inputs
      * @param function(Event) customcb
@@ -2150,6 +2169,10 @@ nettools.jscore.validator.RealTimeValidator.prototype =
  *	  root : 'fForm'
  * }
  *
+ * When onsubmitpromise parameter is defined, the isValid() method will return a Promise object resolved or rejected
+ * depending on the Promise returned by onsubmitpromise callback (the resolve or reject calls must have an object litteral
+ * with statut, field, message properties).
+ *
  * @param Object params Object litteral with properties defining the validation process
  * @return Object Returns an object litteral {statut:bool, field:input, message:string}
  */
@@ -2256,7 +2279,7 @@ nettools.jscore.validator.FormValidator.prototype = (function(){
     
 	
 	return {
-			
+        
 		/**
          * Get a field label (either the NAME parameter or the title attribute, if found)
          *
@@ -2299,7 +2322,7 @@ nettools.jscore.validator.FormValidator.prototype = (function(){
 						var fi = elements[_root + f];
 
 						return _notify(this, nettools.jscore.validator.FormValidator.returnStatus(
-									false, "Information manquante : '" + this.getFieldLabel(fi, f) + "'", fi));
+									false, nettools.jscore.validator.FormValidator.i18n.REQUIRED_FIELD + " : '" + this.getFieldLabel(fi, f) + "'", fi));
 					}
 				}
 					
@@ -2313,7 +2336,7 @@ nettools.jscore.validator.FormValidator.prototype = (function(){
 					if ( _getValue(fi) !== "" )
 						if ( ! _regexps[r].test(_getValue(fi)) )
 							return _notify(this, nettools.jscore.validator.FormValidator.returnStatus(
-										false, "Format valeur incorrect : '" + this.getFieldLabel(fi, r) + "'", fi));
+										false, nettools.jscore.validator.FormValidator.i18n.WRONG_FORMAT + " : '" + this.getFieldLabel(fi, r) + "'", fi));
 				}
 				
 	
@@ -2367,7 +2390,19 @@ nettools.jscore.validator.FormValidator.prototype = (function(){
 nettools.jscore.validator.FormValidator.returnStatus = function(st, msg, f)
 {
 	return {statut:st, message:msg, field:f};
-}
+};
+
+
+
+/** 
+ * Translations
+ */
+nettools.jscore.validator.FormValidator.i18n = {
+    REQUIRED_FIELD : 'Missing data',
+    WRONG_FORMAT : 'Wrong format'
+};      
+        
+			
 
 
 

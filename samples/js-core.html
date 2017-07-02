@@ -30,6 +30,14 @@
             width:4em;
         }
         
+        div#sampleRTValidator form input[data-valid='0']{
+            border:2px solid orange;
+        }
+        
+        div#sampleRTValidator form input[data-valid='1']{
+            border:2px solid forestgreen;
+        }
+        
         @media screen and (max-width:1024px) {
             div.flex > div {
                 width:100%;
@@ -47,12 +55,16 @@
         
         dumpObject : function(o)
         {
+            if ( o == null )
+                return 'null';
+            
             var ret = [];
             for ( var p in o )
                 ret.push(p + ':' + o[p]);
             
             return ret.join('\n');
         },
+        
         
         
         dumpQuerystring : function(u)
@@ -62,6 +74,7 @@
         },
         
         
+        
         dumpUrl : function(u)
         {
             sample.output('Resource=' + u.getResource() + 
@@ -69,6 +82,7 @@
                                 '\nQuerystring.toString()=' + u.getQuerystring().toString() +
                           '\nUrl.toString()=' + u.toString());
         },
+        
         
         
         call : function(fun, params)
@@ -84,11 +98,13 @@
         },
         
         
+        
         simpleCall : function(btn)
         {
             var fun = btn.parentNode.firstChild;
             test.call(nettools.jscore[fun.textContent.split(' ')[0]], [btn.previousSibling.value]);
         },
+        
         
         
         signObject : function()
@@ -116,11 +132,13 @@
         },
         
         
+        
         signForm : function(form)
         {
             
             nettools.jscore.RequestHelper.formSign(form, form.tokenfield, form.signfield);
         },
+        
         
         
         sendXmlHTTPRequest : function(sendString)
@@ -137,6 +155,7 @@
         },
         
         
+        
         sendXmlHTTPRequestPromise : function(sendString)
         {
             nettools.jscore.RequestHelper.sendXmlHTTPRequestPromise('js-core-http-promise.php', sendString?'v1=myvalue1&v2=&v3=1':{v1:'myvalue1', v2:'', v3:true}). 
@@ -146,6 +165,149 @@
                         }).
                     catch(nettools.jscore.RequestHelper.promiseErrorHandler);
         
+        },
+        
+        
+        
+        exceptionHandler : function(simple)
+        {
+            var r = {
+                statut : false,
+                message : "An error occured",
+                exception : simple? "<h1>Exception here !</h1>\n" +
+                            "<h2>CriticalException</h2>\n" +
+                            "<code>CriticalException occured at line 1234</code>"
+                            :
+                            "<h1>Exception here !</h1>\n" +
+                            "<h2>CriticalException</h2>\n" +
+                            "<code>CriticalException occured at line 1234</code>\n" +
+                            "\n" +
+                            "<table style=\"font-family:Courier; margin-top:2em; border:2px solid gray;\">\n" +
+                            "  <tr>" +
+                            "      <th>File</th>" +
+                            "      <th>Line</th>" +
+                            "      <th>Function</th>" +
+                            "      <th>Parameters</th>" +
+                            "  </tr>\n" +
+                            "  <tr>" +
+                            "      <td>include.php</td>" +
+                            "      <td>12</td>" +
+                            "      <td>call()</td>" +
+                            "      <td>'wrong parameter'</td>" +
+                            "  </tr>\n" +
+                            "  <tr>" +
+                            "      <td>main.php</td>" +
+                            "      <td>1</td>" +
+                            "      <td>main()</td>" +
+                            "      <td></td>" +
+                            "  </tr>\n" +
+                            "</table>"
+            };
+            
+            sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:JSON.stringify(r)})));
+        },
+        
+        
+        
+        rtv_on : function(form)
+        {
+            if ( test.rtval )
+                return;
+            
+            
+            
+            function _validatorCallback(input)
+            {
+                switch ( input.name )
+                {
+                    case "txt_num":
+                        return nettools.jscore.validator.Patterns.INT.test(input.value);
+                    case "txt_date":
+                        return nettools.jscore.validator.Patterns.DATEYMD.test(input.value);
+                }
+            }
+            
+            function _customValidatorEvent(e)
+            {
+                this.setAttribute('data-valid', (this.value != '')?1:0);
+            }
+            
+            
+            test.rtval = new nettools.jscore.validator.RealTimeValidator(_validatorCallback);
+            test.rtval.registerOnChangeEvents([form.txt_num, form.txt_date]);
+            test.rtval.registerCustomOnChangeEvents([form.txt_string], _customValidatorEvent);
+        },
+        
+        
+        
+        validateForm : function(form)
+        {
+            var _validator = new nettools.jscore.validator.FormValidator({
+                
+                    required : ['txt_num', 'txt_date'],
+                
+                    regexps : {
+                        txt_num : nettools.jscore.validator.Patterns.INT,
+                        txt_date : nettools.jscore.validator.Patterns.DATEYMD
+                    },
+                
+                    onsubmit : function(elements)
+                        {
+                            if ( elements.txt_string.value != '' )
+                                return {statut:true};
+                            else
+                                return {statut:false, message:'Field is required', field:elements.txt_string};
+                        }
+                
+                });
+            
+            var st = _validator.isValid(form.elements);
+            if ( st.statut )
+                sample.output("Form validation OK");
+            else
+                sample.output("Form validation FAILED from field '" + st.field.name + "' with message '" + st.message + "'");
+            
+            return false;
+        },
+        
+        
+        validateFormPromise : function(form)
+        {
+            var _validator = new nettools.jscore.validator.FormValidator({
+                
+                    required : ['txt_num', 'txt_date'],
+                
+                    regexps : {
+                        txt_num : nettools.jscore.validator.Patterns.INT,
+                        txt_date : nettools.jscore.validator.Patterns.DATEYMD
+                    },
+                
+                    onsubmitpromise : function(elements)
+                        {
+                            if ( elements.txt_string.value != '' )
+                                return Promise.resolve({statut:true});
+                            else
+                                return Promise.reject({statut:false, message:'Field is required', field:elements.txt_string});
+                        }
+                
+                });
+            
+            var st = _validator.isValid(form.elements);
+            if ( st instanceof Promise )
+                st.then(function(st){sample.output("Form validation OK");}).
+                    catch(function(st){sample.output("Form validation FAILED from field '" + st.field.name + "' with message '" + st.message + "'");});
+            else if ( st && !st.statut )
+                sample.output("Form validation FAILED from field '" + st.field.name + "' with message '" + st.message + "'");
+                                
+            
+            return false;
+        },
+        
+        
+        
+        loadi18n : function()
+        {
+            nettools.jscore.loadScript('../src/js-core.i18n.fr.js', function(){alert('FR translations loaded !');});
         }
         
     }
@@ -222,7 +384,7 @@
     
        
         <div class="sampleBox">
-            <h1>Size & array functions</h1>
+            <h1>Size &amp; array functions</h1>
             <div id="sampleSizeArray">   
                 <p>Size.add(int, Size) : <input type="text" value="12px"><input type="text" value="15em"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).add(new nettools.jscore.Size(this.previousSibling.value)));"></p>
                 <p>Size.subtract(int, Size) : <input type="text" value="12px"><input type="text" value="15em"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).subtract(new nettools.jscore.Size(this.previousSibling.value)));"></p>
@@ -249,12 +411,55 @@
     
        
         <div class="sampleBox">
+            <h1>nettools.jscore.RealTimeValidator</h1>
+            <div id="sampleRTValidator">   
+                <form>
+                    <p><label>Numeric field : <input type="text" name="txt_num"></label></p>
+                    <p><label>String field : <input type="text" name="txt_string"></label></p>
+                    <p><label>Date yyyymmdd field : <input type="text" name="txt_date"></label></p>
+                    <p><input type="button" value="Real time validator on" onclick="test.rtv_on(this.form);"></p>
+                </form>
+            </div>
+        </div>
+    
+       
+        <div class="sampleBox">
+            <h1>nettools.jscore.FormValidator</h1>
+            <div id="sampleFormValidator">   
+                <form>
+                    <p><label>Numeric field : <input type="text" name="txt_num"></label></p>
+                    <p><label>String field : <input type="text" name="txt_string"></label></p>
+                    <p><label>Date yyyymmdd field : <input type="text" name="txt_date"></label></p>
+                    <p>
+                        <input type="button" value="load FR translations" onclick="test.loadi18n();">
+                        <input type="submit" onclick="return test.validateForm(this.form);"> 
+                        <input type="submit" value="isValid() -> Promise" onclick="return test.validateFormPromise(this.form);">
+                    </p>
+                </form>
+            </div>
+        </div>
+    
+       
+        <div class="sampleBox">
             <h1>nettools.jscore.StorageManager</h1>
             <div id="sampleStorageManager">   
                 <p><input type="submit" value="fetch()" onclick="nettools.jscore.StorageManager.fetch('nettools.jscore.test_storagemanager', 'storage-manager.json', 'tmp', function(val){sample.output(val);})"></p>
             </div>
         </div>
 
+
+        <div class="sampleBox">
+            <h1>nettools.jscore.xmlhttp.*</h1>
+            <div id="sampleXmlhttp">   
+                <p><input type="button" value="load FR translations" onclick="test.loadi18n();"></p>
+                <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
+                <p>parseJsonResponse : <input type="text" value='{"statut":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(statut=false) : <input type="text" value='{"statut":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(statut=false+exception) : <input type="text" value='{"statut":false,"message":"Error occured","exception":"<b>An exception occured !</b>"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(statut=false+simple formatted exception) : <input type="submit" onclick="test.exceptionHandler(true);"></p>
+                <p>&quot; &quot;(statut=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
+            </div>
+        </div>
 
 
     </div>
