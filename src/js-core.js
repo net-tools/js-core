@@ -1298,7 +1298,7 @@ nettools.jscore.RequestHelper = (function(){
          * Sending an XmlHttpRequest
          * 
          * @param string url
-         * @param function(xmlhttpresponse) callback
+         * @param function(xmlhttpobject) callback
          * @param string|Object postData
          */
 		sendXmlHTTPRequest : function(url,callback,postData)
