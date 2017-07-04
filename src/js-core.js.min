@@ -1,4 +1,7 @@
 'use strict';
+// compatibility test
+if ( typeof Object.prototype.bind !== 'function' )
+    alert('Browser not compliant with ECMASCRIPT 5 !');
 window.nettools=window.nettools||{};
 nettools.jscore=nettools.jscore||{setCookie:function(a,b){var c=arguments,d=arguments.length,e=2<d?c[2]:null,f=3<d?c[3]:null,h=4<d?c[4]:null;c=5<d?!!c[5]:!1;document.cookie=a+"="+encodeURIComponent(b)+(null===e?"":"; expires="+e.toGMTString())+(null===f?"":"; path="+f)+(null===h?"":"; domain="+h)+(!0===c?"; secure":"")},getCookie:function(a){for(var b=document.cookie.split(";"),c,d,e=null,f=0;f<b.length;f++)if(c=b[f].split("="),d=c[0].replace(/^\s+|\s+$/g,""),d===a)return 1<c.length&&(c.shift(),e=
 decodeURIComponent(c.join("=").replace(/^\s+|\s+$/g,""))),e;return null},deleteCookie:function(a,b,c){nettools.jscore.getCookie(a)&&(document.cookie=a+"="+(b?";path="+b:"")+(c?";domain="+c:"")+";expires=Thu, 01-Jan-1970 00:00:01 GMT")},firstUpperCase:function(a){a=String(a);return""!=a?a.substr(0,1).toUpperCase()+a.substr(1):""},removeDiacritics:function(a){for(var b=[{base:"A",letters:/[\u0041\u24B6\uFF21\u00C0\u00C1\u00C2\u1EA6\u1EA4\u1EAA\u1EA8\u00C3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\u00C4\u01DE\u1EA2\u00C5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F]/g},

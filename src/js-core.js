@@ -1,6 +1,15 @@
 'use strict';
 
 
+// compatibility test
+if ( typeof Object.prototype.bind !== 'function' )
+    alert('Browser not compliant with ECMASCRIPT 5 !');
+
+
+
+
+
+
 // namespace
 window.nettools = window.nettools || {};
 nettools.jscore = nettools.jscore || {
