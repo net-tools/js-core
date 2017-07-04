@@ -1,12 +1,6 @@
 'use strict';
 
 
-// compatibility test
-if ( typeof Object.prototype.bind !== 'function' )
-    alert('Browser not compliant with ECMASCRIPT 5 !');
-
-
-
 
 
 
@@ -600,7 +594,11 @@ nettools.jscore = nettools.jscore || {
     {
         // si navigateur moderne, utiliser fonction intégrée
         if ( window['atob'] )
-            return window.atob.bind(window);//function(data){return atob(data);}
+            // test compat ecmascript 5
+            if ( typeof Function.prototype.bind !== 'function' )
+                return function(data){return atob(data)};
+            else
+                return window.atob.bind(window);//function(data){return atob(data);}
         else
             // sinon fonction perso, moins optimisée
             return function(data)
@@ -835,6 +833,14 @@ nettools.jscore = nettools.jscore || {
      */
     addEvent : function(obj, eventname, cb)
     {
+        // compatibility test
+        if ( typeof Function.prototype.bind !== 'function' )
+        {
+            alert('Browser not compliant with ECMASCRIPT 5 !');
+            return;
+        }
+        
+        
         // si déjà un comportement défini, le sauvegarder
         if ( typeof obj[eventname] === 'function' )
         {
