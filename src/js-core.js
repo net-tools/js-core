@@ -1795,6 +1795,15 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          */
 		sendRequestPromise : function(url, postData)
 		{
+            if ( typeof Promise === 'undefined' )
+            {
+                console.log('Browser not compliant with ECMASCRIPT 6 Promises feature !');
+                var o = {};
+                o.then = function(cb){return o;};
+                o.catch = function(cb){cb('Browser not compliant with ECMASCRIPT 6 Promises feature !'); return o;};
+                return o;
+            }
+            
 			return new Promise(function(resolve, reject)
 					{
 						var cb = function(req)

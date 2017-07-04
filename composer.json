@@ -1,7 +1,7 @@
 {
     "name" : "net-tools/js-core",
 	
-    "description" : "Composer library for Javascript core functions ; ECMASCRIPT 5+ required",
+    "description" : "Composer library for Javascript core functions ; ECMASCRIPT 5+ required (6 for Promises feature support)",
 	
 	"type": "library",
 	
