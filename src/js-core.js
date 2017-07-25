@@ -2,10 +2,16 @@
 
 
 
-
-
-// namespace
+// global namespace
 window.nettools = window.nettools || {};
+
+
+
+/**
+ * Namespace for JS core methods
+ * 
+ * @namespace nettools.jscore
+ */
 nettools.jscore = nettools.jscore || {
 
     
@@ -17,6 +23,7 @@ nettools.jscore = nettools.jscore || {
      *
      * To create a cookie that expires in 1 year, pass a Date object created this way : var date_exp = new Date(); date_exp.setTime(date_exp.getTime()+(365*24*3600*1000))
      *
+     * @method setCookie
      * @param string name 
      * @param string value
      * @param Date expires
@@ -44,6 +51,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Get cookie
      * 
+     * @method getCookie
      * @param string check_name
      * @return null|string Return cookie value or NULL if not found
      */
@@ -95,6 +103,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Delete a cookie when called
      *
+     * @method deleteCookie
      * @param string name
      * @param string path
      * @param string domain
@@ -119,6 +128,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Set the first letter to upper case
      * 
+     * @method firstUpperCase
      * @param string s
      * @return string
      */
@@ -136,6 +146,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Replace diacritic characters (such as é or à) by their simple equivalent (e or a)
      *
+     * @method removeDiacritics 
      * @param string str
      * @return string
      */
@@ -240,6 +251,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Encode a string that should be passed in URL
      *
+     * @method escape
      * @param string str
      * @return string
      */
@@ -256,6 +268,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Decode an URL encoded string
      * 
+     * @method unescape
      * @param string str
      * @return string
      */
@@ -271,6 +284,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Filter an array and remove null values (null, undefined) or empty values ''
      *
+     * @method arrayFilter
      * @param string[] arr
      * @param bool removeNullValues Defaults to true
      * @param bool removeEmptyValues Defaults to true
@@ -321,6 +335,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Assert that a number has a leading zero (useful for hours and minutes formatting)
      * 
+     * @method leadingZero
      * @param string|int n
      * @return string
      */
@@ -337,6 +352,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Assert that a number has no leading zero (useful for removing 0 in front of hours and minutes formats)
      * 
+     * @method trimLeadingZero
      * @param string|int n
      * @return int
      */
@@ -354,6 +370,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Adjust date to midnight
      * 
+     * @method date2Midnight
      * @param Date dt
      * @return Date
      */
@@ -368,6 +385,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Pick a random number between min and max
      * 
+     * @method random
      * @param int min
      * @param int max
      * @return int
@@ -384,6 +402,7 @@ nettools.jscore = nettools.jscore || {
      * 
      * We return either a string or a litteral object, depending on what type is QS
      * 
+     * @method querystringAppend
      * @param Object|string qs
      * @param string key
      * @param string value
@@ -407,6 +426,7 @@ nettools.jscore = nettools.jscore || {
      *
      * If the URL has no querystring, ? will be prepend before appending parameters ; otherwise, & will be inserted before new parameters, at the end of the string
      * 
+     * @method appendToUrl
      * @param string url
      * @param string append
      * @return string
@@ -424,6 +444,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Replace some unwanted characters to their HTML entities
      * 
+     * @method htmlentities
      * @param string s
      * @return string
      */
@@ -442,6 +463,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Counting how many times a substring is mentionned in a string
      * 
+     * @method count
      * @param string sub
      * @param string s
      * @return int
@@ -469,6 +491,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Extract file name with extension from a filepath (folders are trimmed)
      *
+     * @method extractFileName
      * @param string fname
      * @return string
      */     
@@ -487,6 +510,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Trim spaces left and right in a string
      *
+     * @method trim
      * @param string str
      * @return string
      */
@@ -504,6 +528,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Trim spaces left in a string
      *
+     * @method ltrim
      * @param string str
      * @return string
      */
@@ -519,6 +544,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Trim spaces right in a string
      *
+     * @method rtrim
      * @param string str
      * @return string
      */
@@ -534,6 +560,7 @@ nettools.jscore = nettools.jscore || {
     /** 
      * Create a random value (length may be set)
      * 
+     * @method randomNumber
      * @param int digits Number of digits of random value ; if omitted, we create a 16 digits value
      * @return int
      */
@@ -548,6 +575,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Get info about current URL
      * 
+     * @method selfUrl
      * @return Object Returns an object litteral with path, queryString and url properties
      */
     selfUrl : function()
@@ -564,6 +592,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Create a unique ID (hex value) of len digits
      * 
+     * @method uniqueId
      * @param int len
      * @return string
      */
@@ -587,6 +616,7 @@ nettools.jscore = nettools.jscore || {
      * 
      * If the browser is compliant with window.atob, we use it ; otherwise, we use a polyfill
      *
+     * @method base64_decode
      * @param string data
      * @return string
      */
@@ -664,6 +694,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Merge two objects litteral
      * 
+     * @method mergeObjects
      * @param Object dest
      * @param Object source
      * @return Object Existing values in DEST are overridden by corresponding values in SOURCE
@@ -696,6 +727,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Get DOM event target
      * 
+     * @method getTarget
      * @param Event e
      * @return Node
      */
@@ -713,6 +745,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Get info about the selected item from a SELECT input
      *
+     * @method getOption
      * @param HTMLSelectElement sel
      * @return Object Returns an object litteral with text, value, index, self proprerties
      */
@@ -734,6 +767,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Get the current checked radio bouton
      *
+     * @method getCheckedRadioButton
      * @param HTMLForm f
      * @param string name
      * @return null|HTMLRadioInput
@@ -755,6 +789,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Converting a NodeList of HTML input elements to a querystring (a string where values are url-encoded)
      *  
+     * @method inputs2querystring
      * @param NodeList elements
      */ 
     inputs2querystring : function(elements)
@@ -767,6 +802,7 @@ nettools.jscore = nettools.jscore || {
     /** 
      * Convert a NodeList of input elements to an object litteral
      * 
+     * @method formFieldsToObject
      * @param NodeList elements
      * @return Object
      */
@@ -806,6 +842,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Set an event on a DOM node
      * 
+     * @method registerEvent
      * @param Node obj
      * @param string ev
      * @param function(Event) cb Callback called for the EV event
@@ -827,6 +864,7 @@ nettools.jscore = nettools.jscore || {
      * The event chain makes it possible to halt event handling ; with DOM event listener we can only cancel propagation in the DOM tree, but we can't prevent 
      * events from being called to all the handlers registered for a given target/event.
      *
+     * @method addEvent
      * @param Node obj
      * @param string eventname
      * @param function(Event) cb
@@ -863,6 +901,7 @@ nettools.jscore = nettools.jscore || {
     /** 
      * Register a user-function to be called at DOM onload event
      * 
+     * @method registerOnLoadCallback
      * @param function(Event) cb
      */
     registerOnLoadCallback : function(cb)
@@ -875,6 +914,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Dynamic script loading with loaded event callback
      *
+     * @method loadScript
      * @param string src
      * @param function(Event) cb
      */
@@ -910,6 +950,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Stop DOM tree event propagation
      * 
+     * @method stopPropagation
      * @param Event e
      */
     stopPropagation : function(e)
@@ -924,6 +965,7 @@ nettools.jscore = nettools.jscore || {
     /** 
      * Show or hide a DOM node
      * 
+     * @method showHide
      * @param Node|string objname
      * @param null|bool visible If this parameter is omitted, showHide is has a on/off behavior
      * @param string display Display CSS value to set when showing the node (usually 'block', but may also be 'inline-block')
@@ -970,6 +1012,7 @@ nettools.jscore = nettools.jscore || {
     /** 
      * Find next item in the DOM tree, ignoring text nodes
      * 
+     * @method nextSibling
      * @param Node elem
      * @return Node
      */
@@ -987,6 +1030,7 @@ nettools.jscore = nettools.jscore || {
     /** 
      * Find previous item in the DOM tree, ignoring text nodes
      * 
+     * @method previousSibling
      * @param Node elem
      * @return Node
      */
@@ -1006,6 +1050,7 @@ nettools.jscore = nettools.jscore || {
      *
      * String must be properly formatted : no space around ';', and a trailing ';' is required !
      *
+     * @method cssToJs
      * @param string css
      * @return Object
      */
@@ -1031,6 +1076,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Convert an object litteral to a CSS string (camelCase properties are converted to values with '-' separator ; declarations are separated with '; ')
      * 
+     * @method jsToCss
      * @param Object styles
      * @return string
      */
@@ -1051,6 +1097,7 @@ nettools.jscore = nettools.jscore || {
     /**
      * Convert a string style name in camelCase to CSS format (eg. fontSize to font-size)
      *
+     * @method camelCaseToCss
      * @param string jsStyle
      * @return string
      */
@@ -1074,6 +1121,7 @@ nettools.jscore = nettools.jscore || {
     /** 
      * Convert a CSS formatted declaration to camelCase (eg. aaa-bbb-ccc to aaaBbbCcc)
      * 
+     * @method cssToCamelCase
      * @param string css
      * @return string
      */
@@ -1090,8 +1138,87 @@ nettools.jscore = nettools.jscore || {
         }	
 
         return ret;
-    }
+    },
     
+    
+    
+    
+    
+    
+    
+// ==== CRYPTO ====
+    
+    /**
+     * SHA1 computation
+     *
+     * @method sha1
+     * @param string str
+     * @return string
+     */
+    sha1 : function(str)
+    {
+        return CryptoJS.SHA1(str).toString();
+    },
+
+
+
+    /**
+     * SHA256 computation
+     *
+     * @method sha256
+     * @param string str
+     * @return string
+     */
+    sha256 : function(str)
+    {
+        return CryptoJS.SHA256(str).toString();
+    },
+
+    
+
+    /**
+     * HMACSHA256 computation
+     *
+     * @method hmacSha256
+     * @param string str
+     * @param string key
+     * @return string
+     */
+    hmacSha256 : function(str, key)
+    {
+        return CryptoJS.HmacSHA256(str, key).toString();
+    },   
+
+    
+
+    /** 
+     * AES encrypt
+     *
+     * @method aes_encrypt
+     * @param string str
+     * @param string key
+     * @return string
+     */
+    aes_encrypt : function(str, key)
+    {
+        return CryptoJS.AES.encrypt(JSON.stringify(str), key, {format: CryptoJSAesJson}).toString();
+    },
+
+
+
+    /**
+     * AES decrypt
+     *
+     * @method aes_decrypt
+     * @param string str
+     * @param string key
+     * @return string
+     */
+    aes_decrypt : function(str, key)
+    {
+        return JSON.parse(CryptoJS.AES.decrypt(str, key, {format: CryptoJSAesJson}).toString(CryptoJS.enc.Utf8));
+    }
+
 }
 
 
@@ -1104,6 +1231,11 @@ nettools.jscore = nettools.jscore || {
 
 
 // ==== STORAGE MANAGER ====
+/**
+ * Namespace to load json data from a file and caching it in browser localStorage
+ *
+ * @namespace nettools.jscore.StorageManager
+ */
 nettools.jscore.StorageManager = {
 
 	/**
@@ -1112,6 +1244,7 @@ nettools.jscore.StorageManager = {
      * If no value found, we read a JSON file and store its contents to the localStorage, for further use.
      * If the browser is not compliant with localStorage, we read the JSON file, but we don't do any cache stuff
      *
+     * @method fetch
      * @param string key
      * @param string ressource Path to JSON encoded file used if KEY index is not found in browser localStorage
      * @param string ns String pointing to the JSON value set (eg. 'data.clients') in the JSON file
@@ -1182,6 +1315,11 @@ nettools.jscore.StorageManager = {
 
 // ==== REQUESTHELPER ====
 
+/**
+ * Namespace to handle POST and XmlHttp requests
+ *
+ * @namespace nettools.jscore.RequestHelper
+ */
 nettools.jscore.RequestHelper = (function(){
 
 	// --- PRIVATE DECLARATIONS ---
@@ -1204,6 +1342,7 @@ nettools.jscore.RequestHelper = (function(){
          * - signUrl has an elements array parameters which holds an array of parameter names in url to use in signature
          * - sign has an elements array
          * 
+         * @method setSignOn
          * @param bool b
          * @param function(Object) Callback called to identify to use in the signature process ; must return {elements:[string1, string2], token:string}
          */
@@ -1218,6 +1357,7 @@ nettools.jscore.RequestHelper = (function(){
 		/**
          * Sign mode accessor
          * 
+         * @method getSignOn
          * @return bool
          */
 		getSignOn : function()
@@ -1230,6 +1370,7 @@ nettools.jscore.RequestHelper = (function(){
         /**
          * Sign a request as a object litteral ; a new field is appended to postData with the signature
          *
+         * @method signObject
          * @param Object postData
          */
         signObject : function(postData)
@@ -1249,6 +1390,7 @@ nettools.jscore.RequestHelper = (function(){
         /** 
          * Set sign method handler ; by default, a simple sign handler is used (sha256 of message and token concatenated)
          *
+         * @method setSignHandler
          * @param function(msg, token) handler
          */
         setSignHandler : function(h)
@@ -1261,6 +1403,7 @@ nettools.jscore.RequestHelper = (function(){
 		/**
         * Post a request to an URL
         * 
+        * @method post
         * @param string url
         * @param string|Object data
         */
@@ -1312,6 +1455,7 @@ nettools.jscore.RequestHelper = (function(){
 		/** 
          * Sending an XmlHttpRequest
          * 
+         * @method sendXmlHTTPRequest
          * @param string url
          * @param function(xmlhttpobject) callback
          * @param string|Object postData
@@ -1342,6 +1486,7 @@ nettools.jscore.RequestHelper = (function(){
 		/**
          * Send an XmlHttpRequest and get a Promise
          * 
+         * @method sendXmlHTTPRequestPromise
          * @param string url
          * @param string|Object postData
          * @return Promise
@@ -1369,6 +1514,7 @@ nettools.jscore.RequestHelper = (function(){
 		/**
          * Handle error in a Promise ; to use as a callback in .catch promise statements
          *
+         * @method promiseErrorHandler
          * @param Error e
          */
 		promiseErrorHandler : function(e)
@@ -1389,6 +1535,7 @@ nettools.jscore.RequestHelper = (function(){
          * 
          * URL parameters used to sign the request are mentionned in ELEMENTS 
          * 
+         * @method signUrl
          * @param string url
          * @param string token
          * @param string[] elements Array of parameter names to use to sign the request
@@ -1415,6 +1562,7 @@ nettools.jscore.RequestHelper = (function(){
 		/**
          * Sign an array of elements with a token
          *
+         * @method sign
          * @param string[] elements
          * @param string token
          * @return string Returns the ELEMENTS array values signed with token through signMethod handler (default or custom)
@@ -1436,6 +1584,7 @@ nettools.jscore.RequestHelper = (function(){
 		/**
          * Sign a form (all inputs with data-sign attribute set ; the value of the attribute gives the order of message signature)
          * 
+         * @method formSign
          * @param HTMLForm form 
          * @param HTMLInput tokenField Field storing the token
          * @param HTMLInput signField Field to receive the signature
@@ -1482,6 +1631,7 @@ nettools.jscore.RequestHelper = (function(){
          * We handle the special case of bool values : a true or false value is sent by FormData as a string 'true' or 'false' value, 
          * this is not desired, so bool values will be converted to 1 or 0 values
          *
+         * @method object2FormData
          * @param Object obj
          * @param null|FormData fd Already created FormData object or null to create a new one from scratch
          * @return FormData
@@ -1522,6 +1672,11 @@ nettools.jscore.RequestHelper = (function(){
 
 // ==== XMLHTTP ====
 
+/**
+ * Namespace to send XmlHttp requests
+ *
+ * @namespace nettools.jscore.xmlhttp
+ */
 nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
 	// --- PRIVATE DECLARATIONS ---
@@ -1535,7 +1690,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 	
 
     
-	/**
+	/*
      * Factory method to create a XmlHttpRequest object
      */
 	function _createXMLHTTPObject() {
@@ -1557,7 +1712,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 	
     
 	
-	/**
+	/*
     * If an error occured, logging details in the javascript console from formatted error page string
     *
     * @param string exception
@@ -1622,7 +1777,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
 	
     
-	/**
+	/*
      * Display a link to open a new page with exception details
      * 
      * @param string exception
@@ -1663,7 +1818,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
     
 
-	/**
+	/*
      * Log exception to the javascript console AND display a link a the page top.
      * 
      * We think an exception is not a normal behavior, so we alert immediately, even if no catch() statement has
@@ -1680,7 +1835,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 	
 	
     
-	/**
+	/*
      * Handle an exception during XmlHtppRequest
      * 
      * We open a popup window ; if not possible, we display a link at the page top ; the exception is always logged in the javascript console
@@ -1712,9 +1867,17 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
     
 	return {
-        
         /**
-         * Translations
+         * Object litteral defining translations
+         *
+         * The object litteral properties for translations are :
+         * - CANNOT_LOG_EXCEPTION_DETAILS
+         * - CANNOT_OPEN_POPUP_WINDOW_EXCEPTION_DETAILS, 
+         * - UNREADABLE_ASYNC_RESPONSE, 
+         * - ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE,
+         * - NO_ERROR_MESSAGE
+         *
+         * @property Object i18n 
          */
         i18n : {
             CANNOT_LOG_EXCEPTION_DETAILS : 'Can\'t display details about the exception',
@@ -1729,6 +1892,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 		/**
          * Send the request 
          * 
+         * @method sendRequest
          * @param string url
          * @param function(response) callback
          * @param string|Object postData
@@ -1789,6 +1953,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          *
          * The Promise will be resolved with the request json response, or rejected if an error occured
          *
+         * @method sendRequestPromise
          * @param string url
          * @param string|Object postData
          * @return Promise
@@ -1852,6 +2017,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 		/**
          * Decode response to Json
          *
+         * @method parseResponse
          * @param string resp
          * @return null|Object Returns an object litteral or NULL if the response is no valid json
          */
@@ -1877,6 +2043,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * data from exception property and output them to Javascript console (H1 may contain title for exception page such as 
          * 'an exception occured', H2 may contain the exception class name, and CODE will contain the exception message).
          * 
+         * @method parseJsonResponse
          * @param string resp
          * @return Object Returning an object litteral with the Json response, always containing a statut property
          */
@@ -1918,11 +2085,17 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
 
 // ==== OOP STUFF ===
+/* 
+ * Namespace for object oriented programming (inheritance and super calls)
+ * 
+ * @namespace nettools.jscore.oop
+ */
 nettools.jscore.oop = nettools.jscore.oop || {
 
 	/**
      * Inherit from a superclass
      *
+     * @method extend
      * @param Object subclass 
      * @param Object superclass 
      */
@@ -1961,6 +2134,7 @@ nettools.jscore.oop = nettools.jscore.oop || {
 	/** 
      * Call a method in the superclass
      *
+     * @method parentCall
      * @param Object that 
      * @param string method Method name
      * @param Array params Array of method parameters
@@ -1985,6 +2159,7 @@ nettools.jscore.oop = nettools.jscore.oop || {
 	/** 
      * Call superclass constructor
      *
+     * @method parentConstructor
      * @param Object classname 
      * @param Object that 
      * @param Array params Array of constructor parameters
@@ -2003,36 +2178,83 @@ nettools.jscore.oop = nettools.jscore.oop || {
 
 
 
-
-
 // ==== VALIDATORS ====
 
 nettools.jscore.validator = {};
 
 
-// useful validator patterns
-nettools.jscore.validator.Patterns =
-	{
-		DATEYY : /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/[0-9]{2}$/,
-		DATEYYYY : /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/[0-9]{4}$/,
-		DATEYMD : /^[0-9]{4}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$/,
-		CP : /^[0-9]{5}$/,
-		TEL : /^0[0-9]{9}$/,
-		MOBILE : /^0[67][0-9]{8}$/,
-		MAIL : /^[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*@[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*[\.]{1}[a-z]{2,6}$/,
-		INT : /^[0-9]+$/,
-		BOOL : /^[01]$/,
-		FLOAT : /^[0-9]*[0-9]\.[0-9]+$/
-	};
+/**
+ * Namespace for common validation patterns
+ * 
+ * @namespace nettools.jscore.validator.Patterns
+ */
+nettools.jscore.validator.Patterns = {
+    /**
+     * @property string DATEYY
+     */
+    DATEYY : /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/[0-9]{2}$/,
+
+    /**
+     * @property string DATEYYYY
+     */
+    DATEYYYY : /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/[0-9]{4}$/,
+
+    /**
+     * @property string DATEYMD
+     */
+    DATEYMD : /^[0-9]{4}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$/,
+
+    /**
+     * French zip code
+     *
+     * @property string CP
+     */
+    CP : /^[0-9]{5}$/,
+
+    /**
+     * French phone number
+     *
+     * @property string TEL 
+     */
+    TEL : /^0[0-9]{9}$/,
+
+    /**
+     * French cellphone
+     * 
+     * @property string MOBILE
+     */
+    MOBILE : /^0[67][0-9]{8}$/,
+
+    /**
+     * @property string MAIL
+     */
+    MAIL : /^[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*@[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*[\.]{1}[a-z]{2,6}$/,
+
+    /**
+     * @property string INT
+     */
+    INT : /^[0-9]+$/,
+
+    /**
+     * @property string BOOL
+     */
+    BOOL : /^[01]$/,
+
+    /**
+     * @property string FLOAT
+     */
+    FLOAT : /^[0-9]*[0-9]\.[0-9]+$/
+};
 
 
 
 /**
- * Realtime validator constructor
+ * Realtime validator class
  * 
+ * @class nettools.jscore.validator.RealTimeValidator
  * @param function(HTMLInput) rtcb User callback that should return true or false if the input value is accepted or not
  */
-nettools.jscore.validator.RealTimeValidator = function(rtcb){
+nettools.jscore.validator.RealTimeValidator = function(rtcb) {
 		
 
 	// ---- PRIVATE STUFF ----
@@ -2072,6 +2294,7 @@ nettools.jscore.validator.RealTimeValidator = function(rtcb){
     /**
      * Register a new input to validate
      *
+     * @method registerOnChangeEvent
      * @param HTMLInput input
      */
 	this.registerOnChangeEvent = function(input)
@@ -2086,6 +2309,7 @@ nettools.jscore.validator.RealTimeValidator = function(rtcb){
      *
      * The custom callback must set the data-valid to 1 or 0 depending on the input validity
      *
+     * @method registerCustomOnChangeEvents
      * @param HTMLInput[] inputs
      * @param function(Event) customcb
      */
@@ -2112,6 +2336,7 @@ nettools.jscore.validator.RealTimeValidator = function(rtcb){
 	/**
      * Force all inputs to validate
      *
+     * @method update
      * @param HTMLForm f
      */
 	this.update = function(f)
@@ -2127,53 +2352,55 @@ nettools.jscore.validator.RealTimeValidator = function(rtcb){
 
 
 // ---- PUBLIC MEMBERS ----
-nettools.jscore.validator.RealTimeValidator.prototype =
+
+/**
+ * Is the form valid ?
+ * 
+ * @method nettools.jscore.validator.RealTimeValidator.prototype.isValid
+ * @param NodeList elements
+ * @return bool
+ */
+nettools.jscore.validator.RealTimeValidator.prototype.isValid = function (elements)
 {
-	/**
-     * Is the form valid ?
-     * 
-     * @param NodeList elements
-     * @return bool
-     */
-	isValid : function (elements)
-	{
-		var elementsl = elements.length;
-		for ( var i = 0 ; i < elementsl ; i++ )
-		{
-			if ( Number(elements[i].getAttribute('data-valid')) === '0' )
-				return false;
-		}
-					
-		return true;
-	},
-	
+    var elementsl = elements.length;
+    for ( var i = 0 ; i < elementsl ; i++ )
+    {
+        if ( Number(elements[i].getAttribute('data-valid')) === '0' )
+            return false;
+    }
+
+    return true;
+};
+
 
     
-	/**
-     * Register an input to validate with a custom callback
-     * 
-     * @param HTMLInput input
-     * @param function(Event) customcb
-     */
-	registerCustomOnChangeEvent : function(input, customcb)
-	{
-		this.registerCustomOnChangeEvents([input], customcb);
-	},
-	
+/**
+ * Register an input to validate with a custom callback
+ * 
+ * @method nettools.jscore.validator.RealTimeValidator.prototype.registerCustomOnChangeEvent
+ * @param HTMLInput input
+ * @param function(Event) customcb
+ */
+nettools.jscore.validator.RealTimeValidator.prototype.registerCustomOnChangeEvent = function(input, customcb)
+{
+    this.registerCustomOnChangeEvents([input], customcb);
+};
+
 	
     
-	/**
-     * Register several fields to validate
-     *
-     * @param HTMLInput[] inputs
-     */
-	registerOnChangeEvents : function(inputs)
-	{
-		var inputsl = inputs.length;
-		for ( var i = 0; i < inputsl ; i++ )
-			this.registerOnChangeEvent(inputs[i]);
-	}		
+/**
+ * Register several fields to validate
+ *
+ * @method nettools.jscore.validator.RealTimeValidator.prototype.registerOnChangeEvents
+ * @param HTMLInput[] inputs
+ */
+nettools.jscore.validator.RealTimeValidator.prototype.registerOnChangeEvents = function(inputs)
+{
+    var inputsl = inputs.length;
+    for ( var i = 0; i < inputsl ; i++ )
+        this.registerOnChangeEvent(inputs[i]);
 };
+
 // ---- /PUBLIC MEMBERS ----
 	
 	
@@ -2181,14 +2408,14 @@ nettools.jscore.validator.RealTimeValidator.prototype =
 
 
 /**
- * On time validator (by contrast to real-time validator)
+ * One time validator (by contrast to real-time validator)
  *
  * Params constructor parameter : 
  * {
  *	  required : ['input1', 'input2', ...]
  *	  regexps : {input1:/reg/, input2:/reg/, ...}
  *	  onsubmit : callback(elements=form.elements) return {statut:true/false, message:"", field:input}
- *	  onsubmitpromise = callback(elements[]) { return Promise.resolve({statut:true})  **OR** return Promise.reject({statut:false, message:'error', field:input}) }
+ *	  onsubmitpromise = callback(elements[]) { return Promise.resolve({statut:true}) **OR** return Promise.reject({statut:false, message:'error', field:input}) }
  *	  notifier : function({statut:true/false, message:'', field:input})
  *	  root : 'fForm'
  * }
@@ -2197,8 +2424,8 @@ nettools.jscore.validator.RealTimeValidator.prototype =
  * depending on the Promise returned by onsubmitpromise callback (the resolve or reject calls must have an object litteral
  * with statut, field, message properties).
  *
+ * @class nettools.jscore.validator.FormValidator
  * @param Object params Object litteral with properties defining the validation process
- * @return Object Returns an object litteral {statut:bool, field:input, message:string}
  */
 nettools.jscore.validator.FormValidator = function(params) {
 		
@@ -2228,184 +2455,249 @@ nettools.jscore.validator.FormValidator = function(params) {
 
 	// ---- PROTECTED MEMBERS ----
 	
+    /**
+     * Root property accessor
+     *
+     * @method setRoot
+     * @param string r
+     */
 	this.setRoot = function(r) { _root = r; };
-	this.getRoot = function() { return _root; };
+	
+    /**
+     * Root property accessor
+     *
+     * @method getRoot
+     * @return string
+     */
+    this.getRoot = function() { return _root; };
+
+    /**
+     * Required property accessor
+     *
+     * @method setRequired
+     * @param string[] fields Array of field names
+     */
 	this.setRequired = function(fields) { _required = fields; };
+
+    /**
+     * Required property accessor
+     *
+     * @method getRequired
+     * @return string[] Returns an array of field names
+     */
 	this.getRequired = function() { return _required; };
+    
+    /**
+     * Regexps property accessor
+     *
+     * @method setRegExps
+     * @param Object regexps Object litteral with properties (field names) set with regexp patterns
+     */
 	this.setRegExps = function(regexps) { _regexps = regexps; };
+    
+    /**
+     * Regexps property accessor
+     *
+     * @method getRegExps
+     * @return Object Returns an object litteral with properties (field names) set with regexp patterns
+     */
 	this.getRegExps = function() { return _regexps; };
+    
+    /**
+     * Onsubmit property accessor
+     *
+     * @method setOnSubmit
+     * @param function cb Callback called to validate the elements with a user-defined process
+     */
 	this.setOnSubmit = function(cb) { _onsubmit = cb; };
+
+    /**
+     * Onsubmit property accessor
+     *
+     * @method getOnSubmit
+     * @return function Returns the callback called to validate the elements with a user-defined process
+     */
 	this.getOnSubmit = function() { return _onsubmit; };
+    
+    /**
+     * OnsubmitPromise property accessor
+     *
+     * @method setOnSubmitPromise
+     * @param function cb Callback called to validate the elements with a user-defined process
+     */
 	this.setOnSubmitPromise = function(cb) { _onsubmitpromise = cb; };
+    
+    /**
+     * OnsubmitPromise property accessor
+     *
+     * @method getOnSubmitPromise
+     * @return function Returns the callback called to validate the elements with a user-defined process
+     */
 	this.getOnSubmitPromise = function() { return _onsubmitpromise; };
+    
+    /**
+     * Notifier property accessor
+     *
+     * @method setNotifier
+     * @param function n Callback called to notify the user about validation status
+     */
 	this.setNotifier = function(n) { _notifier = n; };
+    
+    /**
+     * Notifier property accessor
+     *
+     * @method getNotifier
+     * @return function Returns the callback called to notify the user about validation status
+     */
 	this.getNotifier = function() { return _notifier; };
 
 	// ---- /PROTECTED MEMBERS ----
 };
 
 
-// ---- PUBLIC MEMBERS ----
-nettools.jscore.validator.FormValidator.prototype = (function(){
 
-	// ---- PRIVATE STATIC MEMBERS ----
+/**
+ * Get a field label (either the NAME parameter or the title attribute, if found)
+ *
+ * @method nettools.jscore.validator.FormValidator.prototype.getFieldLabel
+ * @param HTMLInput field
+ * @param string name
+ * @return string
+ */
+nettools.jscore.validator.FormValidator.prototype.getFieldLabel = function(field, name)
+{
+    // if radio field, we have a nodelist !
+    if ( (field instanceof NodeList) && field[0] )
+        var field = field[0];
 
-	/**
-     * Get a field value
-     * 
-     * @param HTMLInput field
-     * @return string
-     */
-	function _getValue(field)
-	{
-		// text field
-		if ( (field.type==='text') || (field.type==='email') || (field.type==='date') || (field.type==='number') || (field.type==='textarea') || (field.type==='hidden') || (field.type==='file') )
-			return field.value;
-		// select
-		else if ( field.type === 'select-one' )
-			return field.options[field.selectedIndex]?field.options[field.selectedIndex].value:'';
-		// radio
-		else if ( (field instanceof NodeList) && field[0] && (field[0].type === 'radio') )
-		{
-			// look for a selected radio
-			var fieldl = field.length;
-			for ( var i = 0 ; i < fieldl ; i++ )
-				if ( field[i].checked )
-					return field[i].value;
-			
-			return '';
-		}
-		else
-			return field.value;
-	}
-	
-	
+    return ( field.title != '' ) ? field.title : name;
+};
+
+
+
+/**
+ * Validate elements 
+ * 
+ * @method nettools.jscore.validator.FormValidator.prototype.isValid
+ * @param HTMLInput[] elements
+ * @return Object Returns an object litteral {statut:bool, field:input, message:string}
+ */
+nettools.jscore.validator.FormValidator.prototype.isValid = function(elements)
+{
+    function __getValue(field)
+    {
+        // text field
+        if ( (field.type==='text') || (field.type==='email') || (field.type==='date') || (field.type==='number') || (field.type==='textarea') || (field.type==='hidden') || (field.type==='file') )
+            return field.value;
+        // select
+        else if ( field.type === 'select-one' )
+            return field.options[field.selectedIndex]?field.options[field.selectedIndex].value:'';
+        // radio
+        else if ( (field instanceof NodeList) && field[0] && (field[0].type === 'radio') )
+        {
+            // look for a selected radio
+            var fieldl = field.length;
+            for ( var i = 0 ; i < fieldl ; i++ )
+                if ( field[i].checked )
+                    return field[i].value;
+
+            return '';
+        }
+        else
+            return field.value;
+    }
     
-	/** 
-     * Alert with a custom error notifier if validation error
-     *
-     * @param nettools.jscore.validator.FormValidator that
-     * @param Object Object litteral returned by isValid
-     */
-	function _notify(that, st)
-	{
-		if ( !st.statut )
-		{
-			var notifier = that.getNotifier();
-			if ( notifier && (typeof notifier === 'function') )
-				notifier(st);
-		}
-		
-		return st;
-	}
-	
-	// ---- /PRIVATE STATIC MEMBERS ----
+
+    function __notify(that, st)
+    {
+        if ( !st.statut )
+        {
+            var notifier = that.getNotifier();
+            if ( notifier && (typeof notifier === 'function') )
+                notifier(st);
+        }
+
+        return st;
+    }
+
     
-	
-	return {
-        
-		/**
-         * Get a field label (either the NAME parameter or the title attribute, if found)
-         *
-         * @param HTMLInput field
-         * @param string name
-         * @return string
-         */
-		getFieldLabel : function(field, name)
-		{
-			// if radio field, we have a nodelist !
-			if ( (field instanceof NodeList) && field[0] )
-				var field = field[0];
-			
-			return ( field.title != '' ) ? field.title : name;
-		},
-	
-        
-	
-		/**
-         * Validate elements 
-         * 
-         * @param HTMLInput[] elements
-         * @return Object Returns an object litteral {statut:bool, field:input, message:string}
-         */
-		isValid : function(elements)
-		{
-			var _required = this.getRequired();
-			var _root = this.getRoot();
-			var _regexps = this.getRegExps();
-			
-			
-			// validate required fields
-			if ( _required && _required.length )
-				for ( var i = 0 ; i < _required.length ; i++ )
-				{
-					var f = _required[i];
-					
-					if ( f && (_getValue(elements[_root + f]) === "") )
-					{
-						var fi = elements[_root + f];
+    
+    
+    var _required = this.getRequired();
+    var _root = this.getRoot();
+    var _regexps = this.getRegExps();
 
-						return _notify(this, nettools.jscore.validator.FormValidator.returnStatus(
-									false, nettools.jscore.validator.FormValidator.i18n.REQUIRED_FIELD + " : '" + this.getFieldLabel(fi, f) + "'", fi));
-					}
-				}
-					
-					
-			// if we arrive here, required fields are OK ; matching regexps now
-			if ( _regexps )
-				for ( var r in _regexps )
-				{
-					var fi = elements[_root + r];
-					
-					if ( _getValue(fi) !== "" )
-						if ( ! _regexps[r].test(_getValue(fi)) )
-							return _notify(this, nettools.jscore.validator.FormValidator.returnStatus(
-										false, nettools.jscore.validator.FormValidator.i18n.WRONG_FORMAT + " : '" + this.getFieldLabel(fi, r) + "'", fi));
-				}
-				
-	
-			// if we arrive here, required and regexps fields are ok
-			// call the custom Promise validation handler (with Promise returning {statut:true/false,message:'', field:input})
-			if ( this.getOnSubmitPromise() )
-			{
-				var p = this.getOnSubmitPromise()(elements);
-				var that = this;
-				return p.catch(
-						function(st)
-						{
-							// if no error, but validation ko ; otherwise, the error treatment is done later in the Promise chain
-							if ( !(st instanceof Error) )
-								_notify(that, st);
-								
-							// returning a rejected Promise
-							return Promise.reject(st);
-						}
-					);
-			}
 
-            
+    // validate required fields
+    if ( _required && _required.length )
+        for ( var i = 0 ; i < _required.length ; i++ )
+        {
+            var f = _required[i];
 
-			// if we arrive here, required and regexps fields are ok, and we don't want to call a custom Promise validation handler
-			if ( this.getOnSubmit() )
-			{
-				var st = this.getOnSubmit()(elements);
-				
-				if ( !st.statut )
-					return _notify(this, st);
-			}
-			
-			
-			// everything Ok
-			return nettools.jscore.validator.FormValidator.returnStatus(true);
-		}
-	};
-})();
-// ---- /PUBLIC MEMBERS ----
+            if ( f && (__getValue(elements[_root + f]) === "") )
+            {
+                var fi = elements[_root + f];
+
+                return __notify(this, nettools.jscore.validator.FormValidator.returnStatus(
+                            false, nettools.jscore.validator.FormValidator.i18n.REQUIRED_FIELD + " : '" + this.getFieldLabel(fi, f) + "'", fi));
+            }
+        }
+
+
+    // if we arrive here, required fields are OK ; matching regexps now
+    if ( _regexps )
+        for ( var r in _regexps )
+        {
+            var fi = elements[_root + r];
+
+            if ( __getValue(fi) !== "" )
+                if ( ! _regexps[r].test(__getValue(fi)) )
+                    return __notify(this, nettools.jscore.validator.FormValidator.returnStatus(
+                                false, nettools.jscore.validator.FormValidator.i18n.WRONG_FORMAT + " : '" + this.getFieldLabel(fi, r) + "'", fi));
+        }
+
+
+    // if we arrive here, required and regexps fields are ok
+    // call the custom Promise validation handler (with Promise returning {statut:true/false,message:'', field:input})
+    if ( this.getOnSubmitPromise() )
+    {
+        var p = this.getOnSubmitPromise()(elements);
+        var that = this;
+        return p.catch(
+                function(st)
+                {
+                    // if no error, but validation ko ; otherwise, the error treatment is done later in the Promise chain
+                    if ( !(st instanceof Error) )
+                        __notify(that, st);
+
+                    // returning a rejected Promise
+                    return Promise.reject(st);
+                }
+            );
+    }
+
+
+
+    // if we arrive here, required and regexps fields are ok, and we don't want to call a custom Promise validation handler
+    if ( this.getOnSubmit() )
+    {
+        var st = this.getOnSubmit()(elements);
+
+        if ( !st.statut )
+            return __notify(this, st);
+    }
+
+
+    // everything Ok
+    return nettools.jscore.validator.FormValidator.returnStatus(true);
+};
+
 
 
 /**
  * Return a validation status
  * 
+ * @method nettools.jscore.validator.FormValidator.returnStatus
  * @param bool str
  * @param null|string msg
  * @param null|HTMLInput f
@@ -2418,8 +2710,14 @@ nettools.jscore.validator.FormValidator.returnStatus = function(st, msg, f)
 
 
 
-/** 
- * Translations
+/**
+ * Object litteral defining translations
+ *
+ * The object litteral properties for translations are :
+ * - REQUIRED_FIELD
+ * - WRONG_FORMAT 
+ *
+ * @property Object nettools.jscore.validator.FormValidator.i18n 
  */
 nettools.jscore.validator.FormValidator.i18n = {
     REQUIRED_FIELD : 'Missing data',
@@ -2442,6 +2740,8 @@ nettools.jscore.struct = nettools.jscore.struct || {};
 
 /**
  * Stack
+ *
+ * @class nettools.jscore.struct.Stack
  */
 nettools.jscore.struct.Stack = function()
 {
@@ -2451,6 +2751,7 @@ nettools.jscore.struct.Stack = function()
     /**
      * Push an item in the stack
      * 
+     * @method push
      * @param mixed o
      */
 	this.push = function(o)
@@ -2463,6 +2764,7 @@ nettools.jscore.struct.Stack = function()
     /** 
      * Pop an item from the stack
      *
+     * @method pop
      * @return false|mixed
      */
 	this.pop = function()
@@ -2482,6 +2784,7 @@ nettools.jscore.struct.Stack = function()
     /** 
      * Test if the stack holds an item
      *
+     * @method contains
      * @param mixed elem
      * @return bool
      */
@@ -2499,6 +2802,7 @@ nettools.jscore.struct.Stack = function()
     /** 
      * Get the stack as a string
      *
+     * @method join
      * @param string delimiter
      * @return string
      */
@@ -2512,6 +2816,7 @@ nettools.jscore.struct.Stack = function()
     /**
      * Count items
      *
+     * @method count
      * @return int
      */
 	this.count = function() { return _stack.length; };
@@ -2519,15 +2824,15 @@ nettools.jscore.struct.Stack = function()
 };
 
 
-nettools.jscore.struct.Stack.prototype = 
-{
-    /**
-     * Test if stack is empty
-     * 
-     * @return bool
-     */
-	isEmpty : function() { return ! (this.count()); }
-};
+/**
+ * Test if stack is empty
+ * 
+ * @method nettools.jscore.struct.Stack.prototype.isEmpty
+ * @return bool
+ */
+nettools.jscore.struct.Stack.prototype.isEmpty = function() { 
+    return ! (this.count()); 
+}
 
 
 
@@ -2539,7 +2844,8 @@ nettools.jscore.struct.Stack.prototype =
 /**
  * Pool of objects
  * 
- * @param function() cons Constructor to create a new object as needed
+ * @class nettools.jscore.struct.Pool
+ * @param function cons Constructor to create a new object as needed
  */
 nettools.jscore.struct.Pool = function(cons)
 {
@@ -2551,6 +2857,7 @@ nettools.jscore.struct.Pool = function(cons)
     /** 
      * Get an item from the pool (new one or used one)
      *
+     * @method get
      * @return Object
      */
 	this.get = function()
@@ -2566,6 +2873,7 @@ nettools.jscore.struct.Pool = function(cons)
     /**
      * Release an item and replace it the the pool so that it can be reused
      * 
+     * @method release
      * @param Object o
      */
 	this.release = function(o)
@@ -2622,51 +2930,6 @@ d[e>>>5]|=128<<24-e%32;d[(e+64>>>9<<4)+14]=h.floor(b/4294967296);d[(e+64>>>9<<4)
 
 
 
-/**
- * SHA1 computation
- *
- * @param string str
- * @return string
- */
-nettools.jscore.sha1 = function(str)
-{
-	return CryptoJS.SHA1(str).toString();
-};
-
-	
-
-/**
- * SHA256 computation
- *
- * @param string str
- * @return string
- */
-nettools.jscore.sha256 = function(str)
-{
-	return CryptoJS.SHA256(str).toString();
-};
-		
-		
-/**
- * HMACSHA256 computation
- *
- * @param string str
- * @param string key
- * @return string
- */
-nettools.jscore.hmacSha256 = function(str, key)
-{
-	return CryptoJS.HmacSHA256(str, key).toString();
-};
-		
-
-
-
-
-
-
-// ==== CRYPTO ====
-
 // AES
 (function(){var u=CryptoJS,p=u.lib.WordArray;u.enc.Base64={stringify:function(d){var l=d.words,p=d.sigBytes,t=this._map;d.clamp();d=[];for(var r=0;r<p;r+=3)for(var w=(l[r>>>2]>>>24-8*(r%4)&255)<<16|(l[r+1>>>2]>>>24-8*((r+1)%4)&255)<<8|l[r+2>>>2]>>>24-8*((r+2)%4)&255,v=0;4>v&&r+0.75*v<p;v++)d.push(t.charAt(w>>>6*(3-v)&63));if(l=t.charAt(64))for(;d.length%4;)d.push(l);return d.join("")},parse:function(d){var l=d.length,s=this._map,t=s.charAt(64);t&&(t=d.indexOf(t),-1!=t&&(l=t));for(var t=[],r=0,w=0;w<
 l;w++)if(w%4){var v=s.indexOf(d.charAt(w-1))<<2*(w%4),b=s.indexOf(d.charAt(w))>>>6-2*(w%4);t[r>>>2]|=(v|b)<<24-8*(r%4);r++}return p.create(t,r)},_map:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="}})();
@@ -2710,37 +2973,6 @@ var CryptoJSAesJson = {
 
 
 
-/** 
- * AES encrypt
- *
- * @param string str
- * @param string key
- * @return string
- */
-nettools.jscore.aes_encrypt = function(str, key)
-{
-	return CryptoJS.AES.encrypt(JSON.stringify(str), key, {format: CryptoJSAesJson}).toString();
-};
-
-
-
-/**
- * AES decrypt
- *
- * @param string str
- * @param string key
- * @return string
- */
-nettools.jscore.aes_decrypt = function(str, key)
-{
-	return JSON.parse(CryptoJS.AES.decrypt(str, key, {format: CryptoJSAesJson}).toString(CryptoJS.enc.Utf8));
-};
-
-
-
-
-
-
 
 
 
@@ -2750,6 +2982,7 @@ nettools.jscore.aes_decrypt = function(str, key)
 /**
  * Querystring management constructor
  *
+ * @class nettools.jscore.Querystring
  * @param Object|string str Querystring to manage, either a string with proper URL-encoding or an object litteral
  */
 nettools.jscore.Querystring = function(str){
@@ -2767,6 +3000,7 @@ nettools.jscore.Querystring = function(str){
     /**
      * Get the querystring as an object litteral
      *
+     * @method getQuerystringObject
      * @return Object
      */
     this.getQuerystringObject = function() {return _querystring;}
@@ -2776,6 +3010,7 @@ nettools.jscore.Querystring = function(str){
     /**
      * Set the querystring as an object litteral
      *
+     * @method setQuerystringObject
      * @param Object qs
      */
     this.setQuerystringObject = function(qs) { _querystring = qs; }
@@ -2800,6 +3035,7 @@ nettools.jscore.Querystring = function(str){
 /**
  * Set a querystring in the object
  *
+ * @method nettools.jscore.Querystring.prototype.setQuerystring
  * @param string qs
  * @return nettools.jscore.Querystring Returns this
  */
@@ -2837,6 +3073,7 @@ nettools.jscore.Querystring.prototype.setQuerystring = function(qs)
 /**
  * Get the Querystring object as a string, with proper url encoding
  *
+ * @method nettools.jscore.Querystring.prototype.toString
  * @return string
  */
 nettools.jscore.Querystring.prototype.toString = function()
@@ -2866,6 +3103,7 @@ nettools.jscore.Querystring.prototype.toString = function()
 /** 
  * Add a new parameter to querystring ; value must not be already encoded
  *
+ * @method nettools.jscore.Querystring.prototype.addParameter
  * @param string key
  * @param string value
  * @return nettools.jscore.Querystring Returns this
@@ -2883,6 +3121,7 @@ nettools.jscore.Querystring.prototype.addParameter = function(key, value)
 /** 
  * Removes a parameter from querystring
  *
+ * @method nettools.jscore.Querystring.prototype.removeParameter
  * @param string key
  * @return nettools.jscore.Querystring Returns this
  */
@@ -2905,6 +3144,7 @@ nettools.jscore.Querystring.prototype.removeParameter = function(key)
 /**
  * Url management constructor
  *
+ * @class nettools.jscore.Url
  * @param string str
  */
 nettools.jscore.Url = function(str){
@@ -2923,6 +3163,7 @@ nettools.jscore.Url = function(str){
     /**
      * Get the resource part (before ?)
      *
+     * @method getResource
      * @return string
      */
     this.getResource = function() {return _resource;}
@@ -2932,6 +3173,7 @@ nettools.jscore.Url = function(str){
     /**
      * Set the resource part (before ?)
      *
+     * @method setResource
      * @param string res
      */
     this.setResource = function(res) {_resource = res;}
@@ -2941,6 +3183,7 @@ nettools.jscore.Url = function(str){
     /**
      * Get the querystring part (after ?), as nettools.jscore.Querystring object
      *
+     * @method getQuerystring
      * @return nettools.jscore.Querystring
      */
     this.getQuerystring = function() {return _querystring;}
@@ -2950,6 +3193,7 @@ nettools.jscore.Url = function(str){
     /**
      * Set the querystring part (after ?), as nettools.jscore.Querystring object
      *
+     * @method setQuerystring
      * @param nettools.jscore.Querystring qs
      */
     this.setQuerystring = function(qs) { _querystring = qs; }
@@ -2971,6 +3215,7 @@ nettools.jscore.Url = function(str){
 /**
  * Set an Url in the object
  *
+ * @method nettools.jscore.Url.prototype.setUrl
  * @param string u
  * @return nettools.jscore.Url Returns this
  */
@@ -3011,6 +3256,7 @@ nettools.jscore.Url.prototype.setUrl = function(u)
 /**
  * Get the Url object as a string, with proper url encoding
  *
+ * @method nettools.jscore.Url.prototype.toString
  * @return string
  */
 nettools.jscore.Url.prototype.toString = function()
@@ -3028,6 +3274,7 @@ nettools.jscore.Url.prototype.toString = function()
 /** 
  * Add a new parameter to querystring ; value must not be already encoded
  *
+ * @method nettools.jscore.Url.prototype.addParameter
  * @param string key
  * @param string value
  * @return nettools.jscore.Url Returns this
@@ -3043,6 +3290,7 @@ nettools.jscore.Url.prototype.addParameter = function(key, value)
 /** 
  * Removes a parameter from querystring
  *
+ * @method nettools.jscore.Url.prototype.removeParameter
  * @param string key
  * @return nettools.jscore.Url Returns this
  */
@@ -3066,6 +3314,7 @@ nettools.jscore.Url.prototype.removeParameter = function(key)
 /** 
  * Size object constructor : handle sizes (arithmetics) and preserve unit
  *
+ * @class nettools.jscore.Size
  * @param int|string|nettools.jscore.Size s Size (as a string, an int, or a Size object to clone) ; if no unit given, we assume it's 'px'
  */
 nettools.jscore.Size = function(s)
@@ -3106,6 +3355,7 @@ nettools.jscore.Size = function(s)
 /** 
  * Does the size exists (not null) ?
  *
+ * @method nettools.jscore.Size.prototype.isNull
  * @return bool
  */
 nettools.jscore.Size.prototype.isNull = function()
@@ -3118,6 +3368,7 @@ nettools.jscore.Size.prototype.isNull = function()
 /** 
  * Is size positive ?
  *
+ * @method nettools.jscore.Size.prototype.isPositive
  * @return bool 
  */
 nettools.jscore.Size.prototype.isPositive = function()
@@ -3130,6 +3381,7 @@ nettools.jscore.Size.prototype.isPositive = function()
 /** 
  * Is size negative ?
  *
+ * @method nettools.jscore.Size.prototype.isNegative
  * @return bool 
  */
 nettools.jscore.Size.prototype.isNegative = function()
@@ -3142,6 +3394,7 @@ nettools.jscore.Size.prototype.isNegative = function()
 /**
  * Negate the size sign (eg. 5px becomes -5px)
  *
+ * @method nettools.jscore.Size.prototype.negate
  * @return Size Returns a new Size object
  */
 nettools.jscore.Size.prototype.negate = function()
@@ -3157,6 +3410,7 @@ nettools.jscore.Size.prototype.negate = function()
 /**
  * Get the absolute value of size (eg. -5px becomes 5px ; 5px stays 5px)
  *
+ * @method nettools.jscore.Size.prototype.abs
  * @return Size Returns a new Size object
  */
 nettools.jscore.Size.prototype.abs = function()
@@ -3172,6 +3426,7 @@ nettools.jscore.Size.prototype.abs = function()
 /**
  * Convert the Size object to a string (size with unit appended)
  *
+ * @method nettools.jscore.Size.prototype.toString
  * @return string
  */
 nettools.jscore.Size.prototype.toString = function()
@@ -3187,6 +3442,7 @@ nettools.jscore.Size.prototype.toString = function()
 /**
  * Add a value to a Size object
  * 
+ * @method nettools.jscore.Size.prototype.add
  * @param int|nettools.jscore.Size value Value to add to object, as an int or a Size object
  * @return Size Returns a new Size object where its size property has been incremented with value parameter
  */
@@ -3212,6 +3468,7 @@ nettools.jscore.Size.prototype.add = function(value)
 /**
  * Subtract a value from a Size object
  * 
+ * @method nettools.jscore.Size.prototype.subtract
  * @param int|nettools.jscore.Size value Value to subtract from an object, as an int or a Size object 
  * @return Size Returns a new Size object where its size property has been decremented with value parameter
  */
