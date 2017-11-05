@@ -1,5 +1,5 @@
 
-/*
+/**
  * Object litteral defining translations in French
  *
  * The object litteral properties for translations are :
@@ -21,7 +21,7 @@ nettools.jscore.xmlhttp.i18n = {
 
 
 
-/*
+/**
  * Object litteral defining translations in French
  *
  * The object litteral properties for translations are :
