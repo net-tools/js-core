@@ -1,6 +1,6 @@
 
 /**
- * Object litteral defining translations in French
+ * Object litteral defining translations in French for nettools.jscore.xmlhttp
  *
  * The object litteral properties for translations are :
  * - CANNOT_LOG_EXCEPTION_DETAILS
@@ -21,8 +21,9 @@ nettools.jscore.xmlhttp.i18n = {
 
 
 
+
 /**
- * Object litteral defining translations in French
+ * Object litteral defining translations in French for nettools.jscore.validator.FormValidator
  *
  * The object litteral properties for translations are :
  * - REQUIRED_FIELD
@@ -35,3 +36,18 @@ nettools.jscore.validator.FormValidator.i18n = {
     WRONG_FORMAT : 'Format incorrect'
 };      
      
+
+
+
+/**
+ * Object litteral defining translations for nettools.jscore.SecureRequestHelper
+ *
+ * The object litteral properties for translations are :
+ * - CSRF_VALUE_NOT_SET
+ *
+ * @property Object i18n 
+ */
+nettools.jscore.SecureRequestHelper.i18n = {
+	CSRF_VALUE_NOT_SET : "Cookie CSRF non défini ; la requête a été stoppée."
+};
+

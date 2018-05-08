@@ -308,7 +308,97 @@
         loadi18n : function()
         {
             nettools.jscore.loadScript('../src/js-core.i18n.fr.js', function(){alert('FR translations loaded !');});
-        }
+        },
+		
+		
+		CSRF_setCookie : function()
+		{
+			nettools.jscore.setCookie('myCSRF', 'abcdefghijklmnopqrstuvwxyz'); // expires when browser closed
+			nettools.jscore.SecureRequestHelper.setCSRFCookieName('myCSRF');
+			nettools.jscore.SecureRequestHelper.setCSRFSubmittedValueName('myCSRFparameter');
+			
+			return nettools.jscore.getCookie('myCSRF');
+		},
+		
+		
+		CSRF_sendXmlHTTPRequest : function(value)
+		{
+			try
+			{
+				nettools.jscore.SecureRequestHelper.sendXmlHTTPRequest(
+						// url
+						'js-core-http-secure.php', 
+
+						// callback
+						function(resp)
+						{
+							var r = nettools.jscore.xmlhttp.parseResponse(resp);
+							sample.output('XmlHttpRequest answered with response : \n' + r);
+						},
+
+
+						// postdata
+						{
+							'value1' : 'fixed value',
+							'sent_value' : value
+						}
+					);
+			}
+			// catching Error when trying to send a request with no CSRF value initialized
+			catch (err)
+			{
+				sample.output(err);
+			}
+		},
+		
+		
+		CSRF_sendXmlHTTPRequestFailing : function()
+		{
+			try
+			{
+				nettools.jscore.RequestHelper.sendXmlHTTPRequest(
+						// url
+						'js-core-http-secure.php', 
+
+						// callback
+						function(resp)
+						{
+							var r = nettools.jscore.xmlhttp.parseResponse(resp);
+							sample.output('XmlHttpRequest answered with response : \n' + r);
+						},
+
+
+						// postdata
+						{
+							'value1' : 'fixed value'
+						}
+					);
+			}
+			// catching Error when trying to send a request with no CSRF value initialized
+			catch (err)
+			{
+				sample.output(err);
+			}
+		},
+		
+		
+		CSRF_sendXmlHTTPRequestPromise : function(value)
+		{
+			nettools.jscore.SecureRequestHelper.sendXmlHTTPRequestPromise(
+					// url
+					'js-core-http-promise-secure.php', 
+
+					// postdata
+					{
+						'value1' : 'fixed value',
+						'sent_value' : value
+					}
+				).then(function(r)
+					{
+						sample.output('XmlHttpRequestPromise answered with status OK and message : \n' + r.message);
+					})
+				.catch(nettools.jscore.RequestHelper.promiseErrorHandler);
+		}
         
     }
     
@@ -375,10 +465,27 @@
                     </p>
                 </form>
                 <hr>
-                <p>cssToJs : <input type="text" value="font-size:12px;color:white"><input type="Submit" onclick="sample.output(test.dumpObject(nettools.jscore.cssToJs(this.previousSibling.value)));"></p>
+                <p>cssToJs : <input type="text" value="font-size:12px;color:white;"><input type="Submit" onclick="sample.output(test.dumpObject(nettools.jscore.cssToJs(this.previousSibling.value)));"></p>
                 <p>JsToCss : <input type="Submit" onclick="sample.output(nettools.jscore.jsToCss({fontSize:'12px',color:'black'}));"></p>
                 <p>camelCaseToCss : <input type="text" value="fontSize"><input type="Submit" onclick="test.simpleCall(this);"></p>
                 <p>cssToCamelCase : <input type="text" value="font-size"><input type="Submit" onclick="test.simpleCall(this);"></p>
+            </div>
+        </div>
+    
+       
+        <div class="sampleBox">
+            <h1>Secure requests</h1>
+            <div id="sampleForm">   
+                <form>
+                    <p>
+                        <input type="button" value="Initialize CSRF helper and set cookie" onclick="sample.output(test.CSRF_setCookie()); ">
+					</p>
+					<p>
+                        <input type="text" value="abcd"><input type="button" value="send secure XmlHttp" onclick="test.CSRF_sendXmlHTTPRequest(this.previousSibling.value); ">
+                        <input type="text" value="abcd"><input type="button" value="send secure XmlHttpPromise" onclick="test.CSRF_sendXmlHTTPRequestPromise(this.previousSibling.value); ">
+                        <input type="button" value="failing XmlHttp (missing CSRF parameter)" onclick="test.CSRF_sendXmlHTTPRequestFailing(); ">
+                    </p>
+                </form>
             </div>
         </div>
     
@@ -443,7 +550,7 @@
         <div class="sampleBox">
             <h1>nettools.jscore.StorageManager</h1>
             <div id="sampleStorageManager">   
-                <p><input type="submit" value="fetch()" onclick="nettools.jscore.StorageManager.fetch('nettools.jscore.test_storagemanager', 'storage-manager.json', 'tmp', function(val){sample.output(val);})"></p>
+                <p><input type="submit" value="fetch()" onclick="nettools.jscore.StorageManager.fetch('nettools.jscore.test_storagemanager', 'storage-manager.js', 'tmp', function(val){sample.output(val);})"></p>
             </div>
         </div>
 

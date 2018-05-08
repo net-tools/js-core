@@ -499,7 +499,7 @@ nettools.jscore = nettools.jscore || {
     {
         var ereg = new RegExp('[^/]*\.[a-z0-9]+$', 'i');
         var regs = ereg.exec(fname);
-        if ( regs.length )
+        if ( regs && regs.length )
             return(regs[0]);
         else
             return "";
@@ -1493,20 +1493,27 @@ nettools.jscore.RequestHelper = (function(){
          */
 		sendXmlHTTPRequestPromise : function(url,postData)
 		{
-			if ( (postData === null) || (postData === undefined) )
-				postData = {};
-
-
-			if ( _signOn )
+			try
 			{
-				if ( typeof(postData) === 'string' )
-					postData = (new nettools.jscore.Querystring(postData)).getQuerystringObject();
+				if ( (postData === null) || (postData === undefined) )
+					postData = {};
 
-                nettools.jscore.RequestHelper.signObject(postData);
+
+				if ( _signOn )
+				{
+					if ( typeof(postData) === 'string' )
+						postData = (new nettools.jscore.Querystring(postData)).getQuerystringObject();
+
+					nettools.jscore.RequestHelper.signObject(postData);
+				}
+
+
+				return nettools.jscore.xmlhttp.sendRequestPromise(url, postData);
 			}
-
-
-			return nettools.jscore.xmlhttp.sendRequestPromise(url, postData);
+			catch (err)
+			{
+				return Promise.reject(err);
+			}
 		},
         
         
@@ -1712,12 +1719,12 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 	
     
 	
-	/*
-    * If an error occured, logging details in the javascript console from formatted error page string
-    *
-    * @param string exception
-    * @param string title
-    */
+    /*
+	 * If an error occured, logging details in the javascript console from formatted error page string
+	 *
+	 * @param string exception
+	 * @param string title
+	 */
 	function _logExceptionToConsole(exception, title)
 	{
 		if ( !console )
@@ -2078,6 +2085,172 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
 
 
+/**
+ * Namespace for secure requests
+ *
+ * @namespace nettools.jscore.SecureRequestHelper
+ */
+nettools.jscore.SecureRequestHelper = (function(){
+		
+	var _csrf_cookiename = '_CSRF_';
+	var _csrf_submittedvaluename = '_FORM_CSRF_';
+
+	
+	// get CSRF cookie
+	function _getCSRFCookie()
+	{
+		var v = nettools.jscore.getCookie(_csrf_cookiename);
+		if ( !v )
+			throw new Error(nettools.jscore.SecureRequestHelper.i18n.CSRF_VALUE_NOT_SET);
+
+		return v;
+	}
+
+
+	
+	return {
+	
+        /**
+         * Object litteral defining translations
+         *
+         * The object litteral properties for translations are :
+         * - CSRF_VALUE_NOT_SET
+         *
+         * @property Object i18n 
+         */
+        i18n : {
+            CSRF_VALUE_NOT_SET : 'CSRF cookie not set ; request has been stopped.'
+        },
+		
+		
+		/**
+		 * Set the CSRF cookie name
+		 *
+		 * @param string name
+		 */
+		setCSRFCookieName : function(name)
+		{
+			_csrf_cookiename = name;
+		},
+	
+		
+		
+		/**
+		 * Get the CSRF cookie name
+		 *
+		 * @return string 
+		 */
+		getCSRFCookieName : function()
+		{
+			return _csrf_cookiename;
+		},
+		
+		
+		
+		/**
+		 * Set the CSRF submitted value name
+		 *
+		 * @param string name
+		 */
+		setCSRFSubmittedValueName : function(name)
+		{
+			_csrf_submittedvaluename = name;
+		},
+	
+		
+		
+		/**
+		 * Get the CSRF submitted value name
+		 *
+		 * @return string 
+		 */
+		getCSRFSubmittedValueName : function()
+		{
+			return _csrf_submittedvaluename;
+		},
+		
+		
+		
+		/**
+		 * Send a secure POST request by sending the CSRF cookie inside the request body (double CSRF cookie submit pattern) 
+		 *
+         * @param string url
+         * @param string|Object postData
+		 */		 
+		post : function(url, postData)
+		{
+			// creating a Querystring object
+			var postData = new nettools.jscore.Querystring(postData);
+			
+			// adding the CSRF value as a parameter
+			postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+			
+			// sending request
+			nettools.jscore.RequestHelper.post(url, postData.getQuerystringObject());
+		},
+	
+		
+		
+		/** 
+         * Sending a secure XmlHttpRequest by sending the CSRF cookie inside the request body (double CSRF cookie submit pattern) 
+         * 
+         * @method sendXmlHTTPRequest
+         * @param string url
+         * @param function(xmlhttpobject) callback
+         * @param string|Object postData
+         */
+		sendXmlHTTPRequest : function(url,callback,postData)
+		{
+			// creating a Querystring object
+			var postData = new nettools.jscore.Querystring(postData);
+			
+			// adding the CSRF value as a parameter
+			postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+			
+			// sending request
+			nettools.jscore.xmlhttp.sendRequest(url, callback, postData.getQuerystringObject());			
+		},
+		
+		
+        
+		/**
+         * Send a secure XmlHttpRequest (by sending the CSRF cookie inside the request body (double CSRF cookie submit pattern) and get a Promise
+         * 
+         * @method sendXmlHTTPRequestPromise
+         * @param string url
+         * @param string|Object postData
+         * @return Promise
+         */
+		sendXmlHTTPRequestPromise : function(url,postData)
+		{
+			try
+			{
+				// creating a Querystring object
+				var postData = new nettools.jscore.Querystring(postData);
+
+				// adding the CSRF value as a parameter
+				postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+			}
+			// catch error when _getCSRFCookie fails
+			catch(err)
+			{
+				return Promise.reject(err);
+			}
+			
+			
+			// sending request and returning a promise
+			return nettools.jscore.xmlhttp.sendRequestPromise(url, postData.getQuerystringObject());			
+		}     
+        
+        
+	}
+	
+	
+})();
+ 
+
+
+
 
 
 
@@ -2085,7 +2258,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
 
 // ==== OOP STUFF ===
-/* 
+/** 
  * Namespace for object oriented programming (inheritance and super calls)
  * 
  * @namespace nettools.jscore.oop
