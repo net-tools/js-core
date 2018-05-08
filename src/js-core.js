@@ -2123,9 +2123,11 @@ nettools.jscore.SecureRequestHelper = (function(){
         },
 		
 		
+		
 		/**
 		 * Set the CSRF cookie name
 		 *
+		 * @method setCSRFCookieName
 		 * @param string name
 		 */
 		setCSRFCookieName : function(name)
@@ -2138,6 +2140,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 		/**
 		 * Get the CSRF cookie name
 		 *
+		 * @method getCSRFCookieName
 		 * @return string 
 		 */
 		getCSRFCookieName : function()
@@ -2150,6 +2153,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 		/**
 		 * Set the CSRF submitted value name
 		 *
+		 * @method setCSRFSubmittedValueName
 		 * @param string name
 		 */
 		setCSRFSubmittedValueName : function(name)
@@ -2162,6 +2166,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 		/**
 		 * Get the CSRF submitted value name
 		 *
+		 * @method getCSRFSubmittedValueName
 		 * @return string 
 		 */
 		getCSRFSubmittedValueName : function()
@@ -2174,6 +2179,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 		/**
 		 * Send a secure POST request by sending the CSRF cookie inside the request body (double CSRF cookie submit pattern) 
 		 *
+		 * @method post
          * @param string url
          * @param string|Object postData
 		 */		 
