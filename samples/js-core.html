@@ -398,6 +398,13 @@
 						sample.output('XmlHttpRequestPromise answered with status OK and message : \n' + r.message);
 					})
 				.catch(nettools.jscore.RequestHelper.promiseErrorHandler);
+		},
+		
+		
+		CSRF_replaceAtags : function()
+		{
+			nettools.jscore.SecureRequestHelper.replaceLinksWithPOSTRequests();
+			sample.output('A tags have been replace with POST calls');
 		}
         
     }
@@ -483,7 +490,13 @@
 					<p>
                         <input type="text" value="abcd"><input type="button" value="send secure XmlHttp" onclick="test.CSRF_sendXmlHTTPRequest(this.previousSibling.value); ">
                         <input type="text" value="abcd"><input type="button" value="send secure XmlHttpPromise" onclick="test.CSRF_sendXmlHTTPRequestPromise(this.previousSibling.value); ">
+					</p>
+					<p>
                         <input type="button" value="failing XmlHttp (missing CSRF parameter)" onclick="test.CSRF_sendXmlHTTPRequestFailing(); ">
+					</p>
+					<p>
+                        <input type="button" value="Replace regular A tags with POST calls and CSRF parameters" onclick="test.CSRF_replaceAtags();">
+						<a href="js-core.html?param=value" data-csrf="1">Link with a query string</a>
                     </p>
                 </form>
             </div>

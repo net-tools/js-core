@@ -1320,355 +1320,158 @@ nettools.jscore.StorageManager = {
  *
  * @namespace nettools.jscore.RequestHelper
  */
-nettools.jscore.RequestHelper = (function(){
+nettools.jscore.RequestHelper = {
 
-	// --- PRIVATE DECLARATIONS ---
-	
-	var _signOn = false;
-	var _signCallback = null;
-	var _sign_field = 'sign';
-    var _signMethod = function(msg, token){return nettools.jscore.sha256(msg+token);};
-	
-	// --- /PRIVATE DECLARATIONS ---
-	
-    
-	return {
+   /**
+	* Post a request to an URL
+	* 
+	* @method post
+	* @param string url
+	* @param string|Object data
+	*/
+	post : function(url, data)
+	{
+		// creating form
+		var form = document.createElement('form');
+		form.method = 'post';
+		form.action = url;
+		form.style.visibility = "hidden";
+		form.style.display = "none";
 
-		/**
-         * Set sign mode on or off
-         *
-         * Callback is used in signObject, post, sendXmlHTTPRequest, sendXmlHTTPRequestPromise ; 
-         * - formSign find elements to use in signature by looking at inputs having data-sign attribute
-         * - signUrl has an elements array parameters which holds an array of parameter names in url to use in signature
-         * - sign has an elements array
-         * 
-         * @method setSignOn
-         * @param bool b
-         * @param function(Object) Callback called to identify to use in the signature process ; must return {elements:[string1, string2], token:string}
-         */
-		setSignOn : function(b, cb)
+
+		// add parameters in hidden fields
+		if ( data )
 		{
-			_signOn = b;
-			_signCallback = cb;
-		},
-		
+			// if request as a string, converting it to a object litteral
+			if ( typeof(data) === 'string' )
+				data = (new nettools.jscore.Querystring(data)).getQuerystringObject();
 
-        
-		/**
-         * Sign mode accessor
-         * 
-         * @method getSignOn
-         * @return bool
-         */
-		getSignOn : function()
-		{
-			return _signOn;
-		},
-		
-        
-		
-        /**
-         * Sign a request as a object litteral ; a new field is appended to postData with the signature
-         *
-         * @method signObject
-         * @param Object postData
-         */
-        signObject : function(postData)
-        {
-            if ( typeof _signCallback == 'function' )
-            {
-                // exécuter le callback sur les infos pour obtenir les valeurs à signer et le token éventuel
-                var sdata = _signCallback(postData);
 
-                // créer un paramètre supplémentaire avec cette signature
-                postData[_sign_field] = nettools.jscore.RequestHelper.sign(sdata.elements, sdata.token);
-            }
-        },
-        
-        
-        
-        /** 
-         * Set sign method handler ; by default, a simple sign handler is used (sha256 of message and token concatenated)
-         *
-         * @method setSignHandler
-         * @param function(msg, token) handler
-         */
-        setSignHandler : function(h)
-        {
-            _signMethod = h;    
-        },
-        
-        
-
-		/**
-        * Post a request to an URL
-        * 
-        * @method post
-        * @param string url
-        * @param string|Object data
-        */
-		post : function(url, data)
-		{
-			// creating form
-			var form = document.createElement('form');
-			form.method = 'post';
-			form.action = url;
-			form.style.visibility = "hidden";
-			form.style.display = "none";
-			
-			
-			// add parameters in hidden fields
-			if ( data )
+			// creating hidden fields
+			for ( var d in data )
 			{
-				// if request as a string, converting it to a object litteral
-				if ( typeof(data) === 'string' )
-					data = (new nettools.jscore.Querystring(data)).getQuerystringObject();
-					
-				// if sign mode on
-				if ( _signOn )
-					nettools.jscore.RequestHelper.signObject(data);
+				var e = document.createElement('input');
+				e.type = "hidden";
+				e.name = d;
 
-				
-				// creating hidden fields
-				for ( var d in data )
-				{
-					var e = document.createElement('input');
-					e.type = "hidden";
-					e.name = d;
-					
-					if ( typeof(data[d]) === 'boolean' )
-						e.value = data[d] ? '1':'0';
-					else
-						e.value = ((data[d]!==undefined) && (data[d]!==null)) ? data[d] : "";
-					
-					form.appendChild(e);
-				}
+				if ( typeof(data[d]) === 'boolean' )
+					e.value = data[d] ? '1':'0';
+				else
+					e.value = ((data[d]!==undefined) && (data[d]!==null)) ? data[d] : "";
+
+				form.appendChild(e);
 			}
-				
-			// submitting form
-			document.body.appendChild(form);
-			form.submit();
-		},
-		
-        
-		
-		/** 
-         * Sending an XmlHttpRequest
-         * 
-         * @method sendXmlHTTPRequest
-         * @param string url
-         * @param function(xmlhttpobject) callback
-         * @param string|Object postData
-         */
-		sendXmlHTTPRequest : function(url,callback,postData)
+		}
+
+		// submitting form
+		document.body.appendChild(form);
+		form.submit();
+	},
+
+
+
+	/** 
+	 * Sending an XmlHttpRequest
+	 * 
+	 * @method sendXmlHTTPRequest
+	 * @param string url
+	 * @param function(xmlhttpobject) callback
+	 * @param string|Object postData
+	 */
+	sendXmlHTTPRequest : function(url,callback,postData)
+	{
+		// conform parameters
+		if ( (postData === null) || (postData === undefined) )
+			postData = {};
+
+
+		return nettools.jscore.xmlhttp.sendRequest(url, callback, postData);
+	},
+
+
+
+	/**
+	 * Send an XmlHttpRequest and get a Promise
+	 * 
+	 * @method sendXmlHTTPRequestPromise
+	 * @param string url
+	 * @param string|Object postData
+	 * @return Promise
+	 */
+	sendXmlHTTPRequestPromise : function(url,postData)
+	{
+		try
 		{
-			// conform parameters
 			if ( (postData === null) || (postData === undefined) )
 				postData = {};
 
 
-			// if sign mode on
-			if ( _signOn )
-			{
-				// if parameters in a string, converting to an objet litteral
-				if ( typeof(postData) === 'string' )
-					postData = (new nettools.jscore.Querystring(postData)).getQuerystringObject();
-
-                nettools.jscore.RequestHelper.signObject(postData);
-			}
-
-
-			return nettools.jscore.xmlhttp.sendRequest(url, callback, postData);
-		},
-		
-		
-        
-		/**
-         * Send an XmlHttpRequest and get a Promise
-         * 
-         * @method sendXmlHTTPRequestPromise
-         * @param string url
-         * @param string|Object postData
-         * @return Promise
-         */
-		sendXmlHTTPRequestPromise : function(url,postData)
+			return nettools.jscore.xmlhttp.sendRequestPromise(url, postData);
+		}
+		catch (err)
 		{
-			try
-			{
-				if ( (postData === null) || (postData === undefined) )
-					postData = {};
+			return Promise.reject(err);
+		}
+	},
 
 
-				if ( _signOn )
-				{
-					if ( typeof(postData) === 'string' )
-						postData = (new nettools.jscore.Querystring(postData)).getQuerystringObject();
 
-					nettools.jscore.RequestHelper.signObject(postData);
-				}
-
-
-				return nettools.jscore.xmlhttp.sendRequestPromise(url, postData);
-			}
-			catch (err)
-			{
-				return Promise.reject(err);
-			}
-		},
-        
-        
-        
-		/**
-         * Handle error in a Promise ; to use as a callback in .catch promise statements
-         *
-         * @method promiseErrorHandler
-         * @param Error e
-         */
-		promiseErrorHandler : function(e)
+	/**
+	 * Handle error in a Promise ; to use as a callback in .catch promise statements
+	 *
+	 * @method promiseErrorHandler
+	 * @param Error e
+	 */
+	promiseErrorHandler : function(e)
+	{
+		if ( e )
 		{
-			if ( e )
-			{
-				if ( e.message )
-					alert(e.message);
-				else
-					alert(e);
-			}
-		},
-		
+			if ( e.message )
+				alert(e.message);
+			else
+				alert(e);
+		}
+	},
 
-        
-		/** 
-         * Sign an URL 
-         * 
-         * URL parameters used to sign the request are mentionned in ELEMENTS 
-         * 
-         * @method signUrl
-         * @param string url
-         * @param string token
-         * @param string[] elements Array of parameter names to use to sign the request
-         * @return string Returns the URL parameter with a sign=xxxxx item appended
-         */
-		signUrl : function(url, token, elements)
-		{
-			var elementsl = elements.length;
-			var msg = [];
-			for ( var i = 0 ; i < elementsl ; i++ )
-			{
-				var regexp = new RegExp('(?:\\?|&)' + elements[i] + '=([^&]+)');
-				var regs = regexp.exec(url);
-				
-				if ( regs )
-					msg.push(regs[1]);
-			}
-			
-			return nettools.jscore.appendToUrl(url, 'sign=' + nettools.jscore.RequestHelper.sign(msg, token));
-		},
+	
+	
+	/** 
+	 * Converting an object litteral to FormData
+	 *
+	 * We handle the special case of null : a null javascript value is sent by FormData as a string 'null' value, 
+	 * this is not desired, so null values will be converted to empty '' values
+	 * We handle the special case of bool values : a true or false value is sent by FormData as a string 'true' or 'false' value, 
+	 * this is not desired, so bool values will be converted to 1 or 0 values
+	 *
+	 * @method object2FormData
+	 * @param Object obj
+	 * @param null|FormData fd Already created FormData object or null to create a new one from scratch
+	 * @return FormData
+	 */
+	object2FormData : function(obj, fd)
+	{
+		if ( (fd === null) || (fd === undefined) ) 
+			fd = new FormData();
+
+		for ( var k in obj )
+			// special case : null values
+			if ( (obj[k] === null)||(obj[k] === undefined) )
+				fd.append(k, '');
 
 
-        
-		/**
-         * Sign an array of elements with a token
-         *
-         * @method sign
-         * @param string[] elements
-         * @param string token
-         * @return string Returns the ELEMENTS array values signed with token through signMethod handler (default or custom)
-         */
-		sign : function(elements, token)
-		{
-			var elementsl = elements.length;
-			var msg = "";
-			for ( var i = 0 ; i < elementsl ; i++ )
-				msg += elements[i];
-			
-			
-			// Sign elements with token and timestamp of validity delay (encoded in hex)
-            return _signMethod(msg, token);
-		},
-		
+			// special case : bool values
+			else if ( typeof obj[k] === 'boolean' )
+				fd.append(k, obj[k] ? '1':'0');
 
-        
-		/**
-         * Sign a form (all inputs with data-sign attribute set ; the value of the attribute gives the order of message signature)
-         * 
-         * @method formSign
-         * @param HTMLForm form 
-         * @param HTMLInput tokenField Field storing the token
-         * @param HTMLInput signField Field to receive the signature
-         */
-		formSign : function(form, tokenField, signField)
-		{
-			var elementsl = form.elements.length;
-			var elements = [];
-			for ( var i = 0 ; i < elementsl ; i++ )
-			{
-				var e = form.elements[i];
-				if ( e.hasAttribute('data-sign') )
-					elements.push(e);
-			}
-			
-			
-			// sorting array of elements to sign according to the index mentionned in data-sign attribute
-			elements.sort(function(a,b)
-							{
-								return parseInt(a.getAttribute('data-sign')) - parseInt(b.getAttribute('data-sign'));
-							}
-						);
-						
-            
-			// converting to an array of input values
-			var elementsl = elements.length;
-			var arr = [];
-			for ( var i = 0 ; i < elementsl ; i++ )
-				arr.push(elements[i].value);
-			
-						
-			// sign process
-			signField.value = nettools.jscore.RequestHelper.sign(arr, tokenField ? tokenField.value : 'emptyToken');
-			return signField.value;
-		},
-		
-		
-        
-		/** 
-         * Converting an object litteral to FormData
-         *
-         * We handle the special case of null : a null javascript value is sent by FormData as a string 'null' value, 
-         * this is not desired, so null values will be converted to empty '' values
-         * We handle the special case of bool values : a true or false value is sent by FormData as a string 'true' or 'false' value, 
-         * this is not desired, so bool values will be converted to 1 or 0 values
-         *
-         * @method object2FormData
-         * @param Object obj
-         * @param null|FormData fd Already created FormData object or null to create a new one from scratch
-         * @return FormData
-         */
-		object2FormData : function(obj, fd)
-		{
-			if ( (fd === null) || (fd === undefined) ) 
-				fd = new FormData();
-				
-			for ( var k in obj )
-                // special case : null values
-                if ( (obj[k] === null)||(obj[k] === undefined) )
-                    fd.append(k, '');
-                
-                    
-                // special case : bool values
-                else if ( typeof obj[k] === 'boolean' )
-                    fd.append(k, obj[k] ? '1':'0');
-            
-                // default case
-                else    
-				    fd.append(k, obj[k]);				
-				
-			return fd;
-		}	
+			// default case
+			else    
+				fd.append(k, obj[k]);				
+
+		return fd;
+	}	
 
 
-	};
-})();
-
+};
 
 
 
@@ -2085,6 +1888,11 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
 
 
+
+
+
+// ==== SECURE REQUEST HELPER ====
+
 /**
  * Namespace for secure requests
  *
@@ -2105,6 +1913,73 @@ nettools.jscore.SecureRequestHelper = (function(){
 
 		return v;
 	}
+	
+	
+	
+	// automatically replace A tag with data-csrf='1' attributes with POST calls and appropriate CSRF parameters
+	function _autoinit()
+	{
+		// event handler
+        function __onclick()
+        {
+			try
+			{
+				nettools.jscore.SecureRequestHelper.post(this.getAttribute('data-csrfhref'), this.getAttribute('data-csrfquerystring'));
+				return false;
+			}
+			catch(err)
+			{
+				alert(err);
+			}
+        }
+		
+		
+		// private handling function for each link
+		function __handle(href)
+		{
+			var old = href.href;
+			href.href = "javascript:void(0)";
+			href.removeAttribute('data-csrf');
+			
+			// split request string at ?
+			var urlparser = old.split('?');
+			
+			// set a custom attribute with script name (left side of ?)
+			href.setAttribute('data-csrfhref', urlparser[0]);
+			
+			// if querystring
+			if ( urlparser[1] )
+				href.setAttribute('data-csrfquerystring', urlparser[1]);
+				
+			// set event handler for this link
+			href.onclick = __onclick;
+		}
+		
+		
+		
+		// if browser compliant with SELECTORS API
+		if ( document.querySelectorAll )
+		{
+			var hrefs = document.querySelectorAll("a[data-csrf='1']");
+			var hrefsl = hrefs.length;
+			for ( var h = 0 ; h < hrefsl ; h++ )
+				__handle(hrefs[h]);
+		}
+		
+		
+		// otherwise handle with regular query on DOM
+		else
+		{
+			// parcourir tous les tags HREF et traiter ceux devant être ré-écrits
+			var hrefs = document.getElementsByTagName('a');
+			var hrefsl = hrefs.length;
+			
+			for ( var h = 0 ; h < hrefsl ; h++ )
+				if ( hrefs[h].getAttribute('data-csrf') === '1' )
+					__handle(hrefs[h]);
+		}
+		
+	}
 
 
 	
@@ -2121,6 +1996,30 @@ nettools.jscore.SecureRequestHelper = (function(){
         i18n : {
             CSRF_VALUE_NOT_SET : 'CSRF cookie not set ; request has been stopped.'
         },
+		
+		
+		
+		/** 
+		 * Search the current DOM for A tags with attribute data-csrf=1 and replace them with POST calls and appropriate CSRF parameters
+		 *
+		 * @method replaceLinksWithPOSTRequests
+		 */
+		replaceLinksWithPOSTRequests : function()
+		{
+			_autoinit();
+		},
+		
+		
+		
+		/**
+		 * At DOM load, automatically replace A tags with data-csrf=1 attributes with POST calls
+		 *
+		 * @method 
+		 */
+		autoReplaceLinksWithPOSTRequests : function()
+		{
+			nettools.jscore.registerOnLoadCallback(_autoinit);
+		},
 		
 		
 		
@@ -2236,19 +2135,17 @@ nettools.jscore.SecureRequestHelper = (function(){
 
 				// adding the CSRF value as a parameter
 				postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+			
+			
+				// sending request and returning a promise
+				return nettools.jscore.xmlhttp.sendRequestPromise(url, postData.getQuerystringObject());			
 			}
 			// catch error when _getCSRFCookie fails
 			catch(err)
 			{
 				return Promise.reject(err);
 			}
-			
-			
-			// sending request and returning a promise
-			return nettools.jscore.xmlhttp.sendRequestPromise(url, postData.getQuerystringObject());			
 		}     
-        
-        
 	}
 	
 	
