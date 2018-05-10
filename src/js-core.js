@@ -1941,6 +1941,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 			href.href = "javascript:void(0)";
 			href.removeAttribute('data-csrf');
 			
+
 			// split request string at ?
 			var urlparser = old.split('?');
 			
@@ -2071,6 +2072,46 @@ nettools.jscore.SecureRequestHelper = (function(){
 		getCSRFSubmittedValueName : function()
 		{
 			return _csrf_submittedvaluename;
+		},
+		
+		
+		
+		/**
+		 * Add an hidden CSRF submitted value in a form node
+		 *
+		 * @method addCSRFSubmittedValueHiddenInput
+		 * @param HTMLForm form
+		 */
+		addCSRFSubmittedValueHiddenInput : function(form)
+		{
+			var input = document.createElement('input');
+			input.type = 'hidden';
+			input.name = _csrf_submittedvaluename;
+			input.value = _getCSRFCookie();
+			form.appendChild(input);
+		},
+		
+		
+		
+		/**
+		 * Insert the CSRF submitted value in a request 
+		 *
+		 * @method addCSRFSubmittedValue
+		 * @param string|Object postData
+		 * @return string|Object
+		 */
+		addCSRFSubmittedValue : function(postData)
+		{
+			// creating a Querystring object
+			var data = new nettools.jscore.Querystring(postData);
+			
+			// adding the CSRF value as a parameter
+			data.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+			
+			if ( typeof postData == 'string' )
+				return data.toString();
+			else
+				return data.getQuerystringObject();
 		},
 		
 		
