@@ -87,15 +87,11 @@ class SecureRequestHelper {
 		if ( !$cookie )
 			return false;
 
-		try
-		{
-			return hash_equals($cookie, $request[$this->_csrf_submittedvaluename]);
-		}
-		// catching when one of hash_equals parameters is null (E_WARNING)
-		catch(\ErrorException $e)
-		{
-			return false;
-		}
+		$t = $request[$this->_csrf_submittedvaluename];
+		if ( is_null($t) )
+			$t = '';
+		
+		return hash_equals($cookie, $t);
 	}
 }
 
