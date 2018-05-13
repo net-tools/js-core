@@ -1715,7 +1715,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 			
 			// set user-agent ; google chrome doesn't allow it so we set a custom header
 			req.setRequestHeader('User-Agent','XMLHTTP/1.0');
-			req.setRequestHeader('X-App-Frmk-Detect-XMLHTTP','xmlhttp');
+			req.setRequestHeader('X-Request-XMLHTTP','1');
 			req.setRequestHeader('Accept','application/json');
 			
 			
