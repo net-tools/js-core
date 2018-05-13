@@ -86,9 +86,16 @@ class SecureRequestHelper {
 		$cookie = $this->getCSRFCookie();
 		if ( !$cookie )
 			return false;
-		
-		// if CSRF cookie exists, comparing with double-submitted cookie as a request value
-		return hash_equals($cookie, $request[$this->_csrf_submittedvaluename]);		
+
+		try
+		{
+			return hash_equals($cookie, $request[$this->_csrf_submittedvaluename]);
+		}
+		// catching when one of hash_equals parameters is null (E_WARNING)
+		catch(\ErrorException $e)
+		{
+			return false;
+		}
 	}
 }
 
