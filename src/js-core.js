@@ -2097,10 +2097,10 @@ nettools.jscore.SecureRequestHelper = (function(){
 		 * The value must be derived from the real cookie value and computed server-side, to prevent hackers from seing the hash process just by having a look
 		 * at the JS code here.
 		 *
-		 * @method setCSRFHashedCookievalue
+		 * @method setCSRFHashedCookieValue
 		 * @param string hashedvalue
 		 */
-		setCSRFHashedCookievalue : function(hashedvalue)
+		setCSRFHashedCookieValue : function(hashedvalue)
 		{
 			_csrf_hashed_cookie = hashedvalue;
 		},
