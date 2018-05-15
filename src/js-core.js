@@ -1902,6 +1902,8 @@ nettools.jscore.SecureRequestHelper = (function(){
 		
 	var _csrf_cookiename = '_CSRF_';
 	var _csrf_submittedvaluename = '_FORM_CSRF_';
+	var _csrf_hashed_cookie = null;
+	
 
 	
 	// get CSRF cookie
@@ -1912,6 +1914,18 @@ nettools.jscore.SecureRequestHelper = (function(){
 			throw new Error(nettools.jscore.SecureRequestHelper.i18n.CSRF_VALUE_NOT_SET);
 
 		return v;
+	}
+	
+	
+	
+	// get CSRF hashed cookie value
+	function _getCSRFHashedCookie()
+	{
+		// if hashed value not set, use regular cookie, preventing calling code to fail
+		if ( _csrf_hashed_cookie == null )
+			_csrf_hashed_cookie = _getCSRFCookie();
+		
+		return _csrf_hashed_cookie;
 	}
 	
 	
@@ -2077,6 +2091,23 @@ nettools.jscore.SecureRequestHelper = (function(){
 		
 		
 		/**
+		 * Set the hashed cookie value, for increased security when using GET requests
+		 * 
+		 * Using a hashed cookie value instead of the real cookie value prevent the cookie value to be disclosed in URL, browser history, etc.
+		 * The value must be derived from the real cookie value and computed server-side, to prevent hackers from seing the hash process just by having a look
+		 * at the JS code here.
+		 *
+		 * @method setCSRFHashedCookievalue
+		 * @param string hashedvalue
+		 */
+		setCSRFHashedCookievalue : function(hashedvalue)
+		{
+			_csrf_hashed_cookie = hashedvalue;
+		},
+		
+		
+		
+		/**
 		 * Add an hidden CSRF submitted value in a form node
 		 *
 		 * @method addCSRFSubmittedValueHiddenInput
@@ -2094,7 +2125,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 		
 		
 		/**
-		 * Insert the CSRF submitted value in a request 
+		 * Insert the CSRF submitted value in a querystring (no URI part)
 		 *
 		 * @method addCSRFSubmittedValue
 		 * @param string|Object postData
@@ -2112,6 +2143,20 @@ nettools.jscore.SecureRequestHelper = (function(){
 				return data.toString();
 			else
 				return data.getQuerystringObject();
+		},
+		
+		
+		
+		/**
+		 * Append a CSRF hashed cookie value to a querystring (used in GET requests)
+		 *
+		 * @method addCSRFHashedValue
+		 * @param string url 
+		 * @return string
+		 */
+		addCSRFHashedValue : function(url)
+		{
+			return nettools.jscore.appendToUrl(url, _getCSRFHashedCookie());
 		},
 		
 		
