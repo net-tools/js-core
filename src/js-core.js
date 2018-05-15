@@ -2156,7 +2156,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 		 */
 		addCSRFHashedValue : function(url)
 		{
-			return nettools.jscore.appendToUrl(url, _getCSRFHashedCookie());
+			return nettools.jscore.appendToUrl(url, _csrf_submittedvaluename + '=' + _getCSRFHashedCookie());
 		},
 		
 		
