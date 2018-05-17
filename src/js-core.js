@@ -2029,7 +2029,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 		/**
 		 * At DOM load, automatically replace A tags with data-csrf=1 attributes with POST calls
 		 *
-		 * @method 
+		 * @method autoReplaceLinksWithPOSTRequests
 		 */
 		autoReplaceLinksWithPOSTRequests : function()
 		{
