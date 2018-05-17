@@ -45,7 +45,7 @@ nettools.jscore.validator.FormValidator.i18n = {
  * The object litteral properties for translations are :
  * - CSRF_VALUE_NOT_SET
  *
- * @property Object i18n 
+ * @property Object nettools.jscore.SecureRequestHelper.i18n 
  */
 nettools.jscore.SecureRequestHelper.i18n = {
 	CSRF_VALUE_NOT_SET : "Cookie CSRF non défini ; la requête a été stoppée."
