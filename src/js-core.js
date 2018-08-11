@@ -2405,7 +2405,12 @@ nettools.jscore.validator.Patterns = {
     /**
      * @property string FLOAT
      */
-    FLOAT : /^[0-9]*[0-9]\.[0-9]+$/
+    FLOAT : /^[0-9]*[0-9]\.[0-9]+$/,
+	
+    /**
+     * @property string FLOAT_INT
+     */
+    FLOAT_INT : /^[0-9]*[0-9](\.[0-9]+)$/
 };
 
 
