@@ -791,6 +791,7 @@ nettools.jscore = nettools.jscore || {
      *  
      * @method inputs2querystring
      * @param NodeList elements
+	 * @return string
      */ 
     inputs2querystring : function(elements)
     {
