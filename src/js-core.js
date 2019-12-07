@@ -1727,7 +1727,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 					// if browser compliant with FormData
 					if ( window.FormData )
 					{
-						//if postData is not a FormData object, convert the object litteral to FormData
+						// if postData is not a FormData object, convert the object litteral to FormData
 						if ( !(postData instanceof FormData) )
 						{
 							var fd = nettools.jscore.RequestHelper.object2FormData(postData);
@@ -2130,24 +2130,32 @@ nettools.jscore.SecureRequestHelper = (function(){
 		
 		
 		/**
-		 * Insert the CSRF submitted value in a querystring (no URI part)
+		 * Insert the CSRF submitted value in a querystring or FormData (no URI part)
 		 *
 		 * @method addCSRFSubmittedValue
-		 * @param string|Object postData
-		 * @return string|Object
+		 * @param string|Object|FormData postData
+		 * @return string|Object|FormData
 		 */
 		addCSRFSubmittedValue : function(postData)
 		{
-			// creating a Querystring object
-			var data = new nettools.jscore.Querystring(postData);
-			
-			// adding the CSRF value as a parameter
-			data.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
-			
-			if ( typeof postData == 'string' )
-				return data.toString();
+			if ( window.FormData && (postData instanceof FormData) )
+			{
+				postData.set(_csrf_submittedvaluename, _getCSRFCookie());
+				return postData;
+			}
 			else
-				return data.getQuerystringObject();
+			{
+				// creating a Querystring object
+				var data = new nettools.jscore.Querystring(postData);
+
+				// adding the CSRF value as a parameter
+				data.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+
+				if ( typeof postData == 'string' )
+					return data.toString();
+				else
+					return data.getQuerystringObject();
+			}
 		},
 		
 		
@@ -2177,10 +2185,10 @@ nettools.jscore.SecureRequestHelper = (function(){
 		{
 			// creating a Querystring object
 			var postData = new nettools.jscore.Querystring(postData);
-			
+
 			// adding the CSRF value as a parameter
 			postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
-			
+
 			// sending request
 			nettools.jscore.RequestHelper.post(url, postData.getQuerystringObject());
 		},
@@ -2197,14 +2205,25 @@ nettools.jscore.SecureRequestHelper = (function(){
          */
 		sendXmlHTTPRequest : function(url,callback,postData)
 		{
-			// creating a Querystring object
-			var postData = new nettools.jscore.Querystring(postData);
-			
-			// adding the CSRF value as a parameter
-			postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
-			
-			// sending request
-			nettools.jscore.xmlhttp.sendRequest(url, callback, postData.getQuerystringObject());			
+			// si object FormData
+			if ( window.FormData && (postData instanceof FormData) )
+			{
+				postData.set(_csrf_submittedvaluename, _getCSRFCookie());
+				
+				// sending request
+				nettools.jscore.xmlhttp.sendRequest(url, callback, postData);
+			}
+			else
+			{
+				// creating a Querystring object
+				var postData = new nettools.jscore.Querystring(postData);
+
+				// adding the CSRF value as a parameter
+				postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+
+				// sending request
+				nettools.jscore.xmlhttp.sendRequest(url, callback, postData.getQuerystringObject());			
+			}
 		},
 		
 		
@@ -2221,15 +2240,26 @@ nettools.jscore.SecureRequestHelper = (function(){
 		{
 			try
 			{
-				// creating a Querystring object
-				var postData = new nettools.jscore.Querystring(postData);
+				// si object FormData
+				if ( window.FormData && (postData instanceof FormData) )
+				{
+					postData.set(_csrf_submittedvaluename, _getCSRFCookie());
 
-				// adding the CSRF value as a parameter
-				postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
-			
-			
-				// sending request and returning a promise
-				return nettools.jscore.xmlhttp.sendRequestPromise(url, postData.getQuerystringObject());			
+					// sending request
+					return nettools.jscore.xmlhttp.sendRequestPromise(url, postData);
+				}
+				else
+				{
+					// creating a Querystring object
+					var postData = new nettools.jscore.Querystring(postData);
+
+					// adding the CSRF value as a parameter
+					postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+
+
+					// sending request and returning a promise
+					return nettools.jscore.xmlhttp.sendRequestPromise(url, postData.getQuerystringObject());			
+				}
 			}
 			// catch error when _getCSRFCookie fails
 			catch(err)
