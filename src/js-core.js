@@ -1727,8 +1727,12 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 					// if browser compliant with FormData
 					if ( window.FormData )
 					{
-						var fd = nettools.jscore.RequestHelper.object2FormData(postData);
-						postData = fd;
+						//if postData is not a FormData object, convert the object litteral to FormData
+						if ( !(postData instanceof FormData) )
+						{
+							var fd = nettools.jscore.RequestHelper.object2FormData(postData);
+							postData = fd;
+						}
 					}
 					else
 					{
