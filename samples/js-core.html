@@ -122,6 +122,26 @@
         
         
         
+        sendXmlHTTPRequestFormData : function()
+        {
+			var fd = new FormData();
+			fd.append('v1', 'myvalue1');
+			fd.append('v2', '');
+			fd.append('v3', 1);
+						
+            nettools.jscore.RequestHelper.sendXmlHTTPRequest('js-core-http.php', 
+                    function(resp)
+                    {
+                        var r = nettools.jscore.xmlhttp.parseResponse(resp);
+                        sample.output('XmlHttpRequest answered : \n' + r);
+                    },
+                                                             
+                    fd
+                );
+        },
+        
+        
+        
         sendXmlHTTPRequestPromise : function(sendString)
         {
             nettools.jscore.RequestHelper.sendXmlHTTPRequestPromise('js-core-http-promise.php', sendString?'v1=myvalue1&v2=&v3=1':{v1:'myvalue1', v2:'', v3:true}). 
@@ -426,12 +446,6 @@
                         <input type="button" value="inputs2querystring" onclick="sample.output(nettools.jscore.inputs2querystring(this.form.elements)); ">
                         <input type="button" value="formFieldsToObject" onclick="sample.output(test.dumpObject(nettools.jscore.formFieldsToObject(this.form.elements)));">
                     </p>
-                    <p>
-                        <input type="button" value="sendXmlHTTPRequest(string)" onclick="test.sendXmlHTTPRequest(true);">
-                        <input type="button" value="sendXmlHTTPRequest(Object)" onclick="test.sendXmlHTTPRequest(false);">
-                        <input type="button" value="sendXmlHTTPRequestPromise(string)" onclick="test.sendXmlHTTPRequestPromise(true);">
-                        <input type="button" value="sendXmlHTTPRequestPromise(Object)" onclick="test.sendXmlHTTPRequestPromise(false);">
-                    </p>
                 </form>
                 <hr>
                 <p>cssToJs : <input type="text" value="font-size:12px;color:white;"><input type="Submit" onclick="sample.output(test.dumpObject(nettools.jscore.cssToJs(this.previousSibling.value)));"></p>
@@ -534,6 +548,15 @@
             <h1>nettools.jscore.xmlhttp.*</h1>
             <div id="sampleXmlhttp">   
                 <p><input type="button" value="load FR translations" onclick="test.loadi18n();"></p>
+                <form>
+                    <p>
+                        <input type="button" value="sendXmlHTTPRequest(string)" onclick="test.sendXmlHTTPRequest(true);">
+                        <input type="button" value="sendXmlHTTPRequest(Object)" onclick="test.sendXmlHTTPRequest(false);">
+                        <input type="button" value="sendXmlHTTPRequest(FormData)" onclick="test.sendXmlHTTPRequestFormData();">
+                        <input type="button" value="sendXmlHTTPRequestPromise(string)" onclick="test.sendXmlHTTPRequestPromise(true);">
+                        <input type="button" value="sendXmlHTTPRequestPromise(Object)" onclick="test.sendXmlHTTPRequestPromise(false);">
+                    </p>
+                </form>
                 <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
                 <p>parseJsonResponse : <input type="text" value='{"statut":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
                 <p>&quot; &quot;(statut=false) : <input type="text" value='{"statut":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
