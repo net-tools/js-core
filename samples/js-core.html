@@ -107,40 +107,6 @@
         
         
         
-        signObject : function()
-        {
-            nettools.jscore.RequestHelper.setSignOn(true,
-                    function(o)
-                    {
-                        return {
-                            elements : [o.v1, o.v2],
-                            token : 'my encryption key'
-                        };
-                    }
-                );
-            
-            
-            var request = {
-                v1 : 'my value1',
-                v2 : 'my value2',
-                vx : 'other value not used on signature'
-            };
-            
-            nettools.jscore.RequestHelper.signObject(request);
-            
-            sample.output(test.dumpObject(request));
-        },
-        
-        
-        
-        signForm : function(form)
-        {
-            
-            nettools.jscore.RequestHelper.formSign(form, form.tokenfield, form.signfield);
-        },
-        
-        
-        
         sendXmlHTTPRequest : function(sendString)
         {
             nettools.jscore.RequestHelper.sendXmlHTTPRequest('js-core-http.php', 
@@ -459,11 +425,7 @@
                         <input type="button" value="getCheckedRadioButton" onclick="sample.output(nettools.jscore.getCheckedRadioButton(this.form, 'radiobtns').value); ">
                         <input type="button" value="inputs2querystring" onclick="sample.output(nettools.jscore.inputs2querystring(this.form.elements)); ">
                         <input type="button" value="formFieldsToObject" onclick="sample.output(test.dumpObject(nettools.jscore.formFieldsToObject(this.form.elements)));">
-                        <input type="button" value="signObject" onclick="test.signObject();">
-                        <input type="button" value="formSign" onclick="test.signForm(this.form);">
-                        <label>Signfield : <input type="text" name="signfield"></label>
                     </p>
-                    <p>Url to sign : <input type="text" value="f.php?v1=val1&v2=val2"><input type="button" value="signUrl" onclick="sample.output(nettools.jscore.RequestHelper.signUrl(this.previousSibling.value, 'token', ['v1']));"></p>
                     <p>
                         <input type="button" value="sendXmlHTTPRequest(string)" onclick="test.sendXmlHTTPRequest(true);">
                         <input type="button" value="sendXmlHTTPRequest(Object)" onclick="test.sendXmlHTTPRequest(false);">
