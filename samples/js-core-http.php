@@ -14,7 +14,7 @@ $r = "Received payload : " . print_r($_POST, true);
 if ( count($_FILES) )
 	foreach ( $_FILES as $f )
 	{
-		$r .= "<br>and file upload content '" . $f['name'] . "' : ";
+		$r .= "\n\nand file upload content '" . $f['name'] . "' : ";
 		$r .= file_get_contents($f['tmp_name']);
 		unlink ($f['tmp_name']);
 	}

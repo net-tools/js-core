@@ -72,6 +72,17 @@
             sample.output('Querystring=' + test.dumpObject(u.getQuerystringObject()) +
                             '\ntoString()=' + u.toString());
         },
+		
+		
+		
+		dumpFormData : function(fd)
+		{
+			var ret = [];
+			for ( var entry of fd.entries() )
+				ret.push(entry[0] + ':' + entry[1]);
+			
+			return ret.join('\n');
+		},
         
         
         
@@ -155,6 +166,13 @@
                     catch(nettools.jscore.RequestHelper.promiseErrorHandler);
         
         },
+		
+		
+		
+		object2FormData : function(obj, fd)
+		{
+			test.dumpFormData(nettools.jscore.RequestHelper.object2FormData(obj, fd));
+		},
         
         
         
@@ -558,6 +576,28 @@
                         <input type="button" value="sendXmlHTTPRequest(FormData)" onclick="test.sendXmlHTTPRequestFormData();">
                         <input type="button" value="sendXmlHTTPRequestPromise(string)" onclick="test.sendXmlHTTPRequestPromise(true);">
                         <input type="button" value="sendXmlHTTPRequestPromise(Object)" onclick="test.sendXmlHTTPRequestPromise(false);">
+                    </p>
+                </form>
+                <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
+                <p>parseJsonResponse : <input type="text" value='{"statut":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(statut=false) : <input type="text" value='{"statut":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(statut=false+exception) : <input type="text" value='{"statut":false,"message":"Error occured","exception":"<b>An exception occured !</b>"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(statut=false+simple formatted exception) : <input type="submit" onclick="test.exceptionHandler(true);"></p>
+                <p>&quot; &quot;(statut=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
+            </div>
+        </div>
+
+
+        <div class="sampleBox">
+            <h1>nettools.jscore.RequestHelper.*</h1>
+            <div id="sampleXmlhttp">   
+                <form>
+                    <p>
+                        <input type="button" value="object2FormData(obj, null)" onclick="test.object2FormData({val:'value'}, null);">
+                        <input type="button" value="object2FormData(obj)" onclick="test.object2FormData({val:'value'});">
+                        <input type="button" value="object2FormData(obj, fd)" onclick="var fd = new FormData();fd.append('val1', 'value1');test.object2FormData({val2:'value2'}, fd);">
+                        <input type="button" value="object2FormData({v:null})" onclick="test.object2FormData({val:null});">
+                        <input type="button" value="object2FormData({v:true})" onclick="test.object2FormData({v:true});">
                     </p>
                 </form>
                 <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
