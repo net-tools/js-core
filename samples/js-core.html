@@ -81,7 +81,7 @@
 			for ( var entry of fd.entries() )
 				ret.push(entry[0] + ':' + entry[1]);
 			
-			return ret.join('\n');
+			sample.output('Formdata=' + ret.join('\n'));
 		},
         
         
