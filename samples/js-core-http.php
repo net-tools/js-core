@@ -9,7 +9,16 @@ header("Last-Modified: ".gmdate( "D, d M Y H:i:s")." GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");	
 
-echo json_encode("Received : " . print_r($_POST, true));
+$r = "Received payload : " . print_r($_POST, true);
+
+if ( count($_FILES) )
+{
+	$r .= "<br>and file upload content : ";
+	$r .= file_get_contents($_FILES['blob']['tmp_name']);
+	unlink ($_FILES['blob']['tmp_name']);
+}
+
+echo json_encode($r);
 
 
 ?>
