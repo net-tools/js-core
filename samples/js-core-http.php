@@ -12,11 +12,12 @@ header("Pragma: no-cache");
 $r = "Received payload : " . print_r($_POST, true);
 
 if ( count($_FILES) )
-{
-	$r .= "<br>and file upload content : ";
-	$r .= file_get_contents($_FILES['blob']['tmp_name']);
-	unlink ($_FILES['blob']['tmp_name']);
-}
+	foreach ( $_FILES as $f )
+	{
+		$r .= "<br>and file upload content '" . $f['name'] . "' : ";
+		$r .= file_get_contents($f['tmp_name']);
+		unlink ($f['tmp_name']);
+	}
 
 echo json_encode($r);
 
