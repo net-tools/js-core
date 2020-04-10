@@ -1376,8 +1376,8 @@ nettools.jscore.RequestHelper = {
 	 * 
 	 * @method sendXmlHTTPRequest
 	 * @param string url
-	 * @param function(xmlhttpobject) callback
-	 * @param string|Object postData
+	 * @param function(response) callback
+	 * @param string|Object|FormData postData
 	 */
 	sendXmlHTTPRequest : function(url,callback,postData)
 	{
@@ -1390,7 +1390,33 @@ nettools.jscore.RequestHelper = {
 	},
 
 
+        
+	/** 
+	 * Send a request with Fetch API
+	 *
+	 * @method sendRequestFetch
+	 * @param string url
+	 * @param string|Object|FormData postData
+	 * @return Promise Returns a Promise resolved with json return, or rejected if request return an error
+	 */
+	sendRequestFetch : function (url, postData)
+	{
+		try
+		{
+			if ( (postData === null) || (postData === undefined) )
+				postData = {};
 
+
+			return nettools.jscore.xmlhttp.sendRequestFetch(url, postData);
+		}
+		catch (err)
+		{
+			return Promise.reject(err);
+		}
+	},
+	
+	
+	
 	/**
 	 * Send an XmlHttpRequest and get a Promise
 	 * 
@@ -1671,6 +1697,76 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 		else
 			_linkToException(exception, title);
 	}
+    
+    
+    
+    /**
+     * Format the request body as either a string or FormData (if browser is compliant with FormData)
+     * 
+     * @param string|object|FormData postData
+     * @return string|FormData Returns a FormData object if browser is FormData-compliant, or a querystring
+     */
+    function _toFormDataOrString(postData)
+    {
+        if ( typeof(postData) !== 'string' )
+            // if browser compliant with FormData
+            if ( window.FormData )
+                // if postData is not a FormData object, convert the object litteral to FormData
+                if ( !(postData instanceof FormData) )
+                    return nettools.jscore.RequestHelper.object2FormData(postData);
+                else
+                    // already FormData
+                    return postData;
+            else
+                // encode object litteral to url-encoded string
+                return new nettools.jscore.Querystring(postData).toString();
+
+        // request already a string
+        else
+            return postData;
+    }
+    
+    
+    
+    /**
+     * Handle the Json response with promise
+     * 
+     * @param function resolve
+     * @param function reject
+     * @param object resp Object litteral for response
+     */
+    function _handleJsonResponsePromise(resolve, reject, resp)
+    {
+        if ( resp === null )
+        {
+            reject(new Error(nettools.jscore.xmlhttp.i18n.UNREADABLE_ASYNC_RESPONSE));
+            return;
+        }
+
+
+        // if answer, but error status 
+        if ( !resp.statut )
+        {
+            // if an exception has been returned in the payload response, handling it now because if no Promise.catch() statement has
+            // been defined, we won't never be warned about the exception
+            if ( resp.exception )
+                try
+                {
+                    _handlePromiseException(resp.exception, resp.message ? resp.message : nettools.jscore.xmlhttp.i18n.ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE);
+                }
+                catch(e)
+                {
+                }
+
+            // reject promise
+            reject(new Error(resp.message ? resp.message : nettools.jscore.xmlhttp.i18n.NO_ERROR_MESSAGE));
+            return;
+        }
+
+
+        // if ok, resolving Promise with Json response
+        resolve(resp);
+    }
 
 
 	// --- /PRIVATE DECLARATIONS ---
@@ -1687,6 +1783,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * - UNREADABLE_ASYNC_RESPONSE, 
          * - ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE,
          * - NO_ERROR_MESSAGE
+         * - FETCH_API_HTTP_ERROR
          *
          * @property Object i18n 
          */
@@ -1695,7 +1792,8 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
             CANNOT_OPEN_POPUP_WINDOW_EXCEPTION_DETAILS : "Can't open a popup window to display the exception details",
             UNREADABLE_ASYNC_RESPONSE : 'Unreadable async response',
             ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE : 'Error during async request (message unavailable)',
-            NO_ERROR_MESSAGE : 'Async request has not return any error message'
+            NO_ERROR_MESSAGE : 'Async request has not return any error message',
+            FETCH_API_HTTP_ERROR : 'Fetch API returned HTTP error : '
         },
         
         
@@ -1706,7 +1804,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * @method sendRequest
          * @param string url
          * @param function(response) callback
-         * @param string|Object postData
+         * @param string|Object|FormData postData
          */
 		sendRequest : function(url,callback,postData) {
 			var req = _createXMLHTTPObject();
@@ -1722,30 +1820,17 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 			
 			if ( postData )
 			{
-                // postData is not a string
-				if ( typeof(postData) !== 'string' )
-					// if browser compliant with FormData
-					if ( window.FormData )
-					{
-						// if postData is not a FormData object, convert the object litteral to FormData
-						if ( !(postData instanceof FormData) )
-						{
-							var fd = nettools.jscore.RequestHelper.object2FormData(postData);
-							postData = fd;
-						}
-					}
-					else
-					{
-						// encode object litteral to url-encoded string
-						postData = new nettools.jscore.Querystring(postData).toString();
-						req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-					}
-				
-				// request already a string
-				else
+                // convert postData (string, object litteral, FormData) to a querystring or FormData (if browser is FormData-compliant)
+                var postData = _toFormDataOrString(postData);
+                
+                
+                // if we have a string as postData (browser is not FormData-compliant), set appropriate headers
+                if ( typeof(postData) == 'string' )
 					req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
 			}
 			
+            
+            // event handler called when request is changing its state
 			req.onreadystatechange = function () {
 				if (req.readyState !== 4) return;
 				if (req.status !== 200 && req.status !== 304) {
@@ -1757,10 +1842,83 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 				else if ( typeof callback === 'function' )
 					callback(req);				
 			}
+            
+            
 			if (req.readyState === 4) return;
+            
+            
+            // sending request
 			req.send(postData);
 		},
 		
+        
+        
+        /** 
+         * Send a request with Fetch API
+         *
+         * @method sendRequestFetch
+         * @param string url
+         * @param string|Object|FormData postData
+         * @return Promise Returns a Promise resolved with json return, or rejected if request return an error
+         */
+        sendRequestFetch : function (url, postData)
+        {
+            // if browser not compliant with Fetch API
+            if ( !window.fetch )
+            {
+                console.log('Browser not compliant with Fetch API')
+                var o = {};
+                o.then = function(cb){return o;};
+                o.catch = function(cb){cb('Browser not compliant with Fetch API'); return o;};
+                return o;
+            }
+
+			
+            if ( typeof Promise === 'undefined' )
+            {
+                console.log('Browser not compliant with ECMASCRIPT 6 Promises feature !');
+                var o = {};
+                o.then = function(cb){return o;};
+                o.catch = function(cb){cb('Browser not compliant with ECMASCRIPT 6 Promises feature !'); return o;};
+                return o;
+            }
+			
+            
+			
+            // converting postData to either a string or FormData
+            var postData = _toFormDataOrString(postData);
+            
+            // if postData is a string, we do have to set the appropriate header to indicate this is a querystring postdata (otherwise, the request body is considered as text/plain)
+            var headers = new Headers((typeof (postData) == 'string') ? {'Content-Type':'application/x-www-form-urlencoded'}:{});
+			headers.append('User-Agent','XMLHTTP/1.0');
+			headers.append('X-Request-XMLHTTP','1');
+			headers.append('Accept','application/json');
+			
+			
+			
+            return new Promise(function(resolve, reject)
+                    {
+                        // calling Fetch API
+                        fetch(url,
+                                {
+                                    method : 'POST', 
+                                    body : postData,
+                                    headers : headers
+                                })
+                            .then(function(response)
+                                {
+                                    if ( response.ok )
+                                        response.json().then(function(obj)
+                                            {
+                                                _handleJsonResponsePromise(resolve, reject, obj);
+                                            });
+                                    else
+                                        reject(new Error(nettools.jscore.xmlhttp.i18n.FETCH_API_HTTP_ERROR + response.status + ' ' + response.statusText));
+                                });
+                    }
+                );
+        },
+        
 		
         
 		/**
@@ -1770,8 +1928,8 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          *
          * @method sendRequestPromise
          * @param string url
-         * @param string|Object postData
-         * @return Promise
+         * @param string|Object|FormData postData
+         * @return Promise Returns a Promise resolved with json return, or rejected if request return an error
          */
 		sendRequestPromise : function(url, postData)
 		{
@@ -1790,35 +1948,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 							{
 								// if unreadable response 
 								var resp = nettools.jscore.xmlhttp.parseResponse(req);
-								if ( resp === null )
-                                {
-									reject(new Error(nettools.jscore.xmlhttp.i18n.UNREADABLE_ASYNC_RESPONSE));
-                                    return;
-                                }
-									
-                                
-                                // if answer, but error status 
-								if ( !resp.statut )
-                                {
-									// if an exception has been returned in the payload response, handling it now because if no Promise.catch() statement has
-                                    // been defined, we won't never be warned about the exception
-									if ( resp.exception )
-										try
-										{
-											_handlePromiseException(resp.exception, resp.message ? resp.message : nettools.jscore.xmlhttp.i18n.ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE);
-										}
-										catch(e)
-										{
-										}
-										
-									// reject promise
-									reject(new Error(resp.message ? resp.message : nettools.jscore.xmlhttp.i18n.NO_ERROR_MESSAGE));
-									return;
-                                }
-									
-								
-								// if ok, resolving Promise with Json response
-								resolve(resp);
+								_handleJsonResponsePromise(resolve, reject, resp);
 							};
 						
 						// envoyer requête
@@ -1999,6 +2129,37 @@ nettools.jscore.SecureRequestHelper = (function(){
 					__handle(hrefs[h]);
 		}
 		
+	}
+	
+	
+	
+	/**
+	 * Add the CSRF value in the request body (double-submit cookie value pattern)
+	 *
+	 * @param string|Object|FormData postData
+	 * @return string|Object|FormData
+	 */
+	function _addCSRFValue(postData)
+	{
+		// if FormData object
+		if ( window.FormData && (postData instanceof FormData) )
+		{
+			postData.set(_csrf_submittedvaluename, _getCSRFCookie());
+			return postData;
+		}
+		
+		// if object litteral or string
+		else
+		{
+			// creating a Querystring object
+			var postData = new nettools.jscore.Querystring(postData);
+
+			// adding the CSRF value as a parameter
+			postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+			
+			// return an object litteral
+			return postData.getQuerystringObject();
+		}
 	}
 
 
@@ -2201,29 +2362,11 @@ nettools.jscore.SecureRequestHelper = (function(){
          * @method sendXmlHTTPRequest
          * @param string url
          * @param function(xmlhttpobject) callback
-         * @param string|Object postData
+         * @param string|Object|FormData postData
          */
 		sendXmlHTTPRequest : function(url,callback,postData)
 		{
-			// si object FormData
-			if ( window.FormData && (postData instanceof FormData) )
-			{
-				postData.set(_csrf_submittedvaluename, _getCSRFCookie());
-				
-				// sending request
-				nettools.jscore.xmlhttp.sendRequest(url, callback, postData);
-			}
-			else
-			{
-				// creating a Querystring object
-				var postData = new nettools.jscore.Querystring(postData);
-
-				// adding the CSRF value as a parameter
-				postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
-
-				// sending request
-				nettools.jscore.xmlhttp.sendRequest(url, callback, postData.getQuerystringObject());			
-			}
+			return nettools.jscore.xmlhttp.sendRequest(url, callback, _addCSRFValue(postData));
 		},
 		
 		
@@ -2233,33 +2376,39 @@ nettools.jscore.SecureRequestHelper = (function(){
          * 
          * @method sendXmlHTTPRequestPromise
          * @param string url
-         * @param string|Object postData
+         * @param string|Object|FormData postData
          * @return Promise
          */
 		sendXmlHTTPRequestPromise : function(url,postData)
 		{
 			try
 			{
-				// si object FormData
-				if ( window.FormData && (postData instanceof FormData) )
-				{
-					postData.set(_csrf_submittedvaluename, _getCSRFCookie());
-
-					// sending request
-					return nettools.jscore.xmlhttp.sendRequestPromise(url, postData);
-				}
-				else
-				{
-					// creating a Querystring object
-					var postData = new nettools.jscore.Querystring(postData);
-
-					// adding the CSRF value as a parameter
-					postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
-
-
-					// sending request and returning a promise
-					return nettools.jscore.xmlhttp.sendRequestPromise(url, postData.getQuerystringObject());			
-				}
+				// sending request and returning a promise
+				return nettools.jscore.xmlhttp.sendRequestPromise(url, _addCSRFValue(postData));
+			}
+			// catch error when _getCSRFCookie fails
+			catch(err)
+			{
+				return Promise.reject(err);
+			}
+		},    
+		
+		
+        
+		/**
+         * Send a secure Fetch request (by sending the CSRF cookie inside the request body (double CSRF cookie submit pattern) and get a Promise
+         * 
+         * @method sendRequestFetch
+         * @param string url
+         * @param string|Object|FormData postData
+         * @return Promise
+         */
+		sendRequestFetch : function(url,postData)
+		{
+			try
+			{
+				// sending request through Fetch API and returning a promise
+				return nettools.jscore.xmlhttp.sendRequestFetch(url, _addCSRFValue(postData));
 			}
 			// catch error when _getCSRFCookie fails
 			catch(err)

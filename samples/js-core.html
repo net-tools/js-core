@@ -170,6 +170,19 @@
 		
 		
 		
+        sendRequestFetch : function(sendString)
+        {
+            nettools.jscore.RequestHelper.sendRequestFetch('js-core-http-promise.php', sendString?'v1=myvalue1&v2=&v3=1':{v1:'myvalue1', v2:'', v3:true}). 
+                    then(function(r)
+                        {
+                            sample.output('sendRequestFetch answered with status OK and message : \n' + r.message);
+                        }).
+                    catch(nettools.jscore.RequestHelper.promiseErrorHandler);
+        
+        },
+		
+		
+		
 		object2FormData : function(obj, fd)
 		{
 			test.dumpFormData(nettools.jscore.RequestHelper.object2FormData(obj, fd));
@@ -409,6 +422,25 @@
 		},
 		
 		
+		CSRF_sendRequestFetch : function(value)
+		{
+			nettools.jscore.SecureRequestHelper.sendRequestFetch(
+					// url
+					'js-core-http-promise-secure.php', 
+
+					// postdata
+					{
+						'value1' : 'fixed value',
+						'sent_value' : value
+					}
+				).then(function(r)
+					{
+						sample.output('Fetch answered with status OK and message : \n' + r.message);
+					})
+				.catch(nettools.jscore.RequestHelper.promiseErrorHandler);
+		},
+		
+		
 		CSRF_replaceAtags : function()
 		{
 			nettools.jscore.SecureRequestHelper.replaceLinksWithPOSTRequests();
@@ -488,6 +520,7 @@
 					<p>
                         <input type="text" value="abcd"><input type="button" value="send secure XmlHttp" onclick="test.CSRF_sendXmlHTTPRequest(this.previousSibling.value); ">
                         <input type="text" value="abcd"><input type="button" value="send secure XmlHttpPromise" onclick="test.CSRF_sendXmlHTTPRequestPromise(this.previousSibling.value); ">
+                        <input type="text" value="abcd"><input type="button" value="send secure Fetch" onclick="test.CSRF_sendRequestFetch(this.previousSibling.value); ">
 					</p>
 					<p>
                         <input type="button" value="failing XmlHttp (missing CSRF parameter)" onclick="test.CSRF_sendXmlHTTPRequestFailing(); ">
@@ -577,6 +610,8 @@
                         <input type="button" value="sendXmlHTTPRequest(FormData)" onclick="test.sendXmlHTTPRequestFormData();">
                         <input type="button" value="sendXmlHTTPRequestPromise(string)" onclick="test.sendXmlHTTPRequestPromise(true);">
                         <input type="button" value="sendXmlHTTPRequestPromise(Object)" onclick="test.sendXmlHTTPRequestPromise(false);">
+                        <input type="button" value="sendRequestFetch(string)" onclick="test.sendRequestFetch(true);">
+                        <input type="button" value="sendRequestFetch(Object)" onclick="test.sendRequestFetch(false);">
                     </p>
                 </form>
                 <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
