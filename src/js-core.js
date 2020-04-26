@@ -1909,17 +1909,13 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 								{
 										if ( response.ok )
 										{
-											try
-											{
-												response.json().then(function(obj)
-													{
-														_handleJsonResponsePromise(resolve, reject, obj);
-													});
-											}
-											catch (err)
-											{
-												reject(err);
-											}
+											response.json().then(function(obj)
+												{
+													_handleJsonResponsePromise(resolve, reject, obj);
+												}).catch(function(err)
+												{
+													reject(err);
+												});
 										}
 										else
 											reject(new Error(nettools.jscore.xmlhttp.i18n.FETCH_API_HTTP_ERROR + response.status + ' ' + response.statusText));
