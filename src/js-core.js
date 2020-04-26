@@ -1899,22 +1899,29 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
             return new Promise(function(resolve, reject)
                     {
                         // calling Fetch API
-                        fetch(url,
-                                {
-                                    method : 'POST', 
-                                    body : postData,
-                                    headers : headers
-                                })
-                            .then(function(response)
-                                {
-                                    if ( response.ok )
-                                        response.json().then(function(obj)
-                                            {
-                                                _handleJsonResponsePromise(resolve, reject, obj);
-                                            });
-                                    else
-                                        reject(new Error(nettools.jscore.xmlhttp.i18n.FETCH_API_HTTP_ERROR + response.status + ' ' + response.statusText));
-                                });
+						try
+						{
+							fetch(url,
+									{
+										method : 'POST', 
+										body : postData,
+										headers : headers
+									})
+								.then(function(response)
+									{
+										if ( response.ok )
+											response.json().then(function(obj)
+												{
+													_handleJsonResponsePromise(resolve, reject, obj);
+												});
+										else
+											reject(new Error(nettools.jscore.xmlhttp.i18n.FETCH_API_HTTP_ERROR + response.status + ' ' + response.statusText));
+									});
+						}
+						catch (err)
+						{
+							reject(err);
+						}
                     }
                 );
         },
