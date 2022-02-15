@@ -2231,16 +2231,15 @@ nettools.jscore.SecureRequestHelper = (function(){
 			}
 			else
 			{
-				// creating a Querystring object
-				var data = new nettools.jscore.Querystring(postData);
-
-				// adding the CSRF value as a parameter
-				data.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
-
-				if ( typeof postData == 'string' )
-					return data.toString();
+				// if arg is an object, just add csrf property
+				if ( typeof postData == 'object' )
+				{
+					postData[_csrf_submittedvaluename] = _getCSRFCookie();
+					return postData;
+				}
+				
 				else
-					return data.getQuerystringObject();
+					return nettools.jscore.appendToUrl(postData, _csrf_submittedvaluename + '=' + _getCSRFCookie());				
 			}
 		},
 		
