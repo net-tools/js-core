@@ -3376,6 +3376,19 @@ nettools.jscore.Querystring.prototype.toString = function()
 
 
 
+/**
+ * Get the Querystring as an URLSearchParams object
+ *
+ * @method nettools.jscore.Querystring.prototype.toURLSearchParams
+ * @return string
+ */
+nettools.jscore.Querystring.prototype.toURLSearchParams = function()
+{
+    return this.getURLSearchParamsObject(); 
+}
+
+
+
 /** 
  * Add a new parameter to querystring ; value must not be already encoded
  *
