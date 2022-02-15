@@ -3354,7 +3354,7 @@ nettools.jscore.Querystring = function(str){
 nettools.jscore.Querystring.prototype.getQuerystringObject = function() {
 	var ret = {};
 
-	this.getURLSearchParamsObject().forEach(function(key, value){
+	this.getURLSearchParamsObject().forEach(function(value, key){
 		ret[key] = value;
 	});
 
