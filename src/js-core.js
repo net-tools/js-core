@@ -410,9 +410,9 @@ nettools.jscore = nettools.jscore || {
      */
     querystringAppend : function(qs, key, value)
     {
-        var q = new nettools.jscore.Querystring(qs);
-        q.addParameter(key, value);
-        
+		var q = new URLSearchParams(qs);
+		q.append(key, value);
+		
         if ( typeof qs == 'string' )
             return q.toString();
         else
@@ -3345,7 +3345,7 @@ nettools.jscore.Querystring = function(str){
     
     // ---- PRIVATE DECL. ----
     
-    var _querystring = [];
+    var _querystring = new URLSearchParams('');
     
     // ---- /PRIVATE DECL. ----
     
@@ -3354,23 +3354,59 @@ nettools.jscore.Querystring = function(str){
     // ---- PROTECTED METHODS & ACCESSORS ----
     
     /**
-     * Get the querystring as an object litteral
-     *
-     * @method getQuerystringObject
-     * @return Object
-     */
-    this.getQuerystringObject = function() {return _querystring;}
-
-
-    
-    /**
      * Set the querystring as an object litteral
      *
      * @method setQuerystringObject
-     * @param Object qs
+     * @param object qs
      */
-    this.setQuerystringObject = function(qs) { _querystring = qs; }
-    
+    this.setQuerystringObject = function(qs) {
+		_querystring = new URLSearchParams('');
+		
+		for ( var p in qs )
+			if ( qs.hasOwnProperty(p) )
+			{
+				var v = qs[p];
+				
+				
+				// handle special types
+				if ( typeof(v) === 'boolean' )
+					_querystring.append(p, v ? '1':'0');
+				else if ( (typeof(v) === 'undefined') || (v === null) )
+					_querystring.append(p, '');
+				else	
+					_querystring.append(p, v);
+			}
+	}
+ 
+	
+	
+	/**
+	 * Set a querystring as a string
+	 *
+	 * @method nettools.jscore.Querystring.prototype.setQuerystring
+	 * @param string qs
+	 * @return nettools.jscore.Querystring Returns this
+	 */
+	this.setQuerystring = function(qs)
+	{
+		_querystring = new URLSearchParams(String(qs));
+		return this;    
+	}
+	
+	
+	
+	/**
+	 * Get underlying URLSearchParams object
+	 * 
+	 * @return URLSearchParams
+	 */
+	this.getURLSearchParamsObject = function()
+	{
+		return _querystring;
+	}
+
+
+
     // ---- /PROTECTED METHODS & ACCESSORS ----
     
     
@@ -3388,43 +3424,25 @@ nettools.jscore.Querystring = function(str){
 
 // ---- PUBLIC PROTOTYPE METHODS ----
 
+
 /**
- * Set a querystring in the object
+ * Get the querystring as an object litteral
  *
- * @method nettools.jscore.Querystring.prototype.setQuerystring
- * @param string qs
- * @return nettools.jscore.Querystring Returns this
+ * @method getQuerystringObject
+ * @return object
  */
-nettools.jscore.Querystring.prototype.setQuerystring = function(qs)
-{
-    var qs = String(qs);
-    
-    
-    if ( !qs )
-    {
-        this.setQuerystringObject({});
-        return this;
-    }
-    
-    
-    var qsitems = qs.split('&');
-    var qsitemsl = qsitems.length;
-    var oqs = {};
-    
-    for ( var i = 0 ; i < qsitemsl ; i++ )
-    {
-        var item = qsitems[i].split('=');
-        if ( item.length != 2 )
-            throw new Error('Malformed querystring, key=value pattern error');
-        
-        oqs[item[0]] = nettools.jscore.unescape(item[1]);
-    }
-    
-    this.setQuerystringObject(oqs);
-    return this;    
+nettools.jscore.Querystring.prototype.getQuerystringObject = function() {
+	var ret = {};
+
+	this.getURLSearchParamsObject().forEach(function(key, value){
+		ret[key] = value;
+	});
+
+	return ret;
 }
 
 
+    
 
 /**
  * Get the Querystring object as a string, with proper url encoding
@@ -3434,24 +3452,7 @@ nettools.jscore.Querystring.prototype.setQuerystring = function(qs)
  */
 nettools.jscore.Querystring.prototype.toString = function()
 {
-    function _getValue(v)
-    {
-        if ( typeof v === 'boolean' )
-            return v?'1':'0';
-        else if ( (v === null) || (v === undefined) )
-            return '';
-        else
-            return v;
-    }
-    
-    
-    var ret = [];
-    var qs = this.getQuerystringObject();
-    
-    for ( var p in qs )
-        ret.push(p + '=' + nettools.jscore.escape(_getValue(qs[p])));
-    
-    return ret.join('&');
+    return this.getURLSearchParamsObject().toString(); 
 }
 
 
@@ -3466,8 +3467,7 @@ nettools.jscore.Querystring.prototype.toString = function()
  */
 nettools.jscore.Querystring.prototype.addParameter = function(key, value)
 {
-    var q = this.getQuerystringObject();
-    q[key] = value;
+    this.getURLSearchParamsObject().append(key, value);
     
     return this;
 }
@@ -3483,8 +3483,7 @@ nettools.jscore.Querystring.prototype.addParameter = function(key, value)
  */
 nettools.jscore.Querystring.prototype.removeParameter = function(key)
 {
-    var q = this.getQuerystringObject();
-    delete q[key];
+    this.getURLSearchParamsObject().delete(key);
     
     return this;
 }
