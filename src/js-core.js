@@ -3739,9 +3739,9 @@ nettools.jscore.Size.prototype.add = function(value)
         return new nettools.jscore.Size(null);
     
     
-    // si ajout de deux objets entre eux
+    // if adding 2 objects
     if ( value instanceof nettools.jscore.Size )
-        // ce n'est possible que si l'unité est la même
+        // only possible if same unit
         if ( this.unit === value.unit )
             return new nettools.jscore.Size(this.size + value.size, this.unit);
         else
@@ -3765,9 +3765,9 @@ nettools.jscore.Size.prototype.subtract = function(value)
         return new nettools.jscore.Size(null);
     
     
-    // si ajout de deux objets entre eux
+    // if dealing with 2 objects
     if ( value instanceof nettools.jscore.Size )
-        // ce n'est possible que si l'unité est la même
+        // only possibile if same unit
         if ( this.unit === value.unit )
             return new nettools.jscore.Size(this.size - value.size, this.unit);
         else
@@ -3778,4 +3778,69 @@ nettools.jscore.Size.prototype.subtract = function(value)
 
 
 
+
+
+
+/**
+ * For older browser, Promise.any or Promise.allSettled are not implemented, we propose here a polyfill
+ */
+nettools.jscore.Promises = {
+	
+	/**
+	 * Wait for the first Promise to be resolved (ignoring failed ones)
+	 *
+	 * @param Promise[] promises
+	 * @return Promise Returns a Promise resolved ; it's value is the value of the first resolved Promise
+	 */
+	any : function(promises)
+	{
+		if ( typeof (Promise.any) == 'function' )
+			return Promise.any(promises);
+		else
+		{
+		   	var errors = [];
+		   
+			return Promise.race(
+					promises.map(
+						function(p) {
+							return p.catch(function(e) {
+								errors.push(e); 
+								if (errors.length >= promises.length)
+									throw errors;
+								return Promise.race(); 	// by construction, race([]) returns a Promise in perpetual waiting state, will never be resolved
+							});
+						}
+				));
+		}
+	},
+	
+	
+	
+	/**
+	 * Wait until all promises have been resolved, ignoring failed ones
+	 *
+	 * @param Promise[] promises
+	 * @return Promise Returning a Promise always resolved with an array of status/reason or status/value mapping each promise value
+	 */
+	allSettled : function(promises)
+	{
+		if ( typeof (Promise.allSettled) == 'function' )
+			return Promise.allSettled(promises);
+		else
+		{
+			// wait until all promises are resolved ; failed ones are catched and transformed in successful ones
+			return Promise.all(
+					promises.map(
+						function(p) {
+							p.then(function(data){
+								return Promise.resolve({status:'fulfilled', value:data});
+							})
+							.catch(function(e){
+								return Promise.resolve({status:'rejected', reason:e});
+							});							
+						}
+				));
+		}
+	}	
+}
 
