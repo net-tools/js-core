@@ -3832,7 +3832,7 @@ nettools.jscore.Promises = {
 			return Promise.all(
 					promises.map(
 						function(p) {
-							p.then(function(data){
+							return p.then(function(data){
 								return Promise.resolve({status:'fulfilled', value:data});
 							})
 							.catch(function(e){
