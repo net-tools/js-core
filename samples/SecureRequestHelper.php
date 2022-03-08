@@ -44,7 +44,7 @@ class SecureRequestHelper {
 	 */
 	public function getCSRFCookie()
 	{
-		return $_COOKIE[$this->_csrf_cookiename];
+		return array_key_exists($this->_csrf_cookiename, $_COOKIE) ? $_COOKIE[$this->_csrf_cookiename] : null;
 	}
 	
 	
@@ -87,7 +87,7 @@ class SecureRequestHelper {
 		if ( !$cookie )
 			return false;
 
-		$t = $request[$this->_csrf_submittedvaluename];
+		$t = array_key_exists($this->_csrf_submittedvaluename, $request) ? $request[$this->_csrf_submittedvaluename] : null;
 		if ( is_null($t) )
 			$t = '';
 		
