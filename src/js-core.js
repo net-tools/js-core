@@ -450,12 +450,32 @@ nettools.jscore = nettools.jscore || {
      */
     htmlentities : function(s)
     {
+		var textArea = document.createElement('textarea');
+  		textArea.innerText = s;
+  		return textArea.innerHTML;
+		/*
         return s.replace(/&/g, '&amp;')
-                .replace(/"/g, '&quote;')
+                .replace(/"/g, '&quot;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/'/g, '&apos;')
-                .replace(/\n/g, '<br>');
+                .replace(/\n/g, '<br>');*/
+    },
+
+
+    
+    /**
+     * Decode html entities
+     * 
+     * @method decodeHtmlentities
+     * @param string s
+     * @return string
+     */
+    decodeHtmlentities : function(s)
+    {
+		var textArea = document.createElement('textarea');
+  		textArea.innerHTML = s;
+  		return textArea.value;
     },
 
 
