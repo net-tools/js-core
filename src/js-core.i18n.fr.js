@@ -1,3 +1,10 @@
+/**
+ * Setting locale
+ */
+nettools.jscore.i18n.locale = 'fr-FR';
+
+
+
 
 /**
  * Object litteral defining translations in French for nettools.jscore.xmlhttp

@@ -14,6 +14,136 @@ window.nettools = window.nettools || {};
  */
 nettools.jscore = nettools.jscore || {
 
+// ===== FORMAT =====
+	
+	/** 
+	 * Default locale : en-US
+	 */	  
+	i18n : {
+		locale : 'en-US'
+	},
+	
+	
+	
+    /**
+     * Convert a month number (1-12) to a localized string
+     *
+     * @param int m
+	 * @param string format May be set with 'long' or 'short'; defaults to 'long'
+     * @return String
+     */
+    month2str : function(m, format)
+    {
+		var d = new Date();
+		d.setDate(15);		// set day because if we are march 31 and we ask for february, this may be an issue
+		d.setMonth(Number(m)-1);
+		
+		var fmt = new Intl.DateTimeFormat(nettools.jscore.i18n.locale, {month:format || 'long'});
+		return fmt.format(d);
+    },
+
+    
+
+    /**
+     * Convert a Date object to a short localized string : ex. for en-US locale 'm/d/yy, h:m AM'
+     * 
+     * @param Date dt Date object
+     * @param bool hours Set this parameter to true to output localized time part
+     * @return string
+     */
+    date2str : function(dt, hours)
+    {
+		if ( hours )
+			var fmt = new Intl.DateTimeFormat(nettools.jscore.i18n.locale, { dateStyle : 'short', timeStyle : 'short' });
+		else
+			var fmt = new Intl.DateTimeFormat(nettools.jscore.i18n.locale, { dateStyle : 'short' });
+		
+		return fmt.format(dt);
+    },
+
+
+    
+    /**
+     * Convert a Date object to a complete date(/time) string 
+	 *
+	 * 'long' format, for en-US locale : Wednesday, August 9, 2023 at 10:06 AM
+     *
+     * @param Date dt Date object
+	 * @param string format May be set to 'long' (default) or 'short'
+     * @param bool hours Set this parameter to true to output localized time part
+     * @return string
+     */     
+    date2fullstr : function(dt, format, hours)
+    {
+		// if full date style
+		if ( (format || 'long') == 'long' )
+		{
+			if ( hours )
+				var fmt = new Intl.DateTimeFormat(nettools.jscore.i18n.locale, { dateStyle : 'full', timeStyle : 'short' });
+			else
+				var fmt = new Intl.DateTimeFormat(nettools.jscore.i18n.locale, { dateStyle : 'full' });
+		}
+		
+		
+		// if short date style
+		else
+		{
+			if ( hours )
+				var fmt = new Intl.DateTimeFormat(nettools.jscore.i18n.locale, { weekday:'short', year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+			else
+				var fmt = new Intl.DateTimeFormat(nettools.jscore.i18n.locale, { weekday:'short', year:'numeric', month:'short', day:'2-digit' });
+		}
+
+		
+		return fmt.format(dt);
+    },
+
+
+    
+    /**
+     * Format a Date object to yyyymmdd
+     *
+     * @param Date dt Date object
+     * @return string
+     */
+    date2ymd : function(dt)
+    {
+        return dt.getFullYear().toString() + nettools.jscore.leadingZero(dt.getMonth()+1) + nettools.jscore.leadingZero(dt.getDate());
+    },
+
+
+	
+    /** 
+     * Format a string with 'yyyymmdd' format to localized short string (ex. for en-US locale : m/d/yy)
+     *
+     * @param string dt
+     * @return string
+     */
+    ymd2shortStr : function(dt)
+    {
+        var dt = new Date(Number(dt.substr(0,4)), Number(dt.substr(4,2))-1, Number(dt.substr(6,2)));
+		return nettools.jscore.date2str(dt);
+    },
+
+
+    
+    /** 
+     * Format a string with 'yyyymmdd' format to localized short string, and ensuring 2-digit values (date2str output a 4 digit year for fr-FR locale)
+     *
+     * @param string dt
+     * @return string
+     */
+    ymd2shortStr2digit : function(dt)
+    {
+        var dt = new Date(Number(dt.substr(0,4)), Number(dt.substr(4,2))-1, Number(dt.substr(6,2)));
+		var f = new Intl.DateTimeFormat(nettools.jscore.i18n.locale, { year:'2-digit', month:'2-digit', day:'2-digit' });
+		return f.format(dt);
+    },
+
+
+    
+    
+	
     
     
 // ===== COOKIES =====
