@@ -139,6 +139,34 @@ nettools.jscore = nettools.jscore || {
 		var f = new Intl.DateTimeFormat(nettools.jscore.i18n.locale, { year:'2-digit', month:'2-digit', day:'2-digit' });
 		return f.format(dt);
     },
+	
+	
+	
+	/**
+	 * Find any A node with given selector and transform its content to a HREF with tel: scheme
+	 *
+	 * @param string selector Selector beginning with 'a' to identify all A anchor nodes to handle (for example, can be all A anchors with 'tel' style : 'a.tel')
+	 * @param HTMLElement node The DOM node to search into (usually, the document object)
+	 */
+	tel2url : function(selector, node)
+	{
+		var node = node || document;
+		
+		// compatibility test
+		if ( !node.querySelectorAll )
+			return;
+
+		var tags = node.querySelectorAll(selector);
+		var tagsl = tags.length;
+		for ( var i = 0 ; i < tagsl ; i++ )
+		{
+			var a = tags[i];
+
+			// create a href attribute, removing spaces, dots, etc. from tel number
+			a.href = "tel:" + a.innerHTML.replace(/[^+0-9]+/g, '');
+			a.innerHTML = "&phone;" + a.innerHTML;
+		}
+	},
 
 
     
