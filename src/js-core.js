@@ -2542,6 +2542,8 @@ nettools.jscore.oop = nettools.jscore.oop || {
 
 	/**
      * Inherit from a superclass
+	 *
+	 * Can be called this way : child = nettools.jscore.oop.extend(function(){ ... subclass constructor here ... }, superclas);
      *
      * @method extend
      * @param Object subclass 
@@ -2575,6 +2577,9 @@ nettools.jscore.oop = nettools.jscore.oop || {
 		// by the way, this correction is only done if we inherit ; if we don't the prototype constructor is wrong
 		if ( superclass.prototype.constructor == Object.prototype.constructor )
 			superclass.prototype.constructor = superclass;
+		
+		
+		return subclass;
 	},
     
 	

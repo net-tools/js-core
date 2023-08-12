@@ -548,15 +548,10 @@
     
        
         <div class="sampleBox">
-            <h1>nettools.jscore.Querystring &amp; Url</h1>
+            <h1>nettools.jscore.Querystring</h1>
             <div id="sampleUrl">   
                 <p>Querystring constructor : <input type="text" value="key1=value1&key2=%26&key3="><input type="Submit" onclick="test.dumpQuerystring(new nettools.jscore.Querystring(this.previousSibling.value));"></p>
                 <p>Querystring constructor (object) : <input type="Submit" onclick="test.dumpQuerystring(new nettools.jscore.Querystring({v1:'my val', v2:null, v3:true}));"></p>
-                <p>Url constructor : <input type="text" value="myfile.php?key1=value1&key2=%26&key3="><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
-                <p>Url constructor : <input type="text" value="myfile.php?"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
-                <p>Url constructor : <input type="text" value="myfile.php"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value));"></p>
-                <p>Add parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="text" value="key3"><input type="text" value="v=&? /"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.previousSibling.previousSibling.value).addParameter(this.previousSibling.previousSibling.value, this.previousSibling.value));"></p>
-                <p>Remove key1 parameter : <input type="text" value="myfile.php?key1=value1&key2=%26"><input type="Submit" onclick="test.dumpUrl(new nettools.jscore.Url(this.previousSibling.value).removeParameter('key1'));"></p>
             </div>
         </div>
     
