@@ -928,6 +928,25 @@ nettools.jscore = nettools.jscore || {
 
         return res;
     },
+    
+    
+    
+    /**
+     * Convert an object litteral to FormData 
+     *
+     * @param object obj
+     * @return FormData
+     */
+    objectToFormData : function(obj)
+    {
+        var fd = new FormData();
+        
+        for ( o in obj )
+            if ( obj.hasOwnProperty(o) )
+                fd.append(o, obj[o]);
+        
+        return fd;
+    }
 
 
     
@@ -3870,7 +3889,7 @@ nettools.jscore.Promises = {
 /**
  * Namespace for submit handlers
  */
-//nettools.jscore.SubmitHandlers = {};
+nettools.jscore.SubmitHandlers = {};
 
 
 
@@ -3878,17 +3897,11 @@ nettools.jscore.Promises = {
 /**
  * Base class for submit handler class
  *
- * Options parameter may contain :
- * - target : url to send data to (if xmlhttp or post request)
- * - csrf : true/false 
- * - data : any data to send along with request body ; can be a string or an object litteral
- * - onSubmit : callback called upon xmlhttp successfull data sent
- *
  * @param object options Object litteral with any relevant parameters
  */
-/*nettools.jscore.SubmitHandlers.Handler = function(options){
+nettools.jscore.SubmitHandlers.Handler = function(options){
 	this.options = options;
-}*/
+}
 
 
 
@@ -3898,9 +3911,9 @@ nettools.jscore.Promises = {
  * @param HTMLFormElement form
  * @param HTMLInputElement[] elements
  */
-/*nettools.jscore.SubmitHandlers.Handler.prototype.submit(form, elements){
+nettools.jscore.SubmitHandlers.Handler.prototype.submit = function(form, elements){
 	
-}*/
+}
 
 
 
@@ -3910,19 +3923,101 @@ nettools.jscore.Promises = {
  * Class to submit form data with custom callback (no real GET/POST request)
  *
  * Options parameter may contain :
- * - data : any data to send along with request body ; can be a string or an object litteral
  * - target : callback function(form, elements)
  *
  * @param object options Object litteral with any relevant parameters
  */
-/*nettools.jscore.SubmitHandlers.Callback = function(options){
-	nettools.jscore.oop.parentConstructor(this, []);
-}
-nettools.jscore.oop.extend(nettools.jscore.SubmitHandlers.Callback, nettools.jscore.SubmitHandlers.Handler);
+nettools.jscore.SubmitHandlers.Callback = nettools.jscore.oop.extend(function(options)
+    {
+        nettools.jscore.oop.parentConstructor(this, [options]);
+    },
+                                                                     
+    nettools.jscore.SubmitHandlers.Handler
+);
 
 
-nettools.jscore.SubmitHandler.prototype.submit(){
+
+/** 
+ * Handle submit by callback
+ *
+ * @param HTMLFormElement form
+ * @param HTMLInputElement[] elements
+ */
+nettools.jscore.SubmitHandlers.Callback.prototype.submit = function(form, elements){
 	
+    if ( typeof this.options.target ===  'function' )
+        this.options.target(form, elements);
+    
+    return true;
 }
-*/
+
+
+
+
+
+
+/**
+ * Class to submit form data through a xmlhttp request
+ *
+ * Options parameter may contain :
+ * - data : any data to send along with request body ; can be a string or an object litteral
+ * - target : url to send xmlhttp POST request
+ * - csrf : true/false 
+ * - onload : callback function(form, elements, {jsonReturn : value }) called when xmlhttp request is done ; the last argument is a litteral object with a 'jsonReturn' property containing any json value returned by request
+ *
+ * @param object options Object litteral with any relevant parameters
+ */
+nettools.jscore.SubmitHandlers.XmlHttp = nettools.jscore.oop.extend(function(options)
+    {
+        nettools.jscore.oop.parentConstructor(this, [options]);
+    },
+                                                                     
+    nettools.jscore.SubmitHandlers.Handler
+);
+
+
+
+/** 
+ * Handle submit by xmlhttp request
+ *
+ * @param HTMLFormElement form
+ * @param HTMLInputElement[] elements
+ */
+nettools.jscore.SubmitHandlers.XmlHttp.prototype.submit = function(form, elements){
+	
+    // définir la méthode de traitement xmlhttp, selon si protection csrf
+    var handler = null;
+    if ( this.options['csrf'] )
+        handler = nettools.jscore.SecureRequestHelper.sendXmlHTTPRequest;
+    else
+        handler = nettools.jscore.RequestHelper.sendXmlHTTPRequest;
+
+    
+    
+    var postFormData = nettools.jscore.objectToFormData(nettools.jscore.formFieldsToObject(elements));
+
+    
+    // appel
+    handler(
+            // POST url
+            this.options.target,
+
+            // callback
+            function(resp)
+            {
+                var r = nettools.jscore.xmlhttp.parseJsonResponse(resp);
+
+                // si on veut être averti des suites de l'enregistrement par xmlhttp
+                if ( typeof this.options['onload'] === 'function' )
+                    this.options.onload(form, elements, {jsonReturn:r});
+            },
+
+            // POST data (sous forme de chaine) ; on inclu les paramètres URL supplémentaires et DATA
+            nettools.jscore.mergeObjects(subm['post'], nettools.jscore.formFieldsToObject(elements))
+        );
+
+    return true;
+}
+
+
 
