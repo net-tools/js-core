@@ -2608,13 +2608,12 @@ nettools.jscore.oop = nettools.jscore.oop || {
      * Call superclass constructor
      *
      * @method parentConstructor
-     * @param Object classname 
      * @param Object that 
      * @param Array params Array of constructor parameters
      */
-	parentConstructor : function(classname, that, params)
+	parentConstructor : function(that, params)
 	{
-		classname.parent.constructor.apply(that, params?params:[]);
+		that.constructor.parent.constructor.apply(that, params?params:[]);
 	}
 };
 
@@ -3604,176 +3603,6 @@ nettools.jscore.Querystring.prototype.removeParameter = function(key)
 
 
 
-
-
-/**
- * Url management constructor
- *
- * @class nettools.jscore.Url
- * @param string str
- */
-nettools.jscore.Url = function(str){
-    
-    // ---- PRIVATE DECL. ----
-    
-    var _resource = null;
-    var _querystring = null;
-    
-    // ---- /PRIVATE DECL. ----
-    
-    
-
-    // ---- PROTECTED METHODS & ACCESSORS ----
-    
-    /**
-     * Get the resource part (before ?)
-     *
-     * @method getResource
-     * @return string
-     */
-    this.getResource = function() {return _resource;}
-
-    
-    
-    /**
-     * Set the resource part (before ?)
-     *
-     * @method setResource
-     * @param string res
-     */
-    this.setResource = function(res) {_resource = res;}
-
-    
-    
-    /**
-     * Get the querystring part (after ?), as nettools.jscore.Querystring object
-     *
-     * @method getQuerystring
-     * @return nettools.jscore.Querystring
-     */
-    this.getQuerystring = function() {return _querystring;}
-
-
-    
-    /**
-     * Set the querystring part (after ?), as nettools.jscore.Querystring object
-     *
-     * @method setQuerystring
-     * @param nettools.jscore.Querystring qs
-     */
-    this.setQuerystring = function(qs) { _querystring = qs; }
-    
-    // ---- /PROTECTED METHODS & ACCESSORS ----
-    
-    
-    
-    // ---- CONSTRUCTOR ----
-    
-    this.setUrl(str);
-    
-    // ---- /CONSTRUCTOR ----
-}
-
-
-// ---- PUBLIC PROTOTYPE METHODS ----
-
-/**
- * Set an Url in the object
- *
- * @method nettools.jscore.Url.prototype.setUrl
- * @param string u
- * @return nettools.jscore.Url Returns this
- */
-nettools.jscore.Url.prototype.setUrl = function(u)
-{
-    var u = String(u);
-    
-    
-    if ( !u )
-    {
-        this.setResource(null);
-        this.setQuerystring(new nettools.jscore.Querystring(''));
-        return this;
-    }
-    
-    
-    // if no querystring
-    if ( u.indexOf('?') == -1 )
-    {
-        this.setResource(u);
-        this.setQuerystring(new nettools.jscore.Querystring(''));
-        return this;
-    }
-    
-    
-    // if querystring present, extract string after ?
-    var p = u.indexOf('?');
-    var qs = u.substr(p+1);
-    
-    
-    this.setResource(u.substr(0, p));  
-    this.setQuerystring(new nettools.jscore.Querystring(qs));
-    return this;    
-}
-
-
-
-/**
- * Get the Url object as a string, with proper url encoding
- *
- * @method nettools.jscore.Url.prototype.toString
- * @return string
- */
-nettools.jscore.Url.prototype.toString = function()
-{
-    var qs = this.getQuerystring().toString();
-
-    if ( !qs )
-        return this.getResource();
-    else
-        return this.getResource() + '?' + qs;
-}
-
-
-
-/** 
- * Add a new parameter to querystring ; value must not be already encoded
- *
- * @method nettools.jscore.Url.prototype.addParameter
- * @param string key
- * @param string value
- * @return nettools.jscore.Url Returns this
- */
-nettools.jscore.Url.prototype.addParameter = function(key, value)
-{
-    this.getQuerystring().addParameter(key, value);
-    return this;
-}
-
-
-
-/** 
- * Removes a parameter from querystring
- *
- * @method nettools.jscore.Url.prototype.removeParameter
- * @param string key
- * @return nettools.jscore.Url Returns this
- */
-nettools.jscore.Url.prototype.removeParameter = function(key)
-{
-    this.getQuerystring().removeParameter(key);
-    return this;
-}
-
-
-
-
-
-
-
-
-
-
 // ==== SIZE ====
 	
 /** 
@@ -4021,4 +3850,74 @@ nettools.jscore.Promises = {
 		}
 	}	
 }
+
+
+
+
+
+
+
+
+
+// ==== SUBMIT HANDLERS ====
+	
+
+/**
+ * Namespace for submit handlers
+ */
+//nettools.jscore.SubmitHandlers = {};
+
+
+
+
+/**
+ * Base class for submit handler class
+ *
+ * Options parameter may contain :
+ * - target : url to send data to (if xmlhttp or post request)
+ * - csrf : true/false 
+ * - data : any data to send along with request body ; can be a string or an object litteral
+ * - onSubmit : callback called upon xmlhttp successfull data sent
+ *
+ * @param object options Object litteral with any relevant parameters
+ */
+/*nettools.jscore.SubmitHandlers.Handler = function(options){
+	this.options = options;
+}*/
+
+
+
+/**
+ * Submit form and elements
+ *
+ * @param HTMLFormElement form
+ * @param HTMLInputElement[] elements
+ */
+/*nettools.jscore.SubmitHandlers.Handler.prototype.submit(form, elements){
+	
+}*/
+
+
+
+
+
+/**
+ * Class to submit form data with custom callback (no real GET/POST request)
+ *
+ * Options parameter may contain :
+ * - data : any data to send along with request body ; can be a string or an object litteral
+ * - target : callback function(form, elements)
+ *
+ * @param object options Object litteral with any relevant parameters
+ */
+/*nettools.jscore.SubmitHandlers.Callback = function(options){
+	nettools.jscore.oop.parentConstructor(this, []);
+}
+nettools.jscore.oop.extend(nettools.jscore.SubmitHandlers.Callback, nettools.jscore.SubmitHandlers.Handler);
+
+
+nettools.jscore.SubmitHandler.prototype.submit(){
+	
+}
+*/
 
