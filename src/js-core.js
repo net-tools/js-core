@@ -556,30 +556,6 @@ nettools.jscore = nettools.jscore || {
 
     
     /**
-     * Add parameter(s) to a querystring
-     * 
-     * We return either a string or a litteral object, depending on what type is QS
-     * 
-     * @method querystringAppend
-     * @param Object|string qs
-     * @param string key
-     * @param string value
-     * @return Object|string
-     */
-    querystringAppend : function(qs, key, value)
-    {
-		var q = new URLSearchParams(qs);
-		q.append(key, value);
-		
-        if ( typeof qs == 'string' )
-            return q.toString();
-        else
-            return q.getQuerystringObject();
-    },
-
-
-    
-    /**
      * Add parameters to an URL
      *
      * If the URL has no querystring, ? will be prepend before appending parameters ; otherwise, & will be inserted before new parameters, at the end of the string
@@ -893,7 +869,7 @@ nettools.jscore = nettools.jscore || {
      */ 
     inputs2querystring : function(elements)
     {
-        return (new nettools.jscore.Querystring(nettools.jscore.formFieldsToObject(elements))).toString();
+		return (new URLSearchParams(nettools.jscore.formFieldsToObject(elements))).toString();
     },
 
     
@@ -930,27 +906,6 @@ nettools.jscore = nettools.jscore || {
     },
     
     
-    
-    /**
-     * Convert an object litteral to FormData 
-     *
-     * @param object obj
-     * @return FormData
-     */
-    objectToFormData : function(obj)
-    {
-        var fd = new FormData();
-        
-        for ( o in obj )
-            if ( obj.hasOwnProperty(o) )
-                fd.append(o, obj[o]);
-        
-        return fd;
-    }
-
-
-    
-
     
     
 
@@ -1441,6 +1396,59 @@ nettools.jscore.StorageManager = {
 nettools.jscore.RequestHelper = {
 
    /**
+    * Normalize user data in object litterals, replacing true/false values by '1' and '0', undefined/null values by ''
+	*
+   	* @param string|object data
+ 	* @return string|object Returns the normalized data parameter 
+	*/
+	normalizeObjectLitteral : function(data)
+	{
+		if ( typeof data === 'string' )
+			return;
+
+
+		for ( var p in data )
+			if ( data.hasOwnProperty(p) )
+			{
+				// handle boolean values
+				if ( typeof data[p] === 'boolean' )
+					data[p] = data[p] ? '1':'0';
+				
+				
+				// handle undefined and null values
+				if ( (data[p] === undefined) || (data[p] === null) )
+					data[p] = '';
+			}
+
+		return data;
+	},
+	
+	
+	
+	/**
+	 * Convert a URLSearchParams object to object litteral
+	 *
+	 * @param URLSearchParams params
+	 * @return object
+	 */
+	URLSearchParamsToObjectLitteral : function(params)
+	{
+		var ret = {};
+		
+		params.forEach(
+			function(value, key)
+			{
+				ret[key] = value;
+			}
+		);
+		
+		
+		return ret;
+	},
+	
+	
+	
+   /**
 	* Post a request to an URL
 	* 
 	* @method post
@@ -1460,27 +1468,22 @@ nettools.jscore.RequestHelper = {
 		// add parameters in hidden fields
 		if ( data )
 		{
-			// if request as a string, converting it to a object litteral
-			if ( typeof(data) === 'string' )
-				data = (new nettools.jscore.Querystring(data)).getQuerystringObject();
+			// if request is a string or an object litteral
+			data = new URLSearchParams(nettools.jscore.RequestHelper.normalizeObjectLitteral(data));
 
+			data.forEach(
+				function(v, k)
+				{
+					var e = document.createElement('input');
+					e.type = "hidden";
+					e.name = k;
 
-			// creating hidden fields
-			for ( var d in data )
-			{
-				var e = document.createElement('input');
-				e.type = "hidden";
-				e.name = d;
-
-				if ( typeof(data[d]) === 'boolean' )
-					e.value = data[d] ? '1':'0';
-				else
-					e.value = ((data[d]!==undefined) && (data[d]!==null)) ? data[d] : "";
-
-				form.appendChild(e);
-			}
+					form.appendChild(e);
+				}
+			);
 		}
 
+		
 		// submitting form
 		document.body.appendChild(form);
 		form.submit();
@@ -1836,7 +1839,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
                     return postData;
             else
                 // encode object litteral to url-encoded string
-                return new nettools.jscore.Querystring(postData).toString();
+				return (new URLSearchParams(nettools.jscore.RequestHelper.normalizeObjectLitteral(postData))).toString();
 
         // request already a string
         else
@@ -2258,8 +2261,8 @@ nettools.jscore.SecureRequestHelper = (function(){
 	/**
 	 * Add the CSRF value in the request body (double-submit cookie value pattern)
 	 *
-	 * @param string|Object|FormData postData
-	 * @return string|Object|FormData
+	 * @param string|object|FormData postData
+	 * @return object|FormData
 	 */
 	function _addCSRFValue(postData)
 	{
@@ -2274,13 +2277,13 @@ nettools.jscore.SecureRequestHelper = (function(){
 		else
 		{
 			// creating a Querystring object
-			var postData = new nettools.jscore.Querystring(postData);
+			var postData = new URLSeachParams(nettools.jscore.RequestHelper.normalizeObjectLitteral(postData));
 
 			// adding the CSRF value as a parameter
-			postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
+			postData.append(_csrf_submittedvaluename, _getCSRFCookie());
 			
 			// return an object litteral
-			return postData.getQuerystringObject();
+			return nettools.jscore.RequestHelper.URLSearchParamsToObjectLitteral(postData);
 		}
 	}
 
@@ -2465,14 +2468,11 @@ nettools.jscore.SecureRequestHelper = (function(){
 		 */		 
 		post : function(url, postData)
 		{
-			// creating a Querystring object
-			var postData = new nettools.jscore.Querystring(postData);
-
-			// adding the CSRF value as a parameter
-			postData.addParameter(_csrf_submittedvaluename, _getCSRFCookie());
-
+			// add CSRF cookie in postData
+			var data = _addCSRFValue(postData);
+			
 			// sending request
-			nettools.jscore.RequestHelper.post(url, postData.getQuerystringObject());
+			nettools.jscore.RequestHelper.post(url, data);
 		},
 	
 		
@@ -3453,180 +3453,6 @@ var CryptoJSAesJson = {
 
 
 
-// ==== URL ====
-
-/**
- * Querystring management constructor
- *
- * @class nettools.jscore.Querystring
- * @param Object|string str Querystring to manage, either a string with proper URL-encoding or an object litteral
- */
-nettools.jscore.Querystring = function(str){
-    
-    // ---- PRIVATE DECL. ----
-    
-    var _querystring = new URLSearchParams('');
-    
-    // ---- /PRIVATE DECL. ----
-    
-    
-
-    // ---- PROTECTED METHODS & ACCESSORS ----
-    
-    /**
-     * Set the querystring as an object litteral
-     *
-     * @method setQuerystringObject
-     * @param object qs
-     */
-    this.setQuerystringObject = function(qs) {
-		_querystring = new URLSearchParams('');
-		
-		for ( var p in qs )
-			if ( qs.hasOwnProperty(p) )
-			{
-				var v = qs[p];
-				
-				
-				// handle special types
-				if ( typeof(v) === 'boolean' )
-					_querystring.append(p, v ? '1':'0');
-				else if ( (typeof(v) === 'undefined') || (v === null) )
-					_querystring.append(p, '');
-				else	
-					_querystring.append(p, v);
-			}
-	}
- 
-	
-	
-	/**
-	 * Set a querystring as a string
-	 *
-	 * @method nettools.jscore.Querystring.prototype.setQuerystring
-	 * @param string qs
-	 * @return nettools.jscore.Querystring Returns this
-	 */
-	this.setQuerystring = function(qs)
-	{
-		_querystring = new URLSearchParams(String(qs));
-		return this;    
-	}
-	
-	
-	
-	/**
-	 * Get underlying URLSearchParams object
-	 * 
-	 * @return URLSearchParams
-	 */
-	this.getURLSearchParamsObject = function()
-	{
-		return _querystring;
-	}
-
-
-
-    // ---- /PROTECTED METHODS & ACCESSORS ----
-    
-    
-    
-    // ---- CONSTRUCTOR ----
-    
-    if ( typeof str == 'string')
-        this.setQuerystring(str);
-    else
-        this.setQuerystringObject(str);
-    
-    // ---- /CONSTRUCTOR ----
-}
-
-
-// ---- PUBLIC PROTOTYPE METHODS ----
-
-
-/**
- * Get the querystring as an object litteral
- *
- * @method getQuerystringObject
- * @return object
- */
-nettools.jscore.Querystring.prototype.getQuerystringObject = function() {
-	var ret = {};
-
-	this.getURLSearchParamsObject().forEach(function(value, key){
-		ret[key] = value;
-	});
-
-	return ret;
-}
-
-
-    
-
-/**
- * Get the Querystring object as a string, with proper url encoding
- *
- * @method nettools.jscore.Querystring.prototype.toString
- * @return string
- */
-nettools.jscore.Querystring.prototype.toString = function()
-{
-    return this.getURLSearchParamsObject().toString(); 
-}
-
-
-
-/**
- * Get the Querystring as an URLSearchParams object
- *
- * @method nettools.jscore.Querystring.prototype.toURLSearchParams
- * @return string
- */
-nettools.jscore.Querystring.prototype.toURLSearchParams = function()
-{
-    return this.getURLSearchParamsObject(); 
-}
-
-
-
-/** 
- * Add a new parameter to querystring ; value must not be already encoded
- *
- * @method nettools.jscore.Querystring.prototype.addParameter
- * @param string key
- * @param string value
- * @return nettools.jscore.Querystring Returns this
- */
-nettools.jscore.Querystring.prototype.addParameter = function(key, value)
-{
-    this.getURLSearchParamsObject().append(key, value);
-    
-    return this;
-}
-
-
-
-/** 
- * Removes a parameter from querystring
- *
- * @method nettools.jscore.Querystring.prototype.removeParameter
- * @param string key
- * @return nettools.jscore.Querystring Returns this
- */
-nettools.jscore.Querystring.prototype.removeParameter = function(key)
-{
-    this.getURLSearchParamsObject().delete(key);
-    
-    return this;
-}
-
-
-
-
-
-
-
 // ==== SIZE ====
 	
 /** 
@@ -3911,9 +3737,57 @@ nettools.jscore.SubmitHandlers.Handler = function(options){
  * @param HTMLFormElement form
  * @param HTMLInputElement[] elements
  */
-nettools.jscore.SubmitHandlers.Handler.prototype.submit = function(form, elements){
+nettools.jscore.SubmitHandlers.Handler.prototype.submit = function(form, elements)
+{
 	
 }
+
+
+
+/**
+ * Convert form elements to FormData, and merge with any supplied user data
+ *
+ * @param HTMLInputElement[] elements
+ * @param string|object data
+ * @return FormData
+ */
+nettools.jscore.SubmitHandlers.Handler.prototype.createBody = function(elements, data)
+{
+    // prepare post data : array of form elements converted to FormData
+    var postFormData = nettools.jscore.RequestHelper.object2FormData(nettools.jscore.formFieldsToObject(elements));
+	
+	
+	// if user data (either string or object litteral, merging it to form post data)
+	if ( data )
+	{
+		var u = new URLSearchParams(this.normalizeUserData(data));
+		u.forEach(
+			function(v, k){
+				postFormData.append(k, v);
+			}
+		);
+	}
+	
+	
+	return postFormData;
+}
+
+
+
+/**
+ * Normalize user data ; if parameter is a string, ignoring ; if parameter is an object litteral, convert bool values to '0' and '1'
+ *
+ * @param string|object data
+ * @return string|object Returns the normalized data parameter 
+ */
+nettools.jscore.SubmitHandlers.Handler.prototype.normalizeUserData = function(data)
+{
+	return nettools.jscore.RequestHelper.normalizeObjectLitteral(data);
+}
+
+
+
+    
 
 
 
@@ -3985,7 +3859,7 @@ nettools.jscore.SubmitHandlers.XmlHttp = nettools.jscore.oop.extend(function(opt
  */
 nettools.jscore.SubmitHandlers.XmlHttp.prototype.submit = function(form, elements){
 	
-    // définir la méthode de traitement xmlhttp, selon si protection csrf
+    // selecting xmlhttp handler, depending on csrf flag
     var handler = null;
     if ( this.options['csrf'] )
         handler = nettools.jscore.SecureRequestHelper.sendXmlHTTPRequest;
@@ -3993,31 +3867,183 @@ nettools.jscore.SubmitHandlers.XmlHttp.prototype.submit = function(form, element
         handler = nettools.jscore.RequestHelper.sendXmlHTTPRequest;
 
     
-    
-    var postFormData = nettools.jscore.objectToFormData(nettools.jscore.formFieldsToObject(elements));
-
-    
-    // appel
+    // calling xmlhttp handler
     handler(
-            // POST url
+            // target url
             this.options.target,
 
-            // callback
+		
+            // callback called to receive request response
             function(resp)
             {
                 var r = nettools.jscore.xmlhttp.parseJsonResponse(resp);
 
-                // si on veut être averti des suites de l'enregistrement par xmlhttp
+                // if user defined onload callback
                 if ( typeof this.options['onload'] === 'function' )
                     this.options.onload(form, elements, {jsonReturn:r});
             },
 
-            // POST data (sous forme de chaine) ; on inclu les paramètres URL supplémentaires et DATA
-            nettools.jscore.mergeObjects(subm['post'], nettools.jscore.formFieldsToObject(elements))
+		
+            // POST data and user data converted to FormData
+            this.createBody(elements, this.options['data']))
         );
+	
 
     return true;
 }
 
+
+
+
+
+
+
+
+
+/**
+ * Class to submit form data through a POST request
+ *
+ * Options parameter may contain :
+ * - data : any data to send along with request body ; can be a string or an object litteral
+ * - target : url to send xmlhttp POST request
+ * - csrf : true/false
+ * - context : document context (usually window.document) ; if not set, window.document is used
+ * - onsubmit : callback function(form, elements) called before data is sent ; form data can be updated during this call
+ *
+ * @param object options Object litteral with any relevant parameters
+ */
+nettools.jscore.SubmitHandlers.Post = nettools.jscore.oop.extend(function(options)
+    {
+        nettools.jscore.oop.parentConstructor(this, [options]);
+    },
+                                                                     
+    nettools.jscore.SubmitHandlers.Handler
+);
+
+
+
+/** 
+ * Create a form in a specific document context (not window.document)
+ *
+ * @param HTMLInputElement[] elements
+ * @param HTMLDocument context
+ */
+nettools.jscore.SubmitHandlers.Post.prototype.createFormInContext = function(elements, context)
+{
+	var form = context.createElement('form');
+	form.style.visibility = 'hidden';
+	form.style.display = "none";
+
+
+	// copy all required inputs (ignoring buttons)
+	var elementsl = elements.length;
+	for ( var i = 0 ; i < elementsl ; i++ )
+	{
+		var e = elements[i];
+
+		switch ( e.type )
+		{
+			case "checkbox":
+			case "radio":
+				if ( e.checked ) 
+					var value = e.value;
+				else
+					// if not checked, no value sent, we don't add the value in the form
+					continue;
+
+				break;
+
+			// ignoring buttons
+			case "button":
+			case "submit":
+				continue;
+
+			// default case
+			default:
+				var value = e.value;
+				break;
+		}
+
+
+		// creating hidden input
+		var input = context.createElement('input');
+		input.type = "hidden";
+		input.name = e.name;
+		input.value = value;
+
+		form.appendChild(input);
+	}
+
+
+	// adding form in context
+	context.body.appendChild(form);
+	return form;
+}
+
+
+	
+/** 
+ * Handle submit by POST request
+ *
+ * @param HTMLFormElement form
+ * @param HTMLInputElement[] elements
+ */
+nettools.jscore.SubmitHandlers.Post.prototype.submit = function(form, elements)
+{
+	
+	// if onsubmit callback
+	if ( typeof this.options['onsubmit'] === 'function' )
+		this.options.onsubmit(form, elements);
+   
+    
+	// document context
+	var context = this.options['context'] || document;
+	
+	
+	// if document context is not current document, creating a form in the user supplied context
+	if ( context != document )
+		form = this.createFormInContext(elements, context);
+
+
+	// maybe adding CSRF fields
+	if ( this.options['csrf'] )
+		nettools.jscore.SecureRequestHelper.addCSRFSubmittedValueHiddenInput(form);
+	
+	
+	form.method = 'post';
+	form.action = this.options.target;
+
+	
+	// checking if one element is a file input ; if so, updating form enctype
+	var elementsl = elements.length;
+	for ( var i = 0 ; i < elementsl ; i++ )
+		if ( elements[i].type === 'file' )
+			{
+				form.enctype = 'multipart/form-data';
+				break;
+			}
+	
+	
+	// add hidden parameters for user data
+	if ( this.options['data'] )
+	{
+		var u = new URLSearchParams(this.normalizeUserData(this.options.data));
+		u.forEach(
+			function(v, k)
+			{
+				var field = context.createElement('input');
+				field.type = "hidden";
+				field.name = k;
+				field.value = v;
+				form.appendChild(field);
+			}
+		);
+	}
+
+	
+	// submitting form
+	form.submit();
+    return true;
+}
 
 
