@@ -1396,15 +1396,15 @@ nettools.jscore.StorageManager = {
 nettools.jscore.RequestHelper = {
 
    /**
-    * Normalize user data in object litterals, replacing true/false values by '1' and '0', undefined/null values by ''
+    * Normalize data values and get a URLSearchParams object 
 	*
-   	* @param string|object data
- 	* @return string|object Returns the normalized data parameter 
+   	* @param string|object data Data to normalize ; if this is a string, no process is done ; if this is an object litteral, bool and empty values are handled
+ 	* @return string|object Returns a URLSearchParams object 
 	*/
-	normalizeObjectLitteral : function(data)
+	normalizeData : function(data)
 	{
 		if ( typeof data === 'string' )
-			return;
+			return new URLSearchParams(data);
 
 
 		for ( var p in data )
@@ -1420,7 +1420,7 @@ nettools.jscore.RequestHelper = {
 					data[p] = '';
 			}
 
-		return data;
+		return new URLSearchParams(data);
 	},
 	
 	
@@ -1468,10 +1468,8 @@ nettools.jscore.RequestHelper = {
 		// add parameters in hidden fields
 		if ( data )
 		{
-			// if request is a string or an object litteral
-			data = new URLSearchParams(nettools.jscore.RequestHelper.normalizeObjectLitteral(data));
-
-			data.forEach(
+            // normalize data (may be a string or an object litteral), and return a URLSearchParams
+			nettools.jscore.RequestHelper.normalizeData(data).forEach(
 				function(v, k)
 				{
 					var e = document.createElement('input');
@@ -1839,7 +1837,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
                     return postData;
             else
                 // encode object litteral to url-encoded string
-				return (new URLSearchParams(nettools.jscore.RequestHelper.normalizeObjectLitteral(postData))).toString();
+                return nettools.jscore.RequestHelper.normalizeData(postData).toString();
 
         // request already a string
         else
@@ -2276,8 +2274,8 @@ nettools.jscore.SecureRequestHelper = (function(){
 		// if object litteral or string
 		else
 		{
-			// creating a Querystring object
-			var postData = new URLSeachParams(nettools.jscore.RequestHelper.normalizeObjectLitteral(postData));
+			// getting a URLSearchParams object
+			var postData = nettools.jscore.RequestHelper.normalizeData(postData);
 
 			// adding the CSRF value as a parameter
 			postData.append(_csrf_submittedvaluename, _getCSRFCookie());
@@ -3774,20 +3772,7 @@ nettools.jscore.SubmitHandlers.Handler.prototype.createBody = function(elements,
 
 
 
-/**
- * Normalize user data ; if parameter is a string, ignoring ; if parameter is an object litteral, convert bool values to '0' and '1'
- *
- * @param string|object data
- * @return string|object Returns the normalized data parameter 
- */
-nettools.jscore.SubmitHandlers.Handler.prototype.normalizeUserData = function(data)
-{
-	return nettools.jscore.RequestHelper.normalizeObjectLitteral(data);
-}
 
-
-
-    
 
 
 
@@ -4027,7 +4012,7 @@ nettools.jscore.SubmitHandlers.Post.prototype.submit = function(form, elements)
 	// add hidden parameters for user data
 	if ( this.options['data'] )
 	{
-		var u = new URLSearchParams(this.normalizeUserData(this.options.data));
+		var u = nettools.jscore.RequestHelper.normalizeData(this.options.data);
 		u.forEach(
 			function(v, k)
 			{
