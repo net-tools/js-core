@@ -67,14 +67,6 @@
         
         
         
-        dumpQuerystring : function(u)
-        {
-            sample.output('Querystring=' + test.dumpObject(u.getQuerystringObject()) +
-                            '\ntoString()=' + u.toString());
-        },
-		
-		
-		
 		dumpFormData : function(fd)
 		{
 			var ret = [];
@@ -84,16 +76,6 @@
 			
 			sample.output('Formdata=' + ret.join('\n'));
 		},
-        
-        
-        
-        dumpUrl : function(u)
-        {
-            sample.output('Resource=' + u.getResource() + 
-                          '\nQuerystring=' + test.dumpObject(u.getQuerystring().getQuerystringObject()) +
-                                '\nQuerystring.toString()=' + u.getQuerystring().toString() +
-                          '\nUrl.toString()=' + u.toString());
-        },
         
         
         
@@ -445,6 +427,51 @@
 		{
 			nettools.jscore.SecureRequestHelper.replaceLinksWithPOSTRequests();
 			sample.output('A tags have been replace with POST calls');
+		},
+		
+		
+		parentConstructor : function()
+		{
+			var t = [];
+			
+			var cl = function(){
+				this.key = 'value';
+				t.push("Constructor of class 'cl' called");
+			};
+			
+			
+			var cl2 = nettools.jscore.oop.extend(function(){
+				t.push("Constructor of class 'cl2' called");
+				
+				this.parentConstructor();
+			}, cl);
+			
+			
+			var o = new cl2();
+			sample.output(t.join("\n"));
+		},
+		
+		
+		parentCall : function()
+		{
+			var t = [];
+			
+			var cl = function(){
+				this.key = 'value';
+			};
+			cl.prototype.fun = function() { t.push("Class 'cl' : key='" + this.key + "'"); }
+			
+			
+			var cl2 = nettools.jscore.oop.extend(function(){
+				this.parentConstructor();
+			}, cl);
+			cl2.prototype.fun = function() { t.push("Class 'cl2' calling inherited 'fun' method"); this.parentCall('fun')}
+			
+			
+			var o = new cl2();
+			o.fun();
+			
+			sample.output(t.join("\n"));
 		}
         
     }
@@ -466,18 +493,83 @@
                 <p>escape : <input type="text"><input type="Submit" onclick="test.simpleCall(this);"></p>
                 <p>unescape : <input type="text"><input type="Submit" onclick="test.simpleCall(this);"></p>
                 <p>htmlentities : <input type="text"><input type="Submit" onclick="this.previousSibling.value=nettools.jscore.htmlentities(this.previousSibling.value);"></p>
-                <p>querystringAppend : <input type="text" value="key1=value1"><input type="Submit" onclick="test.call(nettools.jscore.querystringAppend, [this.previousSibling.value, 'key2', '=val&2']);"></p>
                 <p>appendToUrl : <input type="text" value="key2=value2"><input type="Submit" onclick="test.call(nettools.jscore.appendToUrl, ['file.php?key1=value1', this.previousSibling.value]);"></p>
                 <p>appendToUrl : <input type="text" value="key2=value2"><input type="Submit" onclick="test.call(nettools.jscore.appendToUrl, ['file.php', this.previousSibling.value]);"></p>
                 <p>count(sub, str) : <input type="text"><input type="text"><input type="Submit" onclick="test.call(nettools.jscore.count, [this.previousSibling.previousSibling.value, this.previousSibling.value]);"></p>
                 <p>extractFileName : <input type="text"><input type="Submit" onclick="test.simpleCall(this);"></p>
                 <p>selfUrl : <input type="Submit" onclick="sample.output(test.dumpObject(nettools.jscore.selfUrl()));"></p>
             </div>
-             
         </div>
     
-       
+
         <div class="sampleBox">
+            <h1>nettools.jscore.RequestHelper.*</h1>
+            <div id="sampleXmlhttp">   
+                <form>
+                    <p>
+                        <input type="button" value="object2FormData(obj, null)" onclick="test.object2FormData({val:'value'}, null);">
+                        <input type="button" value="object2FormData(obj)" onclick="test.object2FormData({val:'value'});">
+                        <input type="button" value="object2FormData(obj, fd)" onclick="var fd = new FormData();fd.append('val1', 'value1');test.object2FormData({val2:'value2'}, fd);">
+                        <input type="button" value="object2FormData({v:null})" onclick="test.object2FormData({val:null});">
+                        <input type="button" value="object2FormData({v:true})" onclick="test.object2FormData({v:true});">
+                    </p>
+                </form>
+                <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
+                <p>parseJsonResponse : <input type="text" value='{"statut":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(statut=false) : <input type="text" value='{"statut":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(statut=false+exception) : <input type="text" value='{"statut":false,"message":"Error occured","exception":"<b>An exception occured !</b>"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(statut=false+simple formatted exception) : <input type="submit" onclick="test.exceptionHandler(true);"></p>
+                <p>&quot; &quot;(statut=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
+
+				<p>
+					<input type="button" value="normalizeData('k1=v1&k2=v2')" onclick="test.call(nettools.jscore.RequestHelper.normalizeData, ['k1=v1&k2=v2']);">
+                	<input type="button" value="normalizeData({k1:'v1',...})" onclick="test.call(nettools.jscore.RequestHelper.normalizeData, [{k1:'v1', k2:'v2'}]);">
+                	<input type="button" value="normalizeData({k1:'',k2:null})" onclick="test.call(nettools.jscore.RequestHelper.normalizeData, [{k1:'', k2:null}]);">
+                	<input type="button" value="normalizeData({k1:true,k2:false})" onclick="test.call(nettools.jscore.RequestHelper.normalizeData, [{k1:true, k2:false}]);">
+				</p>
+
+				<p>
+					<input type="button" value="URLSearchParamsToObjectLitteral('k1=&k2=v2&k3=1')" 
+						   onclick="sample.output(test.dumpObject(nettools.jscore.RequestHelper.URLSearchParamsToObjectLitteral(new URLSearchParams('k1=&k2=v2&k3=1'))));">
+				</p>
+				
+				
+				<p>
+					<form>
+						<input type="text" name="input1" value="inputvalue1">
+						<input type="button" value="SubmitHandlers.XmlHttp" 
+							   onclick="var h = new nettools.jscore.SubmitHandlers.XmlHttp({
+										data : {
+											k1:'v1', 
+											k2:false
+										},
+
+										target : 'js-core-submithandlers-http',
+
+										onload : function(form, elements, response)
+											{
+												sample.output(test.dumpObject(response.jsonReturn));
+											}
+									}); h.submit(this.form, this.form.elements);">
+					</form>
+				</p>
+            </div>
+        </div>
+
+
+
+        <div class="sampleBox">
+            <h1>nettools.jscore.oop.*</h1>
+            <div id="sampleXmlhttp">   
+				<p>
+                	<input type="button" value="parentConstructor" onclick="test.parentConstructor();">
+                	<input type="button" value="parentCall" onclick="test.parentCall();">
+				</p>
+            </div>
+        </div>
+
+	
+		<div class="sampleBox">
             <h1>Form &amp; styles functions</h1>
             <div id="sampleForm">   
                 <form>
@@ -548,15 +640,6 @@
     
        
         <div class="sampleBox">
-            <h1>nettools.jscore.Querystring</h1>
-            <div id="sampleUrl">   
-                <p>Querystring constructor : <input type="text" value="key1=value1&key2=%26&key3="><input type="Submit" onclick="test.dumpQuerystring(new nettools.jscore.Querystring(this.previousSibling.value));"></p>
-                <p>Querystring constructor (object) : <input type="Submit" onclick="test.dumpQuerystring(new nettools.jscore.Querystring({v1:'my val', v2:null, v3:true}));"></p>
-            </div>
-        </div>
-    
-       
-        <div class="sampleBox">
             <h1>nettools.jscore.RealTimeValidator</h1>
             <div id="sampleRTValidator">   
                 <form>
@@ -617,29 +700,6 @@
                 <p>&quot; &quot;(statut=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
             </div>
         </div>
-
-
-        <div class="sampleBox">
-            <h1>nettools.jscore.RequestHelper.*</h1>
-            <div id="sampleXmlhttp">   
-                <form>
-                    <p>
-                        <input type="button" value="object2FormData(obj, null)" onclick="test.object2FormData({val:'value'}, null);">
-                        <input type="button" value="object2FormData(obj)" onclick="test.object2FormData({val:'value'});">
-                        <input type="button" value="object2FormData(obj, fd)" onclick="var fd = new FormData();fd.append('val1', 'value1');test.object2FormData({val2:'value2'}, fd);">
-                        <input type="button" value="object2FormData({v:null})" onclick="test.object2FormData({val:null});">
-                        <input type="button" value="object2FormData({v:true})" onclick="test.object2FormData({v:true});">
-                    </p>
-                </form>
-                <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
-                <p>parseJsonResponse : <input type="text" value='{"statut":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(statut=false) : <input type="text" value='{"statut":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(statut=false+exception) : <input type="text" value='{"statut":false,"message":"Error occured","exception":"<b>An exception occured !</b>"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(statut=false+simple formatted exception) : <input type="submit" onclick="test.exceptionHandler(true);"></p>
-                <p>&quot; &quot;(statut=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
-            </div>
-        </div>
-
 
     </div>
 

@@ -860,20 +860,6 @@ nettools.jscore = nettools.jscore || {
 
     
 
-    /**
-     * Converting a NodeList of HTML input elements to a querystring (a string where values are url-encoded)
-     *  
-     * @method inputs2querystring
-     * @param NodeList elements
-	 * @return string
-     */ 
-    inputs2querystring : function(elements)
-    {
-		return (new URLSearchParams(nettools.jscore.formFieldsToObject(elements))).toString();
-    },
-
-    
-
     /** 
      * Convert a NodeList of input elements to an object litteral
      * 
@@ -1597,21 +1583,17 @@ nettools.jscore.RequestHelper = {
 	{
 		if ( (fd === null) || (fd === undefined) ) 
 			fd = new FormData();
-
-		for ( var k in obj )
-			// special case : null values
-			if ( (obj[k] === null)||(obj[k] === undefined) )
-				fd.append(k, '');
-
-
-			// special case : bool values
-			else if ( typeof obj[k] === 'boolean' )
-				fd.append(k, obj[k] ? '1':'0');
-
-			// default case
-			else    
-				fd.append(k, obj[k]);				
-
+		
+		
+		// normalize obj in a URLSearchParams object, with bool and null values handled correctly (null/undefined => '', bool => '1'/'0')
+		nettools.jscore.RequestHelper.normalizeData(obj).forEach(
+			function(v, k)
+			{
+				fd.append(k, v);
+			}
+		);
+		
+		
 		return fd;
 	}	
 
@@ -2596,46 +2578,39 @@ nettools.jscore.oop = nettools.jscore.oop || {
 			superclass.prototype.constructor = superclass;
 		
 		
-		return subclass;
-	},
-    
-	
-	
-	/** 
-     * Call a method in the superclass
-     *
-     * @method parentCall
-     * @param Object that 
-     * @param string method Method name
-     * @param Array params Array of method parameters
-     * @return null|mixed return value ; if we can't find the superclass, null is returnd
-     */
-	parentCall : function(that, method, params)
-	{
-		if ( that.constructor && that.constructor.parent )
+		// define parentCall and parentConstructor methods on prototype 
+		if ( typeof subclass.prototype['parentCall'] !== 'function' )
 		{
-			var m = that.constructor.parent[method];
-			if ( typeof(m) === 'function' )
-				return m.apply(that, params);
-			else
-				return null;
+			// define parentCall method on subclass prototype
+			/**
+			 * Call method in parent class
+			 * 
+			 * @param string method Name of method to call
+			 * @param array params Method parameters
+			 */
+			subclass.prototype.parentCall = function(method, params)
+				{
+					var m = this.constructor.parent[method];
+					if ( typeof m === 'function' )
+						return m.apply(this, params?params:[]);
+					else
+						throw new Error('No method `' + method + '` on class `' + this.constructor.parent.constructor.name + '`');
+				};
+			
+
+			
+			/**
+			 * Call parent constructor
+			 * 
+			 * @param array params Method parameters
+			 */
+			subclass.prototype.parentConstructor = function(params)
+				{
+					this.constructor.parent.constructor.apply(this, params?params:[]);
+				};
 		}
-		else
-			return null;
-	},
-	
-	
-    
-	/** 
-     * Call superclass constructor
-     *
-     * @method parentConstructor
-     * @param Object that 
-     * @param Array params Array of constructor parameters
-     */
-	parentConstructor : function(that, params)
-	{
-		that.constructor.parent.constructor.apply(that, params?params:[]);
+		
+		return subclass;
 	}
 };
 
@@ -3758,7 +3733,7 @@ nettools.jscore.SubmitHandlers.Handler.prototype.createBody = function(elements,
 	// if user data (either string or object litteral, merging it to form post data)
 	if ( data )
 	{
-		var u = new URLSearchParams(this.normalizeUserData(data));
+		var u = new URLSearchParams(nettools.jscore.RequestHelper.normalizeData(data));
 		u.forEach(
 			function(v, k){
 				postFormData.append(k, v);
@@ -3788,7 +3763,7 @@ nettools.jscore.SubmitHandlers.Handler.prototype.createBody = function(elements,
  */
 nettools.jscore.SubmitHandlers.Callback = nettools.jscore.oop.extend(function(options)
     {
-        nettools.jscore.oop.parentConstructor(this, [options]);
+		this.parentConstructor([options]);
     },
                                                                      
     nettools.jscore.SubmitHandlers.Handler
@@ -3828,7 +3803,7 @@ nettools.jscore.SubmitHandlers.Callback.prototype.submit = function(form, elemen
  */
 nettools.jscore.SubmitHandlers.XmlHttp = nettools.jscore.oop.extend(function(options)
     {
-        nettools.jscore.oop.parentConstructor(this, [options]);
+		this.parentConstructor([options]);
     },
                                                                      
     nettools.jscore.SubmitHandlers.Handler
@@ -3851,6 +3826,9 @@ nettools.jscore.SubmitHandlers.XmlHttp.prototype.submit = function(form, element
     else
         handler = nettools.jscore.RequestHelper.sendXmlHTTPRequest;
 
+	
+	var that = this;
+	
     
     // calling xmlhttp handler
     handler(
@@ -3864,13 +3842,13 @@ nettools.jscore.SubmitHandlers.XmlHttp.prototype.submit = function(form, element
                 var r = nettools.jscore.xmlhttp.parseJsonResponse(resp);
 
                 // if user defined onload callback
-                if ( typeof this.options['onload'] === 'function' )
-                    this.options.onload(form, elements, {jsonReturn:r});
+                if ( typeof that.options['onload'] === 'function' )
+                    that.options.onload(form, elements, {jsonReturn:r});
             },
 
 		
             // POST data and user data converted to FormData
-            this.createBody(elements, this.options['data']))
+            this.createBody(elements, this.options['data'])
         );
 	
 
@@ -3899,7 +3877,7 @@ nettools.jscore.SubmitHandlers.XmlHttp.prototype.submit = function(form, element
  */
 nettools.jscore.SubmitHandlers.Post = nettools.jscore.oop.extend(function(options)
     {
-        nettools.jscore.oop.parentConstructor(this, [options]);
+		this.parentConstructor([options]);
     },
                                                                      
     nettools.jscore.SubmitHandlers.Handler
