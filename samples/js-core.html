@@ -427,53 +427,9 @@
 		{
 			nettools.jscore.SecureRequestHelper.replaceLinksWithPOSTRequests();
 			sample.output('A tags have been replace with POST calls');
-		},
-		
-		
-		parentConstructor : function()
-		{
-			var t = [];
-			
-			var cl = function(){
-				this.key = 'value';
-				t.push("Constructor of class 'cl' called");
-			};
-			
-			
-			var cl2 = nettools.jscore.oop.extend(function(){
-				t.push("Constructor of class 'cl2' called");
-				
-				this.parentConstructor();
-			}, cl);
-			
-			
-			var o = new cl2();
-			sample.output(t.join("\n"));
-		},
-		
-		
-		parentCall : function()
-		{
-			var t = [];
-			
-			var cl = function(){
-				this.key = 'value';
-			};
-			cl.prototype.fun = function() { t.push("Class 'cl' : key='" + this.key + "'"); }
-			
-			
-			var cl2 = nettools.jscore.oop.extend(function(){
-				this.parentConstructor();
-			}, cl);
-			cl2.prototype.fun = function() { t.push("Class 'cl2' calling inherited 'fun' method"); this.parentCall('fun')}
-			
-			
-			var o = new cl2();
-			o.fun();
-			
-			sample.output(t.join("\n"));
 		}
-        
+		
+		        
     }
     
     </script>
@@ -556,17 +512,6 @@
             </div>
         </div>
 
-
-
-        <div class="sampleBox">
-            <h1>nettools.jscore.oop.*</h1>
-            <div id="sampleXmlhttp">   
-				<p>
-                	<input type="button" value="parentConstructor" onclick="test.parentConstructor();">
-                	<input type="button" value="parentCall" onclick="test.parentCall();">
-				</p>
-            </div>
-        </div>
 
 	
 		<div class="sampleBox">
