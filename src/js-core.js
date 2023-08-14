@@ -1461,6 +1461,7 @@ nettools.jscore.RequestHelper = {
 					var e = document.createElement('input');
 					e.type = "hidden";
 					e.name = k;
+                    e.value = v;
 
 					form.appendChild(e);
 				}
