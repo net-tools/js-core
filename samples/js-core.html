@@ -427,9 +427,10 @@
 		{
 			nettools.jscore.SecureRequestHelper.replaceLinksWithPOSTRequests();
 			sample.output('A tags have been replace with POST calls');
-		}
+		},
 		
-		        
+		
+        
     }
     
     </script>
@@ -489,31 +490,12 @@
 						   onclick="sample.output(test.dumpObject(nettools.jscore.RequestHelper.URLSearchParamsToObjectLitteral(new URLSearchParams('k1=&k2=v2&k3=1'))));">
 				</p>
 				
-				
-				<p>
-					<form>
-						<input type="text" name="input1" value="inputvalue1">
-						<input type="button" value="SubmitHandlers.XmlHttp" 
-							   onclick="var h = new nettools.jscore.SubmitHandlers.XmlHttp({
-										data : {
-											k1:'v1', 
-											k2:false
-										},
 
-										target : 'js-core-submithandlers-http',
-
-										onload : function(form, elements, response)
-											{
-												sample.output(test.dumpObject(response.jsonReturn));
-											}
-									}); h.submit(this.form, this.form.elements);">
-					</form>
-				</p>
             </div>
         </div>
 
 
-	
+
 		<div class="sampleBox">
             <h1>Form &amp; styles functions</h1>
             <div id="sampleForm">   
@@ -568,19 +550,6 @@
                     </p>
                 </form>
             </div>
-        </div>
-    
-       
-        <div class="sampleBox">
-            <h1>Size &amp; array functions</h1>
-            <div id="sampleSizeArray">   
-                <p>Size.add(int, Size) : <input type="text" value="12px"><input type="text" value="15em"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).add(new nettools.jscore.Size(this.previousSibling.value)));"></p>
-                <p>Size.subtract(int, Size) : <input type="text" value="12px"><input type="text" value="15em"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).subtract(new nettools.jscore.Size(this.previousSibling.value)));"></p>
-                <p>Size.add(int, int) : <input type="text" value="12px"><input type="text" value="15"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).add(this.previousSibling.value));"></p>
-                <p>Size.subtract(int, int) : <input type="text" value="12px"><input type="text" value="15"><input type="submit" onclick="sample.output(new nettools.jscore.Size(this.previousSibling.previousSibling.value).subtract(this.previousSibling.value));"></p>
-                <p>arrayFilter : <input type="text" value="1,2,,,3"><input type="Submit" onclick="sample.output('[' + nettools.jscore.arrayFilter(this.previousSibling.value.split(','), true, true).join(',') + ']');"></p>
-            </div>
-             
         </div>
     
        
