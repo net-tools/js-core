@@ -1681,7 +1681,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
      * Factory method to create a XmlHttpRequest object
      */
 	function _createXMLHTTPObject() {
-		xmlhttp = new XMLHttpRequest();
+		return new XMLHttpRequest();
 /*		var xmlhttp = false;
 		for (var i=0 ; i < _XMLHttpFactories.length ; i++) {
 			try {
@@ -1695,7 +1695,6 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 			}
 			break;
 		}*/
-		return xmlhttp;
 	}
 	
     
