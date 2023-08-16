@@ -116,7 +116,7 @@
         
         
         
-        sendWithFeedback : function(sendString)
+        sendWithFeedback : function()
         {
 			var data = {
 				bigstring : 'x'.repeat(7*1024*1024)
@@ -164,6 +164,55 @@
 				
 					// data
 					data
+				);
+        },
+        
+        
+        
+        sendWithFeedbackPromise : function()
+        {
+			var data = {
+				bigstring : 'x'.repeat(7*1024*1024)
+			}
+			
+			
+            nettools.jscore.RequestHelper.sendWithFeedbackPromise(
+					// onfeedback
+                    function(pct)
+                    {
+                        sample.output('Feedback event : ' + pct + '%');
+                    },
+				
+				
+					// onupload done
+                    function()
+                    {
+                        sample.output('Upload done !');
+                    },
+				
+				
+					// onabort, onerror
+					function()
+					{
+						sample.output('Error/aborted');
+					},
+				
+				
+					// form
+					null,
+				
+				
+					// url
+					'js-core-http-feedback-promise.php',
+					
+				
+					// data
+					data
+				).then(
+                    function(resp)
+                    {
+                        sample.output('XmlHttpRequest with feedback & Promise answered : \n' + resp.message);
+                    }
 				);
         },
         
@@ -657,7 +706,8 @@
                         <input type="button" value="sendXmlHTTPRequestPromise(Object)" onclick="test.sendXmlHTTPRequestPromise(false);">
                         <input type="button" value="sendRequestFetch(string)" onclick="test.sendRequestFetch(true);">
                         <input type="button" value="sendRequestFetch(Object)" onclick="test.sendRequestFetch(false);">
-                        <input type="button" value="sendWithFeedback(string)" onclick="test.sendWithFeedback(true);">
+                        <input type="button" value="sendWithFeedback(string)" onclick="test.sendWithFeedback();">
+                        <input type="button" value="sendWithFeedbackPromise(string)" onclick="test.sendWithFeedbackPromise();">
                     </p>
                 </form>
                 <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
