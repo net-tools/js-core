@@ -1623,7 +1623,7 @@ nettools.jscore.RequestHelper = {
 nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
 	// --- PRIVATE DECLARATIONS ---
-	
+/*	
 	var _XMLHttpFactories = [
 		function () {return new XMLHttpRequest()},
 		function () {return new ActiveXObject("Msxml2.XMLHTTP")},
@@ -1631,13 +1631,14 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 		function () {return new ActiveXObject("Microsoft.XMLHTTP")}
 	];
 	
-
+*/
     
 	/*
      * Factory method to create a XmlHttpRequest object
      */
 	function _createXMLHTTPObject() {
-		var xmlhttp = false;
+		xmlhttp = new XMLHttpRequest();
+/*		var xmlhttp = false;
 		for (var i=0 ; i < _XMLHttpFactories.length ; i++) {
 			try {
 				xmlhttp = _XMLHttpFactories[i]();
@@ -1649,7 +1650,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 				continue;
 			}
 			break;
-		}
+		}*/
 		return xmlhttp;
 	}
 	
@@ -1909,7 +1910,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * 
          * @method sendRequest
          * @param string url
-         * @param function(response) callback
+         * @param function(XMLHttpRequest) callback
          * @param string|Object|FormData postData
          */
 		sendRequest : function(url,callback,postData) {
@@ -2074,7 +2075,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * Decode response to Json
          *
          * @method parseResponse
-         * @param string resp
+         * @param XMLHttpRequest resp
          * @return null|Object Returns an object litteral or NULL if the response is no valid json
          */
 		parseResponse : function(resp)
@@ -2100,7 +2101,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * 'an exception occured', H2 may contain the exception class name, and CODE will contain the exception message).
          * 
          * @method parseJsonResponse
-         * @param string resp
+         * @param XMLHttpRequest resp
          * @return Object Returning an object litteral with the Json response, always containing a statut property
          */
 		parseJsonResponse : function(resp)
@@ -2127,7 +2128,94 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
                 _handleException(r.exception, r.message ? r.message : nettools.jscore.xmlhttp.i18n.ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE);
 
             return r;
-		}
+		},
+		
+		
+		
+        /**
+         * XmlHttp request with upload progress feedback
+         *
+         * @param function(XMLHttpRequest) onload Callback called when upload is done
+         * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
+         * @param function() onupload Called to notify that the upload stage is done
+         * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+         * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+         * @param string url URL to send upload to
+         * @param string|Object data Request body as a string or an object litteral
+         */
+        sendWithFeedback : function(onload, onfeedback, onupload, onabort, form, url, data)
+        {
+            // compatibility check
+            if ( !window.XMLHttpRequest || !window.FormData )
+            {
+                alert('Browser issue ! (FF>=4, IE>=10, CHROME>=7, SAFARI>=5)');
+                return;
+            }
+
+
+			// create request
+            var xhr = new XMLHttpRequest();
+
+            
+			// monitor upload
+			if ( typeof onfeedback === 'function' )
+				xhr.upload.addEventListener("progress", 
+
+								function(e)
+								{
+									if (e.lengthComputable)
+									{
+										var percentage = Math.round((e.loaded * 100) / e.total);
+										onfeedback(percentage);
+									}
+								}, 
+
+								false);
+
+
+            // request over (response received)
+            if ( onload && (typeof onload === 'function') )
+                xhr.addEventListener("load", onload, false);
+
+
+            // upload over (not the answer !)
+			if ( typeof onupload === 'function' )
+            	xhr.upload.addEventListener("load", onupload, false);
+
+            // upload error or canceled
+			if ( typeof onabort === 'function' )
+			{
+				xhr.upload.addEventListener("error", onabort, false);
+				xhr.upload.addEventListener("abort", onabort, false);
+			}
+			
+
+            // open URL
+            xhr.open("POST", url);
+
+            // request body in form ?
+            var fd = form ? new FormData(form) : new FormData();
+
+
+			// body or more data in parameter
+            if ( data )
+            {
+                // if more data is a string, transform it to object litteral
+                if ( typeof(data) === 'string' )
+                    data = nettools.jscore.RequestHelper.URLSearchParamsToObjectLitteral(new URLSearchParams(data));
+            }
+            else 
+                data = {};
+
+			
+            // append data parameters to FormData
+            var fd = nettools.jscore.RequestHelper.object2FormData(data, fd);
+
+			
+            // sending request
+            xhr.send(fd);
+        }
+
 	};
 })();
 
@@ -2522,10 +2610,26 @@ nettools.jscore.SecureRequestHelper = (function(){
 			{
 				return Promise.reject(err);
 			}
-		}     
+		},    
+		
+		
+		
+        /**
+         * Secured XmlHttp request with upload progress feedback
+         *
+         * @param function(XMLHttpRequest) onload Callback called when upload is done
+         * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
+         * @param function() onupload Called to notify that the upload stage is done
+         * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+         * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+         * @param string url URL to send upload to
+         * @param string|Object data Request body as a string or an object litteral
+         */
+        sendWithFeedback : function(onload, onfeedback, onupload, onabort, form, url, data)
+		{
+			return nettools.jscore.xmlhttp.sendWithFeedback(onload, onfeedback, onupload, onabort, form, url, _addCSRFValue(data));
+		},
 	}
-	
-	
 })();
  
 
