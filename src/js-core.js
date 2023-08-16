@@ -2705,6 +2705,24 @@ nettools.jscore.SecureRequestHelper = (function(){
 		{
 			return nettools.jscore.xmlhttp.sendWithFeedback(onload, onfeedback, onupload, onabort, form, url, _addCSRFValue(data));
 		},
+		
+		
+		
+        /**
+         * Secured XmlHttp request with upload progress feedback, returning a Promise
+         *
+         * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
+         * @param function() onupload Called to notify that the upload stage is done
+         * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+         * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+         * @param string url URL to send upload to
+         * @param string|Object data Request body as a string or an object litteral
+		 * @return Promise
+         */
+        sendWithFeedbackPromise : function(onfeedback, onupload, onabort, form, url, data)
+		{
+			return nettools.jscore.xmlhttp.sendWithFeedbackPromise(onfeedback, onupload, onabort, form, url, _addCSRFValue(data));
+		}
 	}
 })();
  
