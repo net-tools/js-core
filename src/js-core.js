@@ -1501,6 +1501,28 @@ nettools.jscore.RequestHelper = {
 
 
         
+	/**
+	 * XmlHttp request with upload progress feedback
+	 *
+	 * @param function(XMLHttpRequest) onload Callback called when upload is done
+	 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
+	 * @param function() onupload Called to notify that the upload stage is done
+	 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+	 * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+	 * @param string url URL to send upload to
+	 * @param string|Object data Request body as a string or an object litteral
+	 */
+	sendWithFeedback : function(onload, onfeedback, onupload, onabort, form, url, data)
+	{
+		// conform parameters
+		if ( (data === null) || (data === undefined) )
+			data = {};
+		
+		nettools.jscore.xmlhttp.sendWithFeedback(onload, onfeedback, onupload, onabort, form, url, data);
+	},
+
+
+        
 	/** 
 	 * Send a request with Fetch API
 	 *
@@ -2175,7 +2197,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
             // request over (response received)
             if ( onload && (typeof onload === 'function') )
-                xhr.addEventListener("load", onload, false);
+                xhr.addEventListener("load", onload.bind(null, xhr), false);
 
 
             // upload over (not the answer !)
