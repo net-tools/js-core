@@ -169,6 +169,60 @@
         
         
         
+        sendWithFeedbackFormData : function()
+        {
+			var fd = new FormData();
+			fd.append('big', 'x'.repeat(1*1024*1024))
+			
+			
+            nettools.jscore.RequestHelper.sendWithFeedback(
+				
+					// onload
+                    function(resp)
+                    {
+                        var r = nettools.jscore.xmlhttp.parseResponse(resp);
+                        sample.output('XmlHttpRequest with feedback answered : \n' + r);
+                    },
+
+				
+					// onfeedback
+                    function(pct)
+                    {
+                        sample.output('Feedback event : ' + pct + '%');
+                    },
+				
+				
+					// onupload done
+                    function()
+                    {
+                        sample.output('Upload done !');
+                    },
+				
+				
+					// onabort, onerror
+					function()
+					{
+						sample.output('Error/aborted');
+					},
+				
+				
+					// form
+					fd,
+				
+				
+					// url
+					'js-core-http-feedback.php',
+					
+				
+					// data
+					{
+						key1 : "value1"
+					}
+				);
+        },
+        
+        
+        
         sendWithFeedbackPromise : function()
         {
 			var data = {
@@ -708,6 +762,7 @@
                         <input type="button" value="sendRequestFetch(Object)" onclick="test.sendRequestFetch(false);">
                         <input type="button" value="sendWithFeedback(string)" onclick="test.sendWithFeedback();">
                         <input type="button" value="sendWithFeedbackPromise(string)" onclick="test.sendWithFeedbackPromise();">
+                        <input type="button" value="sendWithFeedback(FormData)" onclick="test.sendWithFeedbackFormData();">
                     </p>
                 </form>
                 <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
