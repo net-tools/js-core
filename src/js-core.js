@@ -2767,6 +2767,42 @@ nettools.jscore.SecureRequestHelper = (function(){
         sendWithFeedbackPromise : function(onfeedback, onupload, onabort, form, url, data)
 		{
 			return nettools.jscore.xmlhttp.sendWithFeedbackPromise(onfeedback, onupload, onabort, form, url, _addCSRFValue(data));
+		},
+		
+		
+		
+		/**
+		 * Secured file upload with upload progress feedback 
+		 *
+		 * @param function(XMLHttpRequest) onload Callback called when upload is done
+		 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
+		 * @param function() onupload Called to notify that the upload stage is done
+		 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+		 * @param HTMLInputElement[] files Array of input elements of type 'file'
+		 * @param string url URL to send upload to
+		 * @param string|Object data Request body as a string or an object litteral
+		 */
+        filesUploadWithFeedback : function(onload, onfeedback, onupload, onabort, files, url, data)
+		{
+			return nettools.jscore.xmlhttp.filesUploadWithFeedback(onload, onfeedback, onupload, onabort, files, url, _addCSRFValue(data));
+		},
+		
+		
+		
+        /**
+		 * Secured file upload with upload progress feedback, returning a Promise
+         *
+         * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
+         * @param function() onupload Called to notify that the upload stage is done
+         * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+		 * @param HTMLInputElement[] files Array of input elements of type 'file'
+         * @param string url URL to send upload to
+         * @param string|Object data Request body as a string or an object litteral
+		 * @return Promise
+         */
+        filesUploadWithFeedbackPromise : function(onfeedback, onupload, onabort, form, url, data)
+		{
+			return nettools.jscore.xmlhttp.filesUploadWithFeedbackPromise(onfeedback, onupload, onabort, files, url, _addCSRFValue(data));
 		}
 	}
 })();
