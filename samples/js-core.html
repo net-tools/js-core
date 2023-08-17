@@ -278,7 +278,7 @@
 			var f2 = document.getElementById('file2');
 			
 			
-			nettools.jscore.RequestHelper.filesUpload(
+			nettools.jscore.RequestHelper.filesUploadWithFeedback(
 					// onload
                     function(resp)
                     {
@@ -330,7 +330,7 @@
 			var f1 = document.getElementById('file1');
 			var f2 = document.getElementById('file2');
 			
-			nettools.jscore.RequestHelper.filesUploadPromise(
+			nettools.jscore.RequestHelper.filesUploadWithFeedbackPromise(
 					// onfeedback
                     function(pct)
                     {

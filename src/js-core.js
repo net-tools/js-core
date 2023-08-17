@@ -1556,7 +1556,7 @@ nettools.jscore.RequestHelper = {
 	 * @param string url URL to send upload to
 	 * @param string|Object data Request body as a string or an object litteral
 	 */
-	filesUpload : function(onload, onfeedback, onupload, onabort, files, url, data)
+	filesUploadWithFeedback : function(onload, onfeedback, onupload, onabort, files, url, data)
 	{
 		// ajouter dans le FormData tous les champs de formulaire de type File
 		var fd = new FormData();
@@ -1579,7 +1579,7 @@ nettools.jscore.RequestHelper = {
 	 * @param string|Object data Request body as a string or an object litteral
 	 * @return Promise Returns a Promise resolved with json response
 	 */
-	filesUploadPromise : function(onfeedback, onupload, onabort, files, url, data)
+	filesUploadWithFeedbackPromise : function(onfeedback, onupload, onabort, files, url, data)
 	{
 		// ajouter dans le FormData tous les champs de formulaire de type File
 		var fd = new FormData();
