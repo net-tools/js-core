@@ -1544,7 +1544,53 @@ nettools.jscore.RequestHelper = {
 	},
 
 
-        
+
+	/**
+	 * File upload with upload progress feedback 
+	 *
+	 * @param function(XMLHttpRequest) onload Callback called when upload is done
+	 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
+	 * @param function() onupload Called to notify that the upload stage is done
+	 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+	 * @param HTMLInputElement[] files Array of input elements of type 'file'
+	 * @param string url URL to send upload to
+	 * @param string|Object data Request body as a string or an object litteral
+	 */
+	filesUpload : function(onload, onfeedback, onupload, onabort, files, url, data)
+	{
+		// ajouter dans le FormData tous les champs de formulaire de type File
+		var fd = new FormData();
+		for ( var i = 0 ; i < files.length ; i++ )
+			fd.append(files[i].name, files[i].files[0]);
+
+		nettools.jscore.RequestHelper.sendWithFeedback(onload, onfeedback, onupload, onabort, fd, url, data);
+	},
+
+	
+	
+	/**
+	 * File upload with upload progress feedback, returning a Promise
+	 *
+	 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
+	 * @param function() onupload Called to notify that the upload stage is done
+	 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+	 * @param HTMLInputElement[] files Array of input elements of type 'file'
+	 * @param string url URL to send upload to
+	 * @param string|Object data Request body as a string or an object litteral
+	 * @return Promise Returns a Promise resolved with json response
+	 */
+	filesUploadPromise : function(onfeedback, onupload, onabort, files, url, data)
+	{
+		// ajouter dans le FormData tous les champs de formulaire de type File
+		var fd = new FormData();
+		for ( var i = 0 ; i < files.length ; i++ )
+			fd.append(files[i].name, files[i].files[0]);
+
+		return nettools.jscore.RequestHelper.sendWithFeedbackPromise(onfeedback, onupload, onabort, fd, url, data);
+	},
+
+	
+	
 	/** 
 	 * Send a request with Fetch API
 	 *

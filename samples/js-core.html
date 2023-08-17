@@ -272,6 +272,105 @@
         
         
         
+		filesUpload : function(btn)
+		{
+			var f1 = document.getElementById('file1');
+			var f2 = document.getElementById('file2');
+			
+			
+			nettools.jscore.RequestHelper.filesUpload(
+					// onload
+                    function(resp)
+                    {
+                        var r = nettools.jscore.xmlhttp.parseResponse(resp);
+                        sample.output('XmlHttpRequest with feedback answered : \n' + r);
+                    },
+
+				
+					// onfeedback
+                    function(pct)
+                    {
+                        sample.output('Feedback event : ' + pct + '%');
+                    },
+				
+				
+					// onupload done
+                    function()
+                    {
+                        sample.output('Upload done !');
+                    },
+				
+				
+					// onabort, onerror
+					function()
+					{
+						sample.output('Error/aborted');
+					},
+				
+				
+					// files
+					[f1, f2],
+				
+				
+					// url
+					'js-core-http-filesUpload.php',
+					
+				
+					// data
+					{
+						key1 : 'value1'
+					}
+				);
+		},
+		
+		
+		
+		filesUploadPromise : function(btn)
+		{
+			var f1 = document.getElementById('file1');
+			var f2 = document.getElementById('file2');
+			
+			nettools.jscore.RequestHelper.filesUploadPromise(
+					// onfeedback
+                    function(pct)
+                    {
+                        sample.output('Feedback event : ' + pct + '%');
+                    },
+				
+				
+					// onupload done
+                    function()
+                    {
+                        sample.output('Upload done !');
+                    },
+				
+				
+					// onabort, onerror
+					function()
+					{
+						sample.output('Error/aborted');
+					},
+				
+				
+					// files
+					[f1, f2],
+				
+				
+					// url
+					'js-core-http-filesUploadPromise.php',
+
+				
+					// data
+					{
+						key1 : 'value1'
+					}
+				).then(function(r){
+                        sample.output('Files upload with Promise answered with : \n' + r.message);
+				});
+		},
+		
+		
+		
         sendXmlHTTPRequestFormData : function()
         {
 			var fd = new FormData();
@@ -647,6 +746,9 @@
 				</p>
 				
 
+				<p><input type="file" name="file1" id="file1"><input type="file" name="file2" id="file2"> : 
+					<input type="button" onclick="test.filesUpload(); return false;" value="Upload">
+					<input type="button" onclick="test.filesUploadPromise(); return false;" value="Upload(Promise)"></p>
             </div>
         </div>
 
