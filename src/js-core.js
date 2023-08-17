@@ -1508,7 +1508,7 @@ nettools.jscore.RequestHelper = {
 	 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
 	 * @param function() onupload Called to notify that the upload stage is done
 	 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
-	 * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+	 * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
 	 * @param string url URL to send upload to
 	 * @param string|Object data Request body as a string or an object litteral
 	 */
@@ -1529,7 +1529,7 @@ nettools.jscore.RequestHelper = {
 	 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
 	 * @param function() onupload Called to notify that the upload stage is done
 	 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
-	 * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+	 * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
 	 * @param string url URL to send upload to
 	 * @param string|Object data Request body as a string or an object litteral
 	 * @return Promise Returns a Promise resolved with json response
@@ -2182,7 +2182,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
          * @param function() onupload Called to notify that the upload stage is done
          * @param function() onabort Called to notify that the upload stage has been aborted or has failed
-         * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+         * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
          * @param string url URL to send upload to
          * @param string|Object data Request body as a string or an object litteral
          */
@@ -2237,8 +2237,8 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
             // open URL
             xhr.open("POST", url);
 
-            // request body in form ?
-            var fd = form ? new FormData(form) : new FormData();
+            // request body in form (HTMLFormElement or FormData) ?
+            var fd = form ? ((form instanceof FormData) ? form : new FormData(form)) : new FormData();
 
 
 			// body or more data in parameter
@@ -2270,7 +2270,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
          * @param function() onupload Called to notify that the upload stage is done
          * @param function() onabort Called to notify that the upload stage has been aborted or has failed
-         * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+         * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
          * @param string url URL to send upload to
          * @param string|Object data Request body as a string or an object litteral
          */
@@ -2696,7 +2696,7 @@ nettools.jscore.SecureRequestHelper = (function(){
          * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
          * @param function() onupload Called to notify that the upload stage is done
          * @param function() onabort Called to notify that the upload stage has been aborted or has failed
-         * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+         * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
          * @param string url URL to send upload to
          * @param string|Object data Request body as a string or an object litteral
          */
@@ -2713,7 +2713,7 @@ nettools.jscore.SecureRequestHelper = (function(){
          * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
          * @param function() onupload Called to notify that the upload stage is done
          * @param function() onabort Called to notify that the upload stage has been aborted or has failed
-         * @param HTMLFormElement form Form to send ; if not used, set it to NULL, and pass request body in data parameter
+         * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
          * @param string url URL to send upload to
          * @param string|Object data Request body as a string or an object litteral
 		 * @return Promise
