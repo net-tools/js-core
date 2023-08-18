@@ -1505,20 +1505,18 @@ nettools.jscore.RequestHelper = {
 	 * XmlHttp request with upload progress feedback
 	 *
 	 * @param function(XMLHttpRequest) onload Callback called when upload is done
-	 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-	 * @param function() onupload Called to notify that the upload stage is done
-	 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+	 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
 	 * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
 	 * @param string url URL to send upload to
 	 * @param string|Object data Request body as a string or an object litteral
 	 */
-	sendWithFeedback : function(onload, onfeedback, onupload, onabort, form, url, data)
+	sendWithFeedback : function(onload, progressObj, form, url, data)
 	{
 		// conform parameters
 		if ( (data === null) || (data === undefined) )
 			data = {};
 		
-		nettools.jscore.xmlhttp.sendWithFeedback(onload, onfeedback, onupload, onabort, form, url, data);
+		nettools.jscore.xmlhttp.sendWithFeedback(onload, progressObj, form, url, data);
 	},
 
 
@@ -1526,21 +1524,19 @@ nettools.jscore.RequestHelper = {
 	/**
 	 * XmlHttp request with upload progress feedback, returning a Promise when upload done and response received
 	 *
-	 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-	 * @param function() onupload Called to notify that the upload stage is done
-	 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+	 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
 	 * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
 	 * @param string url URL to send upload to
 	 * @param string|Object data Request body as a string or an object litteral
 	 * @return Promise Returns a Promise resolved with json response
 	 */
-	sendWithFeedbackPromise : function(onfeedback, onupload, onabort, form, url, data)
+	sendWithFeedbackPromise : function(progressObj, form, url, data)
 	{
 		// conform parameters
 		if ( (data === null) || (data === undefined) )
 			data = {};
 		
-		return nettools.jscore.xmlhttp.sendWithFeedbackPromise(onfeedback, onupload, onabort, form, url, data);
+		return nettools.jscore.xmlhttp.sendWithFeedbackPromise(progressObj, form, url, data);
 	},
 
 
@@ -1549,21 +1545,19 @@ nettools.jscore.RequestHelper = {
 	 * File upload with upload progress feedback 
 	 *
 	 * @param function(XMLHttpRequest) onload Callback called when upload is done
-	 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-	 * @param function() onupload Called to notify that the upload stage is done
-	 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+	 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
 	 * @param HTMLInputElement[] files Array of input elements of type 'file'
 	 * @param string url URL to send upload to
 	 * @param string|Object data Request body as a string or an object litteral
 	 */
-	filesUploadWithFeedback : function(onload, onfeedback, onupload, onabort, files, url, data)
+	filesUploadWithFeedback : function(onload, progressObj, files, url, data)
 	{
 		// ajouter dans le FormData tous les champs de formulaire de type File
 		var fd = new FormData();
 		for ( var i = 0 ; i < files.length ; i++ )
 			fd.append(files[i].name, files[i].files[0]);
 
-		nettools.jscore.RequestHelper.sendWithFeedback(onload, onfeedback, onupload, onabort, fd, url, data);
+		nettools.jscore.RequestHelper.sendWithFeedback(onload, progressObj, fd, url, data);
 	},
 
 	
@@ -1571,22 +1565,20 @@ nettools.jscore.RequestHelper = {
 	/**
 	 * File upload with upload progress feedback, returning a Promise
 	 *
-	 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-	 * @param function() onupload Called to notify that the upload stage is done
-	 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+	 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
 	 * @param HTMLInputElement[] files Array of input elements of type 'file'
 	 * @param string url URL to send upload to
 	 * @param string|Object data Request body as a string or an object litteral
 	 * @return Promise Returns a Promise resolved with json response
 	 */
-	filesUploadWithFeedbackPromise : function(onfeedback, onupload, onabort, files, url, data)
+	filesUploadWithFeedbackPromise : function(progressObj, files, url, data)
 	{
 		// ajouter dans le FormData tous les champs de formulaire de type File
 		var fd = new FormData();
 		for ( var i = 0 ; i < files.length ; i++ )
 			fd.append(files[i].name, files[i].files[0]);
 
-		return nettools.jscore.RequestHelper.sendWithFeedbackPromise(onfeedback, onupload, onabort, fd, url, data);
+		return nettools.jscore.RequestHelper.sendWithFeedbackPromise(progressObj, fd, url, data);
 	},
 
 	
@@ -1695,6 +1687,67 @@ nettools.jscore.RequestHelper = {
 
 
 };
+
+
+
+
+
+
+
+// ==== REQUEST FEEDBACK ====
+
+nettools.jscore.RequestFeedback = class {
+
+	/**
+	 * Constructor for request upload progress feedback
+	 *
+	 * @param function(int) onfeedback Callback called to notify the upload progress with an int as parameter (percentage done 0..100)
+	 * @param function() onload Callback called when upload is done
+	 * @param function() onabort Callback called if upload is aborted or if an error occured
+	 */
+	constructor(onfeedback, onload, onabort)
+	{
+        this.onload = onload;
+        this.onfeedback = onfeedback;
+        this.onabort = onabort;
+	}
+	
+	
+	
+	/**
+	 * Trigger 'load' event when upload is finished
+	 */
+	load()
+	{
+		if ( typeof this.onload === 'function' )
+			this.onload.call(this);
+	}
+	
+
+
+	/**
+	 * Trigger 'feedback' event to notify about upload progress
+	 *
+	 * @param int pct Percentage of upload progress (0..100)
+	 */
+	feedback(pct)
+	{
+		if ( typeof this.onfeedback === 'function' )
+			this.onfeedback.call(this, pct);
+	}
+	
+	
+	
+	/**
+	 * Trigger 'abort' event when upload is aborted
+	 */
+	abort()
+	{
+		if ( typeof this.onabort === 'function' )
+			this.onabort.call(this);
+	}
+	
+}
 
 
 
@@ -2225,14 +2278,12 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          * XmlHttp request with upload progress feedback
          *
          * @param function(XMLHttpRequest) onload Callback called when upload is done
-         * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-         * @param function() onupload Called to notify that the upload stage is done
-         * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+		 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
          * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
          * @param string url URL to send upload to
          * @param string|Object data Request body as a string or an object litteral
          */
-        sendWithFeedback : function(onload, onfeedback, onupload, onabort, form, url, data)
+        sendWithFeedback : function(onload, progressObj, form, url, data)
         {
             // compatibility check
             if ( !window.XMLHttpRequest || !window.FormData )
@@ -2242,24 +2293,28 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
             }
 
 
+			if ( !(progressObj instanceof nettools.jscore.RequestFeedback) )
+				throw new Error('`progressObj` is not a nettools.jscore.RequestFeedback object');
+
+			
+			
 			// create request
             var xhr = new XMLHttpRequest();
 
             
 			// monitor upload
-			if ( typeof onfeedback === 'function' )
-				xhr.upload.addEventListener("progress", 
+			xhr.upload.addEventListener("progress", 
 
-								function(e)
+							function(e)
+							{
+								if (e.lengthComputable)
 								{
-									if (e.lengthComputable)
-									{
-										var percentage = Math.round((e.loaded * 100) / e.total);
-										onfeedback(percentage);
-									}
-								}, 
+									var percentage = Math.round((e.loaded * 100) / e.total);
+									progressObj.feedback(percentage);
+								}
+							}, 
 
-								false);
+							false);
 
 
             // request over (response received) ; to conform how XmlHttpRequest deals with onload event, we have to bind xhr object to onload callback first parameter
@@ -2270,13 +2325,13 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
             // upload over (not the answer !)
 			if ( typeof onupload === 'function' )
-            	xhr.upload.addEventListener("load", onupload, false);
+            	xhr.upload.addEventListener("load", progressObj.load.bind(progressObj), false);
 
             // upload error or canceled
 			if ( typeof onabort === 'function' )
 			{
-				xhr.upload.addEventListener("error", onabort, false);
-				xhr.upload.addEventListener("abort", onabort, false);
+				xhr.upload.addEventListener("error", progressObj.abort.bind(progressObj), false);
+				xhr.upload.addEventListener("abort", progressObj.abort.bind(progressObj), false);
 			}
 			
 
@@ -2313,14 +2368,12 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
          *
          * The Promise will be resolved with the request json response, or rejected if an error occured
          *
-         * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-         * @param function() onupload Called to notify that the upload stage is done
-         * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+		 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
          * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
          * @param string url URL to send upload to
          * @param string|Object data Request body as a string or an object litteral
          */
-		sendWithFeedbackPromise : function(onfeedback, onupload, onabort, form, url, data)
+		sendWithFeedbackPromise : function(progressObj, form, url, data)
 		{
 			return new Promise(function(resolve, reject)
 					{
@@ -2332,7 +2385,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 							};
 						
 						// envoyer requête
-						nettools.jscore.xmlhttp.sendWithFeedback(cb, onfeedback, onupload, onabort, form, url, data);
+						nettools.jscore.xmlhttp.sendWithFeedback(cb, progressObj, form, url, data);
 					}
 				);
 		}		
@@ -2739,16 +2792,14 @@ nettools.jscore.SecureRequestHelper = (function(){
          * Secured XmlHttp request with upload progress feedback
          *
          * @param function(XMLHttpRequest) onload Callback called when upload is done
-         * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-         * @param function() onupload Called to notify that the upload stage is done
-         * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+		 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
          * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
          * @param string url URL to send upload to
          * @param string|Object data Request body as a string or an object litteral
          */
-        sendWithFeedback : function(onload, onfeedback, onupload, onabort, form, url, data)
+        sendWithFeedback : function(onload, progressObj, form, url, data)
 		{
-			return nettools.jscore.xmlhttp.sendWithFeedback(onload, onfeedback, onupload, onabort, form, url, _addCSRFValue(data));
+			return nettools.jscore.xmlhttp.sendWithFeedback(onload, progressObj, form, url, _addCSRFValue(data));
 		},
 		
 		
@@ -2756,17 +2807,15 @@ nettools.jscore.SecureRequestHelper = (function(){
         /**
          * Secured XmlHttp request with upload progress feedback, returning a Promise
          *
-         * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-         * @param function() onupload Called to notify that the upload stage is done
-         * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+		 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
          * @param HTMLFormElement|FormData form Form to send ; if not used, set it to NULL, and pass request body in data parameter
          * @param string url URL to send upload to
          * @param string|Object data Request body as a string or an object litteral
 		 * @return Promise
          */
-        sendWithFeedbackPromise : function(onfeedback, onupload, onabort, form, url, data)
+        sendWithFeedbackPromise : function(progressObj, form, url, data)
 		{
-			return nettools.jscore.xmlhttp.sendWithFeedbackPromise(onfeedback, onupload, onabort, form, url, _addCSRFValue(data));
+			return nettools.jscore.xmlhttp.sendWithFeedbackPromise(progressObj, form, url, _addCSRFValue(data));
 		},
 		
 		
@@ -2775,16 +2824,14 @@ nettools.jscore.SecureRequestHelper = (function(){
 		 * Secured file upload with upload progress feedback 
 		 *
 		 * @param function(XMLHttpRequest) onload Callback called when upload is done
-		 * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-		 * @param function() onupload Called to notify that the upload stage is done
-		 * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+		 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
 		 * @param HTMLInputElement[] files Array of input elements of type 'file'
 		 * @param string url URL to send upload to
 		 * @param string|Object data Request body as a string or an object litteral
 		 */
-        filesUploadWithFeedback : function(onload, onfeedback, onupload, onabort, files, url, data)
+        filesUploadWithFeedback : function(onload, progressObj, files, url, data)
 		{
-			return nettools.jscore.xmlhttp.filesUploadWithFeedback(onload, onfeedback, onupload, onabort, files, url, _addCSRFValue(data));
+			return nettools.jscore.xmlhttp.filesUploadWithFeedback(onload, progressObj, files, url, _addCSRFValue(data));
 		},
 		
 		
@@ -2792,17 +2839,15 @@ nettools.jscore.SecureRequestHelper = (function(){
         /**
 		 * Secured file upload with upload progress feedback, returning a Promise
          *
-         * @param function(int) onfeedback Called to send feedback during upload stage, with an int as percentage done
-         * @param function() onupload Called to notify that the upload stage is done
-         * @param function() onabort Called to notify that the upload stage has been aborted or has failed
+		 * @param nettools.jscore.RequestFeedback progressObj Objet dealing with upload events
 		 * @param HTMLInputElement[] files Array of input elements of type 'file'
          * @param string url URL to send upload to
          * @param string|Object data Request body as a string or an object litteral
 		 * @return Promise
          */
-        filesUploadWithFeedbackPromise : function(onfeedback, onupload, onabort, form, url, data)
+        filesUploadWithFeedbackPromise : function(progressObj, form, url, data)
 		{
-			return nettools.jscore.xmlhttp.filesUploadWithFeedbackPromise(onfeedback, onupload, onabort, files, url, _addCSRFValue(data));
+			return nettools.jscore.xmlhttp.filesUploadWithFeedbackPromise(progressObj, files, url, _addCSRFValue(data));
 		}
 	}
 })();

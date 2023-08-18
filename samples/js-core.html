@@ -119,8 +119,32 @@
         sendWithFeedback : function()
         {
 			var data = {
-				bigstring : 'x'.repeat(7*1024*1024)
+				bigstring : 'x'.repeat(1*1024*1024)
 			}
+			
+			
+			var fb = new nettools.jscore.RequestFeedback(
+					// feedback
+                    function(pct)
+                    {
+                        sample.output('Feedback event : ' + pct + '%');
+                    },
+				
+				
+					// upload done
+                    function()
+                    {
+                        sample.output('Upload done !');
+                    },
+				
+				
+					// abort, error
+					function()
+					{
+						sample.output('Error/aborted');
+					}					
+				);
+			
 			
 			
             nettools.jscore.RequestHelper.sendWithFeedback(
@@ -131,28 +155,11 @@
                         var r = nettools.jscore.xmlhttp.parseResponse(resp);
                         sample.output('XmlHttpRequest with feedback answered : \n' + r);
                     },
+				
+				
+					// feedback objet
+					fb,
 
-				
-					// onfeedback
-                    function(pct)
-                    {
-                        sample.output('Feedback event : ' + pct + '%');
-                    },
-				
-				
-					// onupload done
-                    function()
-                    {
-                        sample.output('Upload done !');
-                    },
-				
-				
-					// onabort, onerror
-					function()
-					{
-						sample.output('Error/aborted');
-					},
-				
 				
 					// form
 					null,
@@ -175,7 +182,31 @@
 			fd.append('big', 'x'.repeat(1*1024*1024))
 			
 			
-            nettools.jscore.RequestHelper.sendWithFeedback(
+			var fb = new nettools.jscore.RequestFeedback(
+					// feedback
+                    function(pct)
+                    {
+                        sample.output('Feedback event : ' + pct + '%');
+                    },
+				
+				
+					// upload done
+                    function()
+                    {
+                        sample.output('Upload done !');
+                    },
+				
+				
+					// abort, error
+					function()
+					{
+						sample.output('Error/aborted');
+					}					
+				);
+			
+						
+
+			nettools.jscore.RequestHelper.sendWithFeedback(
 				
 					// onload
                     function(resp)
@@ -185,25 +216,8 @@
                     },
 
 				
-					// onfeedback
-                    function(pct)
-                    {
-                        sample.output('Feedback event : ' + pct + '%');
-                    },
-				
-				
-					// onupload done
-                    function()
-                    {
-                        sample.output('Upload done !');
-                    },
-				
-				
-					// onabort, onerror
-					function()
-					{
-						sample.output('Error/aborted');
-					},
+					// feedback object
+					fb,
 				
 				
 					// form
@@ -226,31 +240,37 @@
         sendWithFeedbackPromise : function()
         {
 			var data = {
-				bigstring : 'x'.repeat(7*1024*1024)
+				bigstring : 'x'.repeat(1*1024*1024)
 			}
 			
 			
-            nettools.jscore.RequestHelper.sendWithFeedbackPromise(
-					// onfeedback
+			var fb = new nettools.jscore.RequestFeedback(
+					// feedback
                     function(pct)
                     {
                         sample.output('Feedback event : ' + pct + '%');
                     },
 				
 				
-					// onupload done
+					// upload done
                     function()
                     {
                         sample.output('Upload done !');
                     },
 				
 				
-					// onabort, onerror
+					// abort, error
 					function()
 					{
 						sample.output('Error/aborted');
-					},
-				
+					}					
+				);
+			
+			
+
+            nettools.jscore.RequestHelper.sendWithFeedbackPromise(
+					// feedback object
+					fb,
 				
 					// form
 					null,
@@ -278,6 +298,30 @@
 			var f2 = document.getElementById('file2');
 			
 			
+			var fb = new nettools.jscore.RequestFeedback(
+					// feedback
+                    function(pct)
+                    {
+                        sample.output('Feedback event : ' + pct + '%');
+                    },
+				
+				
+					// upload done
+                    function()
+                    {
+                        sample.output('Upload done !');
+                    },
+				
+				
+					// abort, error
+					function()
+					{
+						sample.output('Error/aborted');
+					}					
+				);
+			
+			
+
 			nettools.jscore.RequestHelper.filesUploadWithFeedback(
 					// onload
                     function(resp)
@@ -287,25 +331,8 @@
                     },
 
 				
-					// onfeedback
-                    function(pct)
-                    {
-                        sample.output('Feedback event : ' + pct + '%');
-                    },
-				
-				
-					// onupload done
-                    function()
-                    {
-                        sample.output('Upload done !');
-                    },
-				
-				
-					// onabort, onerror
-					function()
-					{
-						sample.output('Error/aborted');
-					},
+					// feedback object
+					fb,
 				
 				
 					// files
@@ -330,26 +357,35 @@
 			var f1 = document.getElementById('file1');
 			var f2 = document.getElementById('file2');
 			
-			nettools.jscore.RequestHelper.filesUploadWithFeedbackPromise(
-					// onfeedback
+			
+			var fb = new nettools.jscore.RequestFeedback(
+					// feedback
                     function(pct)
                     {
                         sample.output('Feedback event : ' + pct + '%');
                     },
 				
 				
-					// onupload done
+					// upload done
                     function()
                     {
                         sample.output('Upload done !');
                     },
 				
 				
-					// onabort, onerror
+					// abort, error
 					function()
 					{
 						sample.output('Error/aborted');
-					},
+					}					
+				);
+			
+			
+
+			nettools.jscore.RequestHelper.filesUploadWithFeedbackPromise(
+				
+					// feedback object
+					fb,
 				
 				
 					// files
