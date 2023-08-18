@@ -2324,15 +2324,11 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
 
             // upload over (not the answer !)
-			if ( typeof onupload === 'function' )
-            	xhr.upload.addEventListener("load", progressObj.load.bind(progressObj), false);
+           	xhr.upload.addEventListener("load", progressObj.load.bind(progressObj), false);
 
             // upload error or canceled
-			if ( typeof onabort === 'function' )
-			{
-				xhr.upload.addEventListener("error", progressObj.abort.bind(progressObj), false);
-				xhr.upload.addEventListener("abort", progressObj.abort.bind(progressObj), false);
-			}
+			xhr.upload.addEventListener("error", progressObj.abort.bind(progressObj), false);
+			xhr.upload.addEventListener("abort", progressObj.abort.bind(progressObj), false);
 			
 
             // open URL
