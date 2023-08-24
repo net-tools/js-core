@@ -717,7 +717,114 @@
 		},
 		
 		
-        
+		
+		Callback : function(that)
+		{
+			var h = new nettools.jscore.SubmitHandlers.Callback({
+					target : function(form, elements)
+						{
+							alert('handler');//sample.output(test.dumpObject(elements.input1.value));
+						}
+				}); 
+			
+			h.customEvent(function(form, elements){alert('Custom event before Callback handler');}, false);
+
+			h.submit(that.form, that.form.elements);		
+		},
+		
+		
+		
+		XmlHttp : function(that)
+		{
+			var h = new nettools.jscore.SubmitHandlers.XmlHttp({
+					data : {
+						k1:'v1', 
+						k2:false
+					},
+
+					target : 'js-core-submithandlers-http.php',
+
+					onload : function(form, elements, response)
+						{
+							sample.output(test.dumpObject(response.jsonReturn));
+						}
+				}); 
+			
+			h.customEvent(function(form, elements, response){alert('Custom event' + response);});
+
+			h.submit(that.form, that.form.elements);		
+		},
+		
+		
+		
+		XmlHttpWithFeedback : function(that)
+		{
+			that.previousElementSibling.value = 'x'.repeat(1*1024*1024);
+			
+			var h = new nettools.jscore.SubmitHandlers.XmlHttpWithFeedback({
+					feedback : new nettools.jscore.RequestFeedback(
+						// feedback
+						function(pct)
+						{
+							sample.output('Feedback event : ' + pct + '%');
+						},
+
+
+						// upload done
+						function()
+						{
+							sample.output('Upload done !');
+						},
+
+
+						// abort, error
+						function()
+						{
+							sample.output('Error/aborted');
+						}					
+					),
+				
+					data : {
+						k1:'v1', 
+						k2:false
+					},
+
+					target : 'js-core-http-feedback-promise.php',
+
+					onload : function(form, elements, response)
+						{
+							sample.output(test.dumpObject(response.jsonReturn));
+						}
+				}); 
+			
+			h.customEvent(function(form, elements, response){alert('Custom event' + response);});
+
+			h.submit(that.form, that.form.elements);		
+		},
+		
+		
+		
+		Post : function(that)
+		{
+			var h = new nettools.jscore.SubmitHandlers.Post({
+					data : {
+						k1:'v1', 
+						k2:false
+					},
+
+					target : 'js-core-submithandlers-post.php',
+
+					onsubmit : function(form, elements)
+						{
+							alert('onsubmit event before POST submit');
+						}
+
+				}); 
+			
+			h.customEvent(function(form, elements){alert('Custom event before POST submit');});
+			
+			h.submit(that.form, that.form.elements);
+		}        
     }
     
     </script>
@@ -882,6 +989,44 @@
 
 
         <div class="sampleBox">
+            <h1>com.core.SubmitHandlers</h1>
+				
+				<p>
+					<form>
+						<input type="text" name="input1" value="inputvalue1">
+						<input type="button" value="SubmitHandlers.Callback" 
+							   onclick="test.Callback(this);">
+					</form>
+				</p>
+			
+				<p>
+					<form>
+						<input type="text" name="input1" value="inputvalue1">
+						<input type="button" value="SubmitHandlers.XmlHttp" 
+							   onclick="test.XmlHttp(this);">
+					</form>
+				</p>
+			
+				<p>
+					<form>
+						<input type="text" name="input1" value="inputvalue1">
+						<input type="button" value="SubmitHandlers.XmlHttpWithFeedback" 
+							   onclick="test.XmlHttpWithFeedback(this);">
+					</form>
+				</p>
+			
+				<p>
+					<form>
+						<input type="text" name="input1" value="inputvalue1">
+						<input type="button" value="SubmitHandlers.Post" 
+							   onclick="test.Post(this);">
+					</form>
+				</p>        
+		</div>
+
+
+
+		<div class="sampleBox">
             <h1>nettools.jscore.xmlhttp.*</h1>
             <div id="sampleXmlhttp">   
                 <p><input type="button" value="load FR translations" onclick="test.loadi18n();"></p>

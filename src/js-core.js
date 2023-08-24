@@ -3564,3 +3564,473 @@ nettools.jscore.Promises = {
 }
 
 
+
+
+
+
+
+
+
+
+// ==== SUBMIT HANDLERS ====
+	
+
+/**
+ * Namespace for submit handlers
+ */
+nettools.jscore.SubmitHandlers = {};
+
+
+
+
+nettools.jscore.SubmitHandlers.Handler = class {
+	
+	/**
+	 * Constructor submit handler class
+	 *
+	 * @param object options Object litteral with any relevant parameters
+	 */
+	constructor(options)
+	{
+		this.options = options;
+	}
+
+
+
+	/**
+	 * Submit form and elements
+	 *
+	 * @param HTMLFormElement form
+	 * @param HTMLInputElement[] elements
+	 */
+	submit(form, elements)
+	{
+		throw new Error('`submit` not implemented in `Handler` base class');
+	}
+	
+	
+	
+	/**
+	 * Register a custom event on top of the objet event created when the submit action is done
+	 *
+	 * @param string eventName Name of event in options constructor parameters
+	 * @param function(form, elements) callback
+	 * @param bool after True if custom event must be called after existing one
+	 */
+	customEvent(eventName, callback, after = true)
+	{
+		if ( typeof callback !== 'function' )
+			return;
+			
+		
+		if ( this.options[eventName] == null )
+			this.options[eventName] = callback;
+		else
+		{
+			var old = this.options[eventName];
+			this.options[eventName] = function()
+				{
+					if ( !after )
+						callback.apply(null, arguments);
+				
+					old.apply(null, arguments);
+
+					if ( after )
+						callback.apply(null, arguments);
+				}
+		}
+	}
+
+
+
+	/**
+	 * Convert form elements to FormData, and merge with any supplied user data
+	 *
+	 * @param HTMLInputElement[] elements
+	 * @param string|object data
+	 * @return FormData
+	 */
+	createBody(elements, data)
+	{
+		// prepare post data : array of form elements converted to FormData
+		var postFormData = nettools.jscore.RequestHelper.object2FormData(nettools.jscore.formFieldsToObject(elements));
+
+
+		// if user data (either string or object litteral, merging it to form post data)
+		if ( data )
+		{
+			var u = new URLSearchParams(nettools.jscore.RequestHelper.normalizeData(data));
+			u.forEach(
+				function(v, k){
+					postFormData.append(k, v);
+				}
+			);
+		}
+
+
+		return postFormData;
+	}
+}
+
+
+
+
+
+
+
+
+/**
+ * Class to submit form data with custom callback (no real GET/POST request)
+ *
+ * Options parameter may contain :
+ * - target : callback function(form, elements)
+ *
+ * @param object options Object litteral with any relevant parameters
+ */
+nettools.jscore.SubmitHandlers.Callback = class extends nettools.jscore.SubmitHandlers.Handler{
+
+	/** 
+	 * Handle submit by callback
+	 *
+	 * @param HTMLFormElement form
+	 * @param HTMLInputElement[] elements
+	 */
+	submit(form, elements){
+
+		if ( typeof this.options.target ===  'function' )
+			this.options.target(form, elements);
+	}
+	
+	
+	
+	/**
+	 * Register a custom event on top of the objet event created when the submit action is done
+	 *
+	 * @param function(form, elements) callback 
+	 * @param bool after True if custom event must be called after existing one
+	 */
+	customEvent(callback, after = true)
+	{
+		super.customEvent('target', callback, after);
+	}
+}
+
+
+
+
+
+
+
+
+/**
+ * Class to submit form data through a xmlhttp request
+ *
+ * Options parameter may contain :
+ * - data : any data to send along with request body ; can be a string or an object litteral
+ * - target : url to send xmlhttp POST request
+ * - csrf : true/false 
+ * - onload : callback function(form, elements, {jsonReturn : value }) called when xmlhttp request is done ; the last argument is a litteral object with a 'jsonReturn' property containing any json value returned by request
+ *
+ * @param object options Object litteral with any relevant parameters
+ */
+nettools.jscore.SubmitHandlers.XmlHttp = class extends nettools.jscore.SubmitHandlers.Handler{
+
+	/** 
+	 * Handle submit by xmlhttp request
+	 *
+	 * @param HTMLFormElement form
+	 * @param HTMLInputElement[] elements
+	 */
+	submit(form, elements)
+	{
+		// selecting xmlhttp handler, depending on csrf flag
+		var handler = null;
+		if ( this.options['csrf'] )
+			handler = nettools.jscore.SecureRequestHelper.sendXmlHTTPRequest;
+		else
+			handler = nettools.jscore.RequestHelper.sendXmlHTTPRequest;
+
+
+		var that = this;
+
+
+		// calling xmlhttp handler
+		handler(
+				// target url
+				this.options.target,
+
+
+				// callback called to receive request response
+				function(resp)
+				{
+					var r = nettools.jscore.xmlhttp.parseJsonResponse(resp);
+
+					// if user defined onload callback
+					if ( typeof that.options['onload'] === 'function' )
+						that.options.onload(form, elements, {jsonReturn:r});
+				},
+
+
+				// POST data and user data converted to FormData
+				this.createBody(elements, this.options['data'])
+			);
+	}
+	
+	
+	
+	/**
+	 * Register a custom event on top of the objet event created when the submit action is done
+	 *
+	 * @param function(form, elements, response) callback
+	 * @param bool after True if custom event must be called after existing one
+	 */
+	customEvent(callback, after = true)
+	{
+		super.customEvent('onload', callback, after);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+/**
+ * Class to submit form data through a xmlhttp request with feedback 
+ *
+ * Options parameter may contain :
+ * - feedback : a nettools.jscore.RequestFeedback object
+ * - data : any data to send along with request body ; can be a string or an object litteral
+ * - target : url to send xmlhttp POST request
+ * - csrf : true/false 
+ * - onload : callback function(form, elements, {jsonReturn : value }) called when xmlhttp request is done ; the last argument is a litteral object with a 'jsonReturn' property containing any json value returned by request
+ *
+ * @param object options Object litteral with any relevant parameters
+ */
+nettools.jscore.SubmitHandlers.XmlHttpWithFeedback = class extends nettools.jscore.SubmitHandlers.Handler{
+
+	/** 
+	 * Handle submit by xmlhttp request
+	 *
+	 * @param HTMLFormElement form
+	 * @param HTMLInputElement[] elements
+	 */
+	submit(form, elements)
+	{
+		var that = this;
+		
+		
+		// select method depending on CSRF handling
+		if ( this.options.csrf )
+			var fun = nettools.jscore.SecureRequestHelper.sendWithFeedback;
+		else
+			var fun = nettools.jscore.RequestHelper.sendWithFeedback;
+		
+		
+		fun(			
+			// callback called to receive request response
+			function(resp)
+			{
+				var r = nettools.jscore.xmlhttp.parseJsonResponse(resp);
+
+				// if user defined onload callback
+				if ( typeof that.options['onload'] === 'function' )
+					that.options.onload(form, elements, {jsonReturn:r});
+			},
+			
+			
+			// nettools.jscore.RequestFeedback object
+			this.options.feedback,
+
+			
+			// form
+			form,
+			
+			
+			// target url
+			this.options.target,
+			
+			
+			// more body data
+			this.options.data
+		);
+	}
+	
+	
+	
+	/**
+	 * Register a custom event on top of the objet event created when the submit action is done
+	 *
+	 * @param function(form, elements, response) callback
+	 * @param bool after True if custom event must be called after existing one
+	 */
+	customEvent(callback, after = true)
+	{
+		super.customEvent('onload', callback, after);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+/**
+ * Class to submit form data through a POST request
+ *
+ * Options parameter may contain :
+ * - data : any data to send along with request body ; can be a string or an object litteral
+ * - target : url to send xmlhttp POST request
+ * - csrf : true/false
+ * - context : document context (usually window.document) ; if not set, window.document is used
+ * - onsubmit : callback function(form, elements) called before data is sent ; form data can be updated during this call
+ *
+ * @param object options Object litteral with any relevant parameters
+ */
+nettools.jscore.SubmitHandlers.Post = class extends nettools.jscore.SubmitHandlers.Handler{
+
+	/** 
+	 * Create a form in a specific document context (not window.document)
+	 *
+	 * @param HTMLInputElement[] elements
+	 * @param HTMLDocument context
+	 */
+	static createFormInContext(elements, context)
+	{
+		var form = context.createElement('form');
+		form.style.visibility = 'hidden';
+		form.style.display = "none";
+
+
+		// copy all required inputs (ignoring buttons)
+		var elementsl = elements.length;
+		for ( var i = 0 ; i < elementsl ; i++ )
+		{
+			var e = elements[i];
+
+			switch ( e.type )
+			{
+				case "checkbox":
+				case "radio":
+					if ( e.checked ) 
+						var value = e.value;
+					else
+						// if not checked, no value sent, we don't add the value in the form
+						continue;
+
+					break;
+
+				// ignoring buttons
+				case "button":
+				case "submit":
+					continue;
+
+				// default case
+				default:
+					var value = e.value;
+					break;
+			}
+
+
+			// creating hidden input
+			var input = context.createElement('input');
+			input.type = "hidden";
+			input.name = e.name;
+			input.value = value;
+
+			form.appendChild(input);
+		}
+
+
+		// adding form in context
+		context.body.appendChild(form);
+		return form;
+	}
+	
+
+
+	/** 
+	 * Handle submit by POST request
+	 *
+	 * @param HTMLFormElement form
+	 * @param HTMLInputElement[] elements
+	 */
+	submit(form, elements)
+	{
+		// if onsubmit callback
+		if ( typeof this.options['onsubmit'] === 'function' )
+			this.options.onsubmit(form, elements);
+
+
+		// document context
+		var context = this.options['context'] || document;
+
+
+		// if document context is not current document, creating a form in the user supplied context
+		if ( context != document )
+			form = this.constructor.createFormInContext(elements, context);
+
+
+		// maybe adding CSRF fields
+		if ( this.options['csrf'] )
+			nettools.jscore.SecureRequestHelper.addCSRFSubmittedValueHiddenInput(form);
+
+
+		form.method = 'post';
+		form.action = this.options.target;
+
+
+		// checking if one element is a file input ; if so, updating form enctype
+		var elementsl = elements.length;
+		for ( var i = 0 ; i < elementsl ; i++ )
+			if ( elements[i].type === 'file' )
+				{
+					form.enctype = 'multipart/form-data';
+					break;
+				}
+
+
+		// add hidden parameters for user data
+		if ( this.options['data'] )
+		{
+			var u = nettools.jscore.RequestHelper.normalizeData(this.options.data);
+			u.forEach(
+				function(v, k)
+				{
+					var field = context.createElement('input');
+					field.type = "hidden";
+					field.name = k;
+					field.value = v;
+					form.appendChild(field);
+				}
+			);
+		}
+
+
+		// submitting form
+		form.submit();
+	}
+	
+	
+	
+	/**
+	 * Register a custom event on top of the objet event created when the submit action is done
+	 *
+	 * @param function(form, elements, response) callback
+	 * @param bool after True if custom event must be called after existing one
+	 */
+	customEvent(callback, after = true)
+	{
+		super.customEvent('onsubmit', callback, after);
+	}
+}
+
+
