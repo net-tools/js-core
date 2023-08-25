@@ -3670,6 +3670,23 @@ nettools.jscore.SubmitHandlers.Handler = class {
 
 		return postFormData;
 	}
+	
+	
+	
+	/**
+	 * Submit a form, ensuring handler is a object of class SubmitHandlers.Handler ; if not (it's a callback function), creating a object of class SubmitHandlers.Callback
+	 *
+	 * @param function|nettools.jscore.SubmitHandlers.Handler
+	 * @param HTMLFormElement form
+	 * @param HTMLInputElement[] elements
+	 */
+	static formSubmit(handler, form, elements)
+	{
+		if ( typeof handler === 'function' )
+			handler = new nettools.jscore.SubmitHandlers.Callback({ target : handler });
+		
+		handler.submit(form, elements);
+	}
 }
 
 
@@ -3688,7 +3705,7 @@ nettools.jscore.SubmitHandlers.Handler = class {
  * @param object options Object litteral with any relevant parameters
  */
 nettools.jscore.SubmitHandlers.Callback = class extends nettools.jscore.SubmitHandlers.Handler{
-
+	
 	/** 
 	 * Handle submit by callback
 	 *
