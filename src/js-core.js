@@ -3130,7 +3130,13 @@ nettools.jscore.validator.FormValidator = function(params) {
 	_regexps = params['regexps'];
 	_onsubmit = params['onsubmit'];
 	_onsubmitpromise = params['onsubmitpromise'];
-	_notifier = params['notifier'] || function(st) { alert(st.message); if ( st.field ) st.field.focus(); };
+	_notifier = params['notifier'] || function(st) {
+		if ( st.message )
+			alert(st.message);
+
+		if ( st.field && (st.field.type != 'hidden') && st.field.focus )
+			st.field.focus();
+	};
 	_root = params['root'] ? params['root'] : '';
 
 	// ---- /CONSTRUCTOR ----
