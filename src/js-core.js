@@ -3748,7 +3748,7 @@ nettools.jscore.SubmitHandlers.Callback = class extends nettools.jscore.SubmitHa
 	static toSubmitHandler(cb)
 	{
 		if ( !cb )
-			return new nettools.jscore.SubmitHandlers.Callback.dummy();
+			return nettools.jscore.SubmitHandlers.Callback.dummy();
 
 		if ( typeof cb === 'function' )
 			return new nettools.jscore.SubmitHandlers.Callback({ target : cb });
