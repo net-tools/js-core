@@ -3736,6 +3736,27 @@ nettools.jscore.SubmitHandlers.Callback = class extends nettools.jscore.SubmitHa
 	{
 		super.customEvent('target', callback, after);
 	}
+	
+	
+	
+	/**
+	 * Ensure user submit process is a SubmitHandler.Handler object, and not a callback function
+	 *
+	 * @param function(form,elements)|nettools.jscore.SubmitHandlers.Handler cb User submit process
+	 * @return null|nettools.jscore.SubmitHandlers.Handler If 'cb' is a callback function, a nettools.jscore.SubmitHandlers.Callback object is created and returned
+	 */
+	static toSubmitHandler(cb)
+	{
+		if ( !cb )
+			return null;
+
+		if ( typeof cb === 'function' )
+			return new nettools.jscore.SubmitHandlers.Callback({ target : cb });
+		else if ( (typeof cb === 'object') && (cb instanceof nettools.jscore.SubmitHandlers.Handler) )
+			return cb;
+		else
+			throw new Error('Invalid submit handler');
+	}
 }
 
 
