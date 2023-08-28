@@ -3743,12 +3743,12 @@ nettools.jscore.SubmitHandlers.Callback = class extends nettools.jscore.SubmitHa
 	 * Ensure user submit process is a SubmitHandler.Handler object, and not a callback function
 	 *
 	 * @param function(form,elements)|nettools.jscore.SubmitHandlers.Handler cb User submit process
-	 * @return null|nettools.jscore.SubmitHandlers.Handler If 'cb' is a callback function, a nettools.jscore.SubmitHandlers.Callback object is created and returned
+	 * @return nettools.jscore.SubmitHandlers.Handler If 'cb' is a callback function, a nettools.jscore.SubmitHandlers.Callback object is created and returned
 	 */
 	static toSubmitHandler(cb)
 	{
 		if ( !cb )
-			return null;
+			return new nettools.jscore.SubmitHandlers.Callback({ target : null });
 
 		if ( typeof cb === 'function' )
 			return new nettools.jscore.SubmitHandlers.Callback({ target : cb });
