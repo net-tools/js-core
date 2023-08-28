@@ -3748,7 +3748,7 @@ nettools.jscore.SubmitHandlers.Callback = class extends nettools.jscore.SubmitHa
 	static toSubmitHandler(cb)
 	{
 		if ( !cb )
-			return new nettools.jscore.SubmitHandlers.Callback({ target : null });
+			return new nettools.jscore.SubmitHandlers.Callback.dummy();
 
 		if ( typeof cb === 'function' )
 			return new nettools.jscore.SubmitHandlers.Callback({ target : cb });
@@ -3756,6 +3756,19 @@ nettools.jscore.SubmitHandlers.Callback = class extends nettools.jscore.SubmitHa
 			return cb;
 		else
 			throw new Error('Invalid submit handler');
+	}
+	
+	
+	
+	
+	/** 
+	 * Create a dummy empty callback
+	 *
+	 * @return nettools.jscore.SubmitHandlers.Callback
+	 */
+	static dummy()
+	{
+		return new nettools.jscore.SubmitHandlers.Callback({ target : function(){} });
 	}
 }
 
