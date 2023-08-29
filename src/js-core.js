@@ -3622,11 +3622,12 @@ nettools.jscore.SubmitHandlers.Handler = class {
 	 * @param string eventName Name of event in options constructor parameters
 	 * @param function(form, elements) callback
 	 * @param bool after True if custom event must be called after existing one
+	 * @return nettools.jscore.SubmitHandlers.Handler Returns this for chaining
 	 */
 	customEvent(eventName, callback, after = true)
 	{
 		if ( typeof callback !== 'function' )
-			return;
+			return this;
 			
 		
 		if ( this.options[eventName] == null )
@@ -3645,6 +3646,9 @@ nettools.jscore.SubmitHandlers.Handler = class {
 						callback.apply(null, arguments);
 				}
 		}
+		
+		
+		return this;
 	}
 
 
