@@ -3735,10 +3735,11 @@ nettools.jscore.SubmitHandlers.Callback = class extends nettools.jscore.SubmitHa
 	 *
 	 * @param function(form, elements) callback 
 	 * @param bool after True if custom event must be called after existing one
+	 * @return nettools.jscore.SubmitHandlers.Handler Returns this for chaining
 	 */
 	customEvent(callback, after = true)
 	{
-		super.customEvent('target', callback, after);
+		return super.customEvent('target', callback, after);
 	}
 	
 	
@@ -3844,10 +3845,11 @@ nettools.jscore.SubmitHandlers.XmlHttp = class extends nettools.jscore.SubmitHan
 	 *
 	 * @param function(form, elements, response) callback
 	 * @param bool after True if custom event must be called after existing one
+	 * @return nettools.jscore.SubmitHandlers.Handler Returns this for chaining
 	 */
 	customEvent(callback, after = true)
 	{
-		super.customEvent('onload', callback, after);
+		return super.customEvent('onload', callback, after);
 	}
 }
 
@@ -3928,10 +3930,11 @@ nettools.jscore.SubmitHandlers.XmlHttpWithFeedback = class extends nettools.jsco
 	 *
 	 * @param function(form, elements, response) callback
 	 * @param bool after True if custom event must be called after existing one
+	 * @return nettools.jscore.SubmitHandlers.Handler Returns this for chaining
 	 */
 	customEvent(callback, after = true)
 	{
-		super.customEvent('onload', callback, after);
+		return super.customEvent('onload', callback, after);
 	}
 }
 
@@ -4087,10 +4090,11 @@ nettools.jscore.SubmitHandlers.Post = class extends nettools.jscore.SubmitHandle
 	 *
 	 * @param function(form, elements, response) callback
 	 * @param bool after True if custom event must be called after existing one
+	 * @return nettools.jscore.SubmitHandlers.Handler Returns this for chaining
 	 */
 	customEvent(callback, after = true)
 	{
-		super.customEvent('onsubmit', callback, after);
+		return super.customEvent('onsubmit', callback, after);
 	}
 }
 
