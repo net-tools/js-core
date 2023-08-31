@@ -2881,6 +2881,11 @@ nettools.jscore.validator.Patterns = {
      * @property string DATEYMD
      */
     DATEYMD : /^[0-9]{4}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$/,
+	
+	/**
+	 * @property string DATEJS
+	 */
+	DATEJS : /^[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
 
     /**
      * French zip code
