@@ -462,7 +462,7 @@
         exceptionHandler : function(simple)
         {
             var r = {
-                statut : false,
+                status : false,
                 message : "An error occured",
                 exception : simple? "<h1>Exception here !</h1>\n" +
                             "<h2>CriticalException</h2>\n" +
@@ -544,15 +544,15 @@
                     onsubmit : function(elements)
                         {
                             if ( elements.txt_string.value != '' )
-                                return {statut:true};
+                                return {status:true};
                             else
-                                return {statut:false, message:'Field is required', field:elements.txt_string};
+                                return {status:false, message:'Field is required', field:elements.txt_string};
                         }
                 
                 });
             
             var st = _validator.isValid(form.elements);
-            if ( st.statut )
+            if ( st.status )
                 sample.output("Form validation OK");
             else
                 sample.output("Form validation FAILED from field '" + st.field.name + "' with message '" + st.message + "'");
@@ -575,9 +575,9 @@
                     onsubmitpromise : function(elements)
                         {
                             if ( elements.txt_string.value != '' )
-                                return Promise.resolve({statut:true});
+                                return Promise.resolve({status:true});
                             else
-                                return Promise.reject({statut:false, message:'Field is required', field:elements.txt_string});
+                                return Promise.reject({status:false, message:'Field is required', field:elements.txt_string});
                         }
                 
                 });
@@ -586,7 +586,7 @@
             if ( st instanceof Promise )
                 st.then(function(st){sample.output("Form validation OK");}).
                     catch(function(st){sample.output("Form validation FAILED from field '" + st.field.name + "' with message '" + st.message + "'");});
-            else if ( st && !st.statut )
+            else if ( st && !st.status )
                 sample.output("Form validation FAILED from field '" + st.field.name + "' with message '" + st.message + "'");
                                 
             
@@ -866,11 +866,11 @@
                     </p>
                 </form>
                 <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
-                <p>parseJsonResponse : <input type="text" value='{"statut":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(statut=false) : <input type="text" value='{"statut":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(statut=false+exception) : <input type="text" value='{"statut":false,"message":"Error occured","exception":"<b>An exception occured !</b>"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(statut=false+simple formatted exception) : <input type="submit" onclick="test.exceptionHandler(true);"></p>
-                <p>&quot; &quot;(statut=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
+                <p>parseJsonResponse : <input type="text" value='{"status":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(status=false) : <input type="text" value='{"status":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(status=false+exception) : <input type="text" value='{"status":false,"message":"Error occured","exception":"<b>An exception occured !</b>"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(status=false+simple formatted exception) : <input type="submit" onclick="test.exceptionHandler(true);"></p>
+                <p>&quot; &quot;(status=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
 
 				<p>
 					<input type="button" value="normalizeData('k1=v1&k2=v2')" onclick="test.call(nettools.jscore.RequestHelper.normalizeData, ['k1=v1&k2=v2']);">
@@ -1045,11 +1045,11 @@
                     </p>
                 </form>
                 <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
-                <p>parseJsonResponse : <input type="text" value='{"statut":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(statut=false) : <input type="text" value='{"statut":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(statut=false+exception) : <input type="text" value='{"statut":false,"message":"Error occured","exception":"<b>An exception occured !</b>"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(statut=false+simple formatted exception) : <input type="submit" onclick="test.exceptionHandler(true);"></p>
-                <p>&quot; &quot;(statut=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
+                <p>parseJsonResponse : <input type="text" value='{"status":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(status=false) : <input type="text" value='{"status":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(status=false+exception) : <input type="text" value='{"status":false,"message":"Error occured","exception":"<b>An exception occured !</b>"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
+                <p>&quot; &quot;(status=false+simple formatted exception) : <input type="submit" onclick="test.exceptionHandler(true);"></p>
+                <p>&quot; &quot;(status=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
             </div>
         </div>
 

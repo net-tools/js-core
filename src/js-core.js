@@ -1994,7 +1994,7 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
 
 
         // if answer, but error status 
-        if ( !resp.statut )
+        if ( !resp.status )
         {
             // if an exception has been returned in the payload response, handling it now because if no Promise.catch() statement has
             // been defined, we won't never be warned about the exception
@@ -2237,14 +2237,14 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
         /**
          * Parse a response and decode it to Json
          *
-         * If the json returned response has statut, message, or exception properties, we use them to display error data
+         * If the json returned response has status, message, or exception properties, we use them to display error data
          * If exception property has a special formatting of H1, H2 and CODE tags, it will be used to extract critical meaningful
          * data from exception property and output them to Javascript console (H1 may contain title for exception page such as 
          * 'an exception occured', H2 may contain the exception class name, and CODE will contain the exception message).
          * 
          * @method parseJsonResponse
          * @param XMLHttpRequest resp
-         * @return Object Returning an object litteral with the Json response, always containing a statut property
+         * @return Object Returning an object litteral with the Json response, always containing a status property
          */
 		parseJsonResponse : function(resp)
 		{
@@ -2258,15 +2258,15 @@ nettools.jscore.xmlhttp = nettools.jscore.xmlhttp || (function() {
             {
                 // error JSON.parse
                 alert(nettools.jscore.xmlhttp.i18n.UNREADABLE_ASYNC_RESPONSE + " : " + e);
-                return {statut:false};
+                return {status:false};
             }
 
-            // statut ko and message
-            if ( !r.statut && r.message )
+            // status ko and message
+            if ( !r.status && r.message )
                 alert(r.message);
 
-            // statut ko and exception
-            if ( !r.statut && r.exception )
+            // status ko and exception
+            if ( !r.status && r.exception )
                 _handleException(r.exception, r.message ? r.message : nettools.jscore.xmlhttp.i18n.ERROR_DURING_ASYNC_REQUEST_NO_MESSAGE_AVAILABLE);
 
             return r;
@@ -3102,15 +3102,15 @@ nettools.jscore.validator.RealTimeValidator.prototype.registerOnChangeEvents = f
  * {
  *	  required : ['input1', 'input2', ...]
  *	  regexps : {input1:/reg/, input2:/reg/, ...}
- *	  onsubmit : callback(elements=form.elements) return {statut:true/false, message:"", field:input}
- *	  onsubmitpromise = callback(elements[]) { return Promise.resolve({statut:true}) **OR** return Promise.reject({statut:false, message:'error', field:input}) }
- *	  notifier : function({statut:true/false, message:'', field:input})
+ *	  onsubmit : callback(elements=form.elements) return {status:true/false, message:"", field:input}
+ *	  onsubmitpromise = callback(elements[]) { return Promise.resolve({status:true}) **OR** return Promise.reject({status:false, message:'error', field:input}) }
+ *	  notifier : function({status:true/false, message:'', field:input})
  *	  root : 'fForm'
  * }
  *
  * When onsubmitpromise parameter is defined, the isValid() method will return a Promise object resolved or rejected
  * depending on the Promise returned by onsubmitpromise callback (the resolve or reject calls must have an object litteral
- * with statut, field, message properties).
+ * with status, field, message properties).
  *
  * @class nettools.jscore.validator.FormValidator
  * @param Object params Object litteral with properties defining the validation process
@@ -3274,7 +3274,7 @@ nettools.jscore.validator.FormValidator.prototype.getFieldLabel = function(field
  * 
  * @method nettools.jscore.validator.FormValidator.prototype.isValid
  * @param HTMLInput[] elements
- * @return Object Returns an object litteral {statut:bool, field:input, message:string}
+ * @return Object Returns an object litteral {status:bool, field:input, message:string}
  */
 nettools.jscore.validator.FormValidator.prototype.isValid = function(elements)
 {
@@ -3304,7 +3304,7 @@ nettools.jscore.validator.FormValidator.prototype.isValid = function(elements)
 
     function __notify(that, st)
     {
-        if ( !st.statut )
+        if ( !st.status )
         {
             var notifier = that.getNotifier();
             if ( notifier && (typeof notifier === 'function') )
@@ -3352,7 +3352,7 @@ nettools.jscore.validator.FormValidator.prototype.isValid = function(elements)
 
 
     // if we arrive here, required and regexps fields are ok
-    // call the custom Promise validation handler (with Promise returning {statut:true/false,message:'', field:input})
+    // call the custom Promise validation handler (with Promise returning {status:true/false,message:'', field:input})
     if ( this.getOnSubmitPromise() )
     {
         var p = this.getOnSubmitPromise()(elements);
@@ -3377,7 +3377,7 @@ nettools.jscore.validator.FormValidator.prototype.isValid = function(elements)
     {
         var st = this.getOnSubmit()(elements);
 
-        if ( !st.statut )
+        if ( !st.status )
             return __notify(this, st);
     }
 
@@ -3395,11 +3395,11 @@ nettools.jscore.validator.FormValidator.prototype.isValid = function(elements)
  * @param bool str
  * @param null|string msg
  * @param null|HTMLInput f
- * @return Object Returns an object litteral {statut:bool, field:input, message:string}
+ * @return Object Returns an object litteral {status:bool, field:input, message:string}
  */
 nettools.jscore.validator.FormValidator.returnStatus = function(st, msg, f)
 {
-	return {statut:st, message:msg, field:f};
+	return {status:st, message:msg, field:f};
 };
 
 
