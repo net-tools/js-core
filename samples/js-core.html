@@ -865,12 +865,6 @@
                         <input type="button" value="object2FormData({v:true})" onclick="test.object2FormData({v:true});">
                     </p>
                 </form>
-                <p>parseResponse : <input type="text" value='{"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseResponse({responseText:this.previousSibling.value})));"></p>
-                <p>parseJsonResponse : <input type="text" value='{"status":true,"v":"value"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(status=false) : <input type="text" value='{"status":false,"message":"Error occured"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(status=false+exception) : <input type="text" value='{"status":false,"message":"Error occured","exception":"<b>An exception occured !</b>"}'><input type="submit" onclick="sample.output(test.dumpObject(nettools.jscore.xmlhttp.parseJsonResponse({responseText:this.previousSibling.value})));"></p>
-                <p>&quot; &quot;(status=false+simple formatted exception) : <input type="submit" onclick="test.exceptionHandler(true);"></p>
-                <p>&quot; &quot;(status=false+detailed formatted exception) : <input type="submit" onclick="test.exceptionHandler(false);"></p>
 
 				<p>
 					<input type="button" value="normalizeData('k1=v1&k2=v2')" onclick="test.call(nettools.jscore.RequestHelper.normalizeData, ['k1=v1&k2=v2']);">
@@ -913,7 +907,6 @@
                     </p>
                     <p>
                         <input type="button" value="getCheckedRadioButton" onclick="sample.output(nettools.jscore.getCheckedRadioButton(this.form, 'radiobtns').value); ">
-                        <input type="button" value="inputs2querystring" onclick="sample.output(nettools.jscore.inputs2querystring(this.form.elements)); ">
                         <input type="button" value="formFieldsToObject" onclick="sample.output(test.dumpObject(nettools.jscore.formFieldsToObject(this.form.elements)));">
                     </p>
                 </form>
