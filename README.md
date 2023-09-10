@@ -17,7 +17,7 @@ To install net-tools/js-core package, just require it through composer and inser
 
 ## Reference ##
 
-Full reference would be too long. Please refer to the jsdoc repository here : http://net-tools.ovh/js-api-reference/net-tools/index.html#js-core/src/js-core.js
+Full reference would be too long. 
 
 However, here is a simple list of functions provided :
 
