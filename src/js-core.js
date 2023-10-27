@@ -2427,7 +2427,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 	{
 		// if hashed value not set, use regular cookie, preventing calling code to fail
 		if ( _csrf_hashed_cookie == null )
-			_csrf_hashed_cookie = CryptoJS.HmacSHA256(_getCSRFCookie(), eval(atob('KG5ldyBEYXRlKCkpLmdldEZ1bGxZZWFyKCkudG9TdHJpbmcoKQ=='))).toString();
+			_csrf_hashed_cookie = '!' + CryptoJS.HmacSHA256(_getCSRFCookie(), eval(atob('KG5ldyBEYXRlKCkpLmdldEZ1bGxZZWFyKCkudG9TdHJpbmcoKQ=='))).toString();
 		
 		return _csrf_hashed_cookie;
 	}
