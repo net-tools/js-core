@@ -1202,56 +1202,7 @@ nettools.jscore = nettools.jscore || {
         }	
 
         return ret;
-    },
-    
-    
-    
-    
-    
-    
-    
-// ==== CRYPTO ====
-    
-    /**
-     * SHA1 computation
-     *
-     * @method sha1
-     * @param string str
-     * @return string
-     */
-    sha1 : function(str)
-    {
-        return CryptoJS.SHA1(str).toString();
-    },
-
-
-
-    /**
-     * SHA256 computation
-     *
-     * @method sha256
-     * @param string str
-     * @return string
-     */
-    sha256 : function(str)
-    {
-        return CryptoJS.SHA256(str).toString();
-    },
-
-    
-
-    /**
-     * HMACSHA256 computation
-     *
-     * @method hmacSha256
-     * @param string str
-     * @param string key
-     * @return string
-     */
-    hmacSha256 : function(str, key)
-    {
-        return CryptoJS.HmacSHA256(str, key).toString();
-    }  
+    }
 }
 
 
@@ -2375,7 +2326,7 @@ nettools.jscore.SecureRequestHelper = (function(){
 		
 	var _csrf_cookiename = '_CSRF_';
 	var _csrf_submittedvaluename = '_FORM_CSRF_';
-	var _csrf_hashed_cookie = null;
+
 	
 
 	
@@ -2387,18 +2338,6 @@ nettools.jscore.SecureRequestHelper = (function(){
 			throw new Error(nettools.jscore.SecureRequestHelper.i18n.CSRF_VALUE_NOT_SET);
 
 		return v;
-	}
-	
-	
-	
-	// get CSRF hashed cookie value
-	function _getCSRFHashedCookie()
-	{
-		// if hashed value not set, use regular cookie, preventing calling code to fail
-		if ( _csrf_hashed_cookie == null )
-			_csrf_hashed_cookie = '!' + CryptoJS.HmacSHA256(_getCSRFCookie(), eval(atob('KG5ldyBEYXRlKCkpLmdldEZ1bGxZZWFyKCkudG9TdHJpbmcoKQ=='))).toString();
-		
-		return _csrf_hashed_cookie;
 	}
 	
 	
@@ -2595,23 +2534,6 @@ nettools.jscore.SecureRequestHelper = (function(){
 		
 		
 		/**
-		 * Set the hashed cookie value, for increased security when using GET requests
-		 * 
-		 * Using a hashed cookie value instead of the real cookie value prevent the cookie value to be disclosed in URL, browser history, etc.
-		 * The value must be derived from the real cookie value and computed server-side, to prevent hackers from seing the hash process just by having a look
-		 * at the JS code here.
-		 *
-		 * @method setCSRFHashedCookieValue
-		 * @param string hashedvalue
-		 */
-		setCSRFHashedCookieValue : function(hashedvalue)
-		{
-			_csrf_hashed_cookie = hashedvalue;
-		},
-		
-		
-		
-		/**
 		 * Add an hidden CSRF submitted value in a form node
 		 *
 		 * @method addCSRFSubmittedValueHiddenInput
@@ -2661,13 +2583,13 @@ nettools.jscore.SecureRequestHelper = (function(){
 		/**
 		 * Append a CSRF hashed cookie value to a querystring (used in GET requests)
 		 *
-		 * @method addCSRFHashedValue
+		 * @method addCSRFValue
 		 * @param string url 
 		 * @return string
 		 */
-		addCSRFHashedValue : function(url)
+		addCSRFValue : function(url)
 		{
-			return nettools.jscore.appendToUrl(url, _csrf_submittedvaluename + '=' + _getCSRFHashedCookie());
+			return nettools.jscore.appendToUrl(url, _csrf_submittedvaluename + '=' + _getCSRFCookie());
 		},
 		
 		
