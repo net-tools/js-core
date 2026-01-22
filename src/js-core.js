@@ -2581,20 +2581,6 @@ nettools.jscore.SecureRequestHelper = (function(){
 		
 		
 		/**
-		 * Append a CSRF hashed cookie value to a querystring (used in GET requests)
-		 *
-		 * @method addCSRFValue
-		 * @param string url 
-		 * @return string
-		 */
-		addCSRFValue : function(url)
-		{
-			return nettools.jscore.appendToUrl(url, _csrf_submittedvaluename + '=' + _getCSRFCookie());
-		},
-		
-		
-		
-		/**
 		 * Send a secure POST request by sending the CSRF cookie inside the request body (double CSRF cookie submit pattern) 
 		 *
 		 * @method post
