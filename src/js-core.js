@@ -795,7 +795,61 @@ nettools.jscore = nettools.jscore || {
 
         
     
-    
+
+	
+// ==== CRYPTO ====
+	
+	/**
+	 * Polyfill for Uint8Array.toHex function (available since late 2025)
+	 *
+	 * @method Uint8Array_toHex
+	 * @param Uint8Array message
+	 * @return string Returns an hex string
+	 */
+	Uint8Array_toHex : function(buffer)
+	{
+		// if recent browser late 2025, we have a uint8array.toHex function
+		if ( typeof buffer.toHex === 'function' )
+			return buffer.toHex();
+		else
+		{
+			// FROM https://www.xaymar.com/articles/2020/12/08/fastest-uint8array-to-hex-string-conversion-in-javascript/
+			// Pre-Init
+			const LUT_HEX_4b = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+			const LUT_HEX_8b = new Array(0x100);
+			for (let n = 0; n < 0x100; n++) {
+				LUT_HEX_8b[n] = `${LUT_HEX_4b[(n >>> 4) & 0xF]}${LUT_HEX_4b[n & 0xF]}`;
+			}
+			// End Pre-Init
+			let out = '';
+			for (let idx = 0, edx = buffer.length; idx < edx; idx++) {
+				out += LUT_HEX_8b[buffer[idx]];
+			}
+
+			return out;
+		}
+	},
+
+
+
+	/**
+	 * Create SHA256 digest
+	 *
+	 * @method sha256
+	 * @param string message
+	 * @return string Returns a Promise resolved with the SHA256 hash as an hex string
+	 */
+	sha256 : function(message)
+	{
+		// creating hash and returning a Promise resolved with hash as an hex string
+		return window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(message))
+									
+			// we obtain a hash n an ArrayBuffer, which is converted to Uint8Array to be accessed
+			.then( hashBuffer => new Uint8Array(hashBuffer) )
+		
+			// then it's converted to an hex string (natively or with polyfill)
+			.then( uint8arr => nettools.jscore.Uint8Array_toHex(uint8arr) );
+	},
     
     
 
